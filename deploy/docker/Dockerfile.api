@@ -1,0 +1,40 @@
+# syntax=docker/dockerfile:1.7
+FROM python:3.11-slim
+
+ARG BACKEND_REPO=https://github.com/codingworkflow/claude-code-api.git
+ARG BACKEND_REF=main
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      git ca-certificates build-essential curl gnupg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Optional: install Claude Code CLI (headless) if the backend or workflows expect it
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && npm install -g @anthropic-ai/claude-code \
+    && npm cache clean --force
+
+# Clone upstream backend and install
+RUN git clone ${BACKEND_REPO} /opt/claude-code-api \
+    && cd /opt/claude-code-api \
+    && git checkout ${BACKEND_REF} \
+    && pip install --upgrade pip \
+    && pip install .
+
+# Non-root user
+RUN useradd -m appuser
+USER appuser
+
+# Working directory mounted from host (files/workspace -> /workspace)
+WORKDIR /workspace
+
+# Entry script (logging + start server)
+COPY --chown=appuser:appuser entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
+EXPOSE 8000

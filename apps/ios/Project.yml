@@ -1,0 +1,38 @@
+name: ClaudeCode
+options:
+  minimumXcodeGenVersion: 2.39.1
+  deploymentTarget:
+    iOS: "17.0"
+configs:
+  Debug: debug
+  Release: release
+
+packages:
+  swift-log:         { url: "https://github.com/apple/swift-log.git",        from: "1.5.3" }
+  swift-metrics:     { url: "https://github.com/apple/swift-metrics.git",    from: "2.5.0" }
+  swift-collections: { url: "https://github.com/apple/swift-collections.git",from: "1.0.6" }
+  eventsource:       { url: "https://github.com/LaunchDarkly/swift-eventsource.git", from: "3.0.0" }
+  KeychainAccess:    { url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: "4.2.2" }
+  Charts:            { url: "https://github.com/danielgindi/Charts.git",     from: "5.1.0" }
+  Shout:             { url: "https://github.com/jakeheis/Shout.git",         from: "0.6.5" }
+
+targets:
+  ClaudeCode:
+    type: application
+    platform: iOS
+    sources: [Sources]
+    resources:
+      - path: Sources/App/Theme/Tokens.css
+    settings:
+      base:
+        INFOPLIST_FILE: Sources/App/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.yourorg.claudecodeabs
+        SWIFT_VERSION: 5.10
+    dependencies:
+      - package: swift-log
+      - package: swift-metrics
+      - package: swift-collections
+      - package: eventsource
+      - package: KeychainAccess
+      - package: Charts
+      - package: Shout

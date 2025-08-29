@@ -1,0 +1,17 @@
+services:
+  api:
+    build:
+      context: ../../
+      dockerfile: deploy/docker/Dockerfile.api
+      args:
+        BACKEND_REF: main
+    environment:
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY}"
+      PORT: "${PORT:-8000}"
+    volumes:
+      - ../../files/workspace:/workspace
+    ports:
+      - "${PORT:-8000}:8000"
+    restart: unless-stopped
+    init: true
+    tty: true
