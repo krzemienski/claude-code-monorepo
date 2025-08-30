@@ -37,7 +37,7 @@ public struct AnimatedTextField: View {
     }
     
     public var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.none) {
             ZStack(alignment: .leading) {
                 // Animated placeholder
                 Text(placeholder)
@@ -46,14 +46,14 @@ public struct AnimatedTextField: View {
                         for: dynamicTypeSize
                     )))
                     .foregroundStyle(Theme.mutedFg)
-                    .offset(y: showPlaceholder ? 0 : -25)
+                    .offset(y: showPlaceholder ? 0 : -Theme.Spacing.lg)
                     .scaleEffect(showPlaceholder ? 1.0 : 0.85, anchor: .leading)
                     .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showPlaceholder)
                 
-                HStack(spacing: 8) {
+                HStack(spacing: Theme.Spacing.sm) {
                     if let icon = icon {
                         Image(systemName: icon)
-                            .font(.system(size: 18))
+                            .font(.system(size: Theme.FontSize.md))
                             .foregroundStyle(isFocused ? Theme.primary : Theme.mutedFg)
                             .animation(.easeInOut(duration: 0.2), value: isFocused)
                     }
@@ -75,10 +75,10 @@ public struct AnimatedTextField: View {
                         onSubmit?()
                     }
                 }
-                .padding(.top, showPlaceholder ? 0 : 15)
+                .padding(.top, showPlaceholder ? Theme.Spacing.none : Theme.Spacing.md)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 16)
+            .padding(.horizontal, Theme.Spacing.md)
+            .padding(.vertical, Theme.Spacing.md)
             .background(
                 RoundedRectangle(cornerRadius: Theme.CornerRadius.md)
                     .fill(isFocused ? Theme.inputFocus : Theme.input)
@@ -94,7 +94,7 @@ public struct AnimatedTextField: View {
                             startPoint: borderAnimation ? .trailing : .leading,
                             endPoint: borderAnimation ? .leading : .trailing
                         ),
-                        lineWidth: isFocused ? 2 : 1
+                        lineWidth: isFocused ? Theme.Spacing.xxs : Theme.Spacing.xxs / 2
                     )
                     .animation(
                         isFocused ? 
@@ -106,8 +106,8 @@ public struct AnimatedTextField: View {
         }
         .accessibilityElement(
             label: placeholder,
-            hint: "Text field",
-            value: text.isEmpty ? "Empty" : text
+            value: text.isEmpty ? "Empty" : text,
+            hint: "Text field"
         )
         .onChange(of: text) { newValue in
             showPlaceholder = newValue.isEmpty && !isFocused
@@ -144,9 +144,9 @@ public struct AnimatedSearchBar: View {
     }
     
     public var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: Theme.Spacing.sm) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 18))
+                .font(.system(size: Theme.FontSize.md))
                 .foregroundStyle(isFocused ? Theme.primary : Theme.mutedFg)
                 .animation(.easeInOut(duration: 0.2), value: isFocused)
             
@@ -167,14 +167,14 @@ public struct AnimatedSearchBar: View {
                     }
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 16))
+                        .font(.system(size: Theme.FontSize.base))
                         .foregroundStyle(Theme.mutedFg)
                 }
                 .transition(.scale.combined(with: .opacity))
             }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
+        .padding(.horizontal, Theme.Spacing.md)
+        .padding(.vertical, Theme.Spacing.sm)
         .background(
             Capsule()
                 .fill(isFocused ? Theme.inputFocus : Theme.input)
@@ -183,15 +183,15 @@ public struct AnimatedSearchBar: View {
             Capsule()
                 .strokeBorder(
                     isFocused ? Theme.primary : Theme.border,
-                    lineWidth: isFocused ? 2 : 1
+                    lineWidth: isFocused ? Theme.Spacing.xxs : Theme.Spacing.xxs / 2
                 )
         )
         .animation(.easeInOut(duration: 0.2), value: isFocused)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: !searchText.isEmpty)
         .accessibilityElement(
             label: "Search",
-            hint: placeholder,
-            value: searchText.isEmpty ? "Empty" : searchText
+            value: searchText.isEmpty ? "Empty" : searchText,
+            hint: placeholder
         )
     }
 }
@@ -207,7 +207,7 @@ struct AnimatedTextField_Previews: PreviewProvider {
         
         var body: some View {
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: Theme.Spacing.lg) {
                     AnimatedTextField(
                         placeholder: "Username",
                         text: $text,

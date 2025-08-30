@@ -3,7 +3,7 @@ import LocalAuthentication
 import Combine
 
 // MARK: - Authentication State
-enum AuthenticationState {
+public enum AuthenticationState {
     case unauthenticated
     case authenticating
     case authenticated(user: AuthenticatedUser)
@@ -12,7 +12,7 @@ enum AuthenticationState {
 }
 
 // MARK: - Authentication Error
-enum AuthenticationError: LocalizedError {
+public enum AuthenticationError: LocalizedError {
     case invalidCredentials
     case biometricNotAvailable
     case biometricAuthenticationFailed
@@ -21,7 +21,7 @@ enum AuthenticationError: LocalizedError {
     case sessionExpired
     case unknown(String)
     
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .invalidCredentials:
             return "Invalid API key or credentials"
@@ -42,21 +42,29 @@ enum AuthenticationError: LocalizedError {
 }
 
 // MARK: - Authenticated User
-struct AuthenticatedUser {
-    let id: String
-    let apiKey: String
-    let baseURL: String
-    let authenticatedAt: Date
-    let biometricEnabled: Bool
+public struct AuthenticatedUser {
+    public let id: String
+    public let apiKey: String
+    public let baseURL: String
+    public let authenticatedAt: Date
+    public let biometricEnabled: Bool
+    
+    public init(id: String, apiKey: String, baseURL: String, authenticatedAt: Date, biometricEnabled: Bool) {
+        self.id = id
+        self.apiKey = apiKey
+        self.baseURL = baseURL
+        self.authenticatedAt = authenticatedAt
+        self.biometricEnabled = biometricEnabled
+    }
 }
 
 // MARK: - Authentication Manager
 @MainActor
-class AuthenticationManager: ObservableObject {
+public class AuthenticationManager: ObservableObject {
     // MARK: - Properties
-    @Published var state: AuthenticationState = .unauthenticated
-    @Published var isBiometricAvailable: Bool = false
-    @Published var biometricType: LABiometryType = .none
+    @Published public var state: AuthenticationState = .unauthenticated
+    @Published public var isBiometricAvailable: Bool = false
+    @Published public var biometricType: LABiometryType = .none
     
     private let keychain: KeychainService
     private let laContext = LAContext()
@@ -70,7 +78,7 @@ class AuthenticationManager: ObservableObject {
     private let biometricEnabledKey = "claude_code_biometric_enabled"
     
     // MARK: - Singleton
-    static let shared = AuthenticationManager()
+    public static let shared = AuthenticationManager()
     
     // MARK: - Initialization
     private init() {
@@ -86,7 +94,7 @@ class AuthenticationManager: ObservableObject {
     // MARK: - Public Methods
     
     /// Authenticate with API key and base URL
-    func authenticate(apiKey: String, baseURL: String) async throws {
+    public func authenticate(apiKey: String, baseURL: String) async throws {
         state = .authenticating
         
         do {
@@ -211,7 +219,7 @@ class AuthenticationManager: ObservableObject {
     }
     
     /// Sign out and clear credentials
-    func signOut() {
+    public func signOut() {
         // Clear keychain
         try? KeychainService(service: "com.yourorg.claudecodeabs", account: apiKeyKey).remove()
         try? KeychainService(service: "com.yourorg.claudecodeabs", account: baseURLKey).remove()

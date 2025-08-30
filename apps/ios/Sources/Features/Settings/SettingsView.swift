@@ -23,11 +23,10 @@ struct SettingsView: View {
                     .textInputAutocapitalization(.never)
                     .disableAutocorrection(true)
                     .focused($focusedField, equals: .baseURL)
-                    .dynamicTypeSize()
                     .accessibilityElement(
                         label: "Server base URL",
-                        hint: "Enter the URL of your Claude Code server",
-                        value: settings.baseURL
+                        value: settings.baseURL,
+                        hint: "Enter the URL of your Claude Code server"
                     )
 
                 HStack(spacing: Theme.Spacing.adaptive(Theme.Spacing.sm)) {
@@ -36,17 +35,14 @@ struct SettingsView: View {
                             .textInputAutocapitalization(.never)
                             .disableAutocorrection(true)
                             .focused($focusedField, equals: .apiKey)
-                            .dynamicTypeSize()
                     } else {
                         SecureField("API Key", text: $settings.apiKeyPlaintext)
                             .focused($focusedField, equals: .apiKey)
-                            .dynamicTypeSize()
                     }
                     Button(showKey ? "Hide" : "Show") { 
                         showKey.toggle() 
                     }
                     .buttonStyle(.bordered)
-                    .dynamicTypeSize()
                     .accessibilityElement(
                         label: showKey ? "Hide API key" : "Show API key",
                         hint: showKey ? "Hide the API key for security" : "Show the API key to verify it",
@@ -55,31 +51,31 @@ struct SettingsView: View {
                 }
                 .accessibilityElement(
                     label: "API Key",
-                    hint: "Enter your API key for authentication",
-                    value: showKey ? settings.apiKeyPlaintext : "Hidden"
+                    value: showKey ? settings.apiKeyPlaintext : "Hidden",
+                    hint: "Enter your API key for authentication"
                 )
 
                 Toggle("Streaming by default", isOn: $settings.streamingDefault)
-                    .dynamicTypeSize()
+                    .applyDynamicTypeSize()
                     .accessibilityElement(
                         label: "Streaming by default",
-                        hint: "Enable streaming responses for faster feedback",
-                        value: settings.streamingDefault ? "Enabled" : "Disabled"
+                        value: settings.streamingDefault ? "Enabled" : "Disabled",
+                        hint: "Enable streaming responses for faster feedback"
                     )
 
                 Stepper(value: $settings.sseBufferKiB, in: 16...512, step: 16) {
                     Text("SSE buffer: \(settings.sseBufferKiB) KiB")
-                        .dynamicTypeSize()
+                        .applyDynamicTypeSize()
                 }
                 .accessibilityElement(
                     label: "SSE buffer size",
-                    hint: "Adjust the server-sent events buffer size in kilobytes",
-                    value: "\(settings.sseBufferKiB) kilobytes"
+                    value: "\(settings.sseBufferKiB) kilobytes",
+                    hint: "Adjust the server-sent events buffer size in kilobytes"
                 )
             }
 
             Section("Actions") {
-                AdaptiveStack {
+                HStack {
                     Button {
                         Task { await validateAndSave() }
                     } label: {
@@ -91,7 +87,7 @@ struct SettingsView: View {
                                 )
                         } else { 
                             Text("Validate")
-                                .dynamicTypeSize()
+                                .applyDynamicTypeSize()
                         }
                     }
                     .buttonStyle(.borderedProminent)
@@ -108,7 +104,7 @@ struct SettingsView: View {
                     Text(healthText)
                         .foregroundStyle(errorMsg == nil ? Theme.accent : Theme.destructive)
                         .font(.footnote)
-                        .dynamicTypeSize()
+                        .applyDynamicTypeSize()
                         .accessibilityElement(
                             label: "Server status",
                             value: healthText
@@ -121,11 +117,11 @@ struct SettingsView: View {
                     Text(errorMsg)
                         .foregroundStyle(Theme.destructive)
                         .font(.footnote)
-                        .dynamicTypeSize()
+                        .applyDynamicTypeSize()
                         .accessibilityElement(
                             label: "Error message",
-                            traits: .isStaticText,
-                            value: errorMsg
+                            value: errorMsg,
+                            traits: .isStaticText
                         )
                 }
             }

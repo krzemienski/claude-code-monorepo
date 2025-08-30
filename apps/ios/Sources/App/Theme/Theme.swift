@@ -131,6 +131,8 @@ public enum Theme {
     // MARK: - UI Element Colors
     public static let card = backgroundTertiary
     public static let cardFg = foreground
+    public static let popover = backgroundSecondary
+    public static let popoverFg = foreground
     public static let border = Color(hex: "2D3748").opacity(0.5)
     public static let borderActive = neonCyan.opacity(0.5)
     public static let input = Color(hex: "1A202C")
@@ -184,6 +186,7 @@ public enum Theme {
         public static let xs: CGFloat = 12       // Caption (spec: 12pt) ✅
         public static let sm: CGFloat = 14
         public static let base: CGFloat = 16     // Body (spec: 16pt) ✅
+        public static let md: CGFloat = 16       // Alias for base
         public static let lg: CGFloat = 18       // Subtitle (spec: 18pt) ✅
         public static let xl: CGFloat = 20
         public static let xxl: CGFloat = 24      // Title (spec: 24pt) ✅
@@ -249,6 +252,8 @@ public enum Theme {
     
     // MARK: - Spacing Scale with Adaptive Layout Support
     public enum Spacing {
+        public static let none: CGFloat = 0
+        public static let xxs: CGFloat = 2
         public static let xs: CGFloat = 4
         public static let sm: CGFloat = 8
         public static let md: CGFloat = 12
@@ -256,6 +261,8 @@ public enum Theme {
         public static let xl: CGFloat = 24
         public static let xxl: CGFloat = 32
         public static let xxxl: CGFloat = 48
+        public static let huge: CGFloat = 56
+        public static let massive: CGFloat = 64
         
         // Adaptive spacing for different device idioms
         public static func adaptive(_ spacing: CGFloat, for idiom: UIUserInterfaceIdiom = UIDevice.current.userInterfaceIdiom) -> CGFloat {

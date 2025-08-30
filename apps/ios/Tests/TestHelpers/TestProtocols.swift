@@ -22,5 +22,19 @@ extension URLSession: URLSessionProtocol {
 
 // MARK: - Keychain Extension
 extension Keychain: KeychainProtocol {
-    // Keychain already has these methods with matching signatures
+    func get(_ key: String) throws -> String? {
+        return try self.get(key)
+    }
+    
+    func set(_ value: String, key: String) throws {
+        try self.set(value, key: key)
+    }
+    
+    func remove(_ key: String) throws {
+        try self.remove(key)
+    }
+    
+    func removeAll() throws {
+        try self.removeAll()
+    }
 }

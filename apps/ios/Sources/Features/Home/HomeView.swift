@@ -4,7 +4,6 @@ import Charts
 struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel
     @StateObject private var settings = AppSettings()
-    @StateObject private var accessibilitySettings = AccessibilitySettings()
     
     // Environment values for adaptive layout
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
@@ -108,7 +107,7 @@ struct HomeView: View {
     
     private var mainScrollContent: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: Theme.Spacing.xl) {
                         // Welcome header with animation
                         welcomeHeader
                             .opacity(showWelcome ? 1 : 0)
@@ -150,7 +149,7 @@ struct HomeView: View {
                                 hint: "View system monitoring and analytics"
                             )
                         }
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, Theme.Spacing.lg)
                         .scaleEffect(showWelcome ? 1 : 0.9)
                         .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.2), value: showWelcome)
 
@@ -165,17 +164,17 @@ struct HomeView: View {
                                         VStack(alignment: .leading) {
                                             Text(p.name)
                                                 .font(.headline)
-                                                .dynamicTypeSize()
+                                                .applyDynamicTypeSize()
                                             Text(p.path ?? "—")
                                                 .font(.caption)
                                                 .foregroundStyle(Theme.mutedFg)
-                                                .dynamicTypeSize()
+                                                .applyDynamicTypeSize()
                                         }
                                         Spacer()
                                         Image(systemName: "chevron.right")
                                             .accessibilityHidden(true)
                                     }
-                                    .padding(.vertical, 8)
+                                    .padding(.vertical, Theme.Spacing.sm)
                                 }
                                 .accessibleNavigationLink(
                                     label: "Project \(p.name)",
@@ -197,17 +196,17 @@ struct HomeView: View {
                                         VStack(alignment: .leading) {
                                             Text(s.title ?? s.id)
                                                 .font(.subheadline)
-                                                .dynamicTypeSize()
+                                                .applyDynamicTypeSize()
                                             Text("model \(s.model) • msgs \(s.messageCount ?? 0)")
                                                 .font(.caption)
                                                 .foregroundStyle(Theme.mutedFg)
-                                                .dynamicTypeSize()
+                                                .applyDynamicTypeSize()
                                         }
                                         Spacer()
                                         Image(systemName: "chevron.right")
                                             .accessibilityHidden(true)
                                     }
-                                    .padding(.vertical, 8)
+                                    .padding(.vertical, Theme.Spacing.sm)
                                 }
                                 .accessibleNavigationLink(
                                     label: "Session \(s.title ?? s.id)",
@@ -221,7 +220,7 @@ struct HomeView: View {
                         // Usage Highlights with chart visualization
                         enhancedSectionCard("Usage Statistics", icon: "chart.bar.fill", iconColor: Color(h: 180, s: 100, l: 50)) {
                         if let st = viewModel.stats {
-                            VStack(spacing: 16) {
+                            VStack(spacing: Theme.Spacing.lg) {
                                 HStack {
                                     enhancedMetric("Tokens", "\(st.totalTokens)", icon: "cube.fill", color: Color(h: 280, s: 100, l: 50))
                                     enhancedMetric("Sessions", "\(st.activeSessions)", icon: "person.2.fill", color: Color(h: 220, s: 100, l: 50))
@@ -233,14 +232,14 @@ struct HomeView: View {
                                 if st.totalTokens > 0 {
                                     usageChart(tokens: st.totalTokens)
                                         .frame(height: 100)
-                                        .padding(.top, 8)
+                                        .padding(.top, Theme.Spacing.sm)
                                 }
                             }
                         } else if viewModel.isLoading { ProgressView() }
                         else { Text("No stats").foregroundStyle(Theme.mutedFg) }
                     }
             }
-            .padding(.vertical, 16)
+            .padding(.vertical, Theme.Spacing.lg)
         }
     }
 
@@ -267,7 +266,7 @@ struct HomeView: View {
     }
     
     private var welcomeHeader: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: Theme.Spacing.sm) {
             Text("Command Center")
                 .font(.largeTitle)
                 .fontWeight(.bold)
@@ -294,8 +293,8 @@ struct HomeView: View {
             Text(title)
                 .fontWeight(.medium)
         }
-        .padding(.vertical, 12)
-        .padding(.horizontal, 16)
+        .padding(.vertical, Theme.Spacing.md)
+        .padding(.horizontal, Theme.Spacing.lg)
         .background(
             ZStack {
                 Theme.card
@@ -327,7 +326,7 @@ struct HomeView: View {
         iconColor: Color,
         @ViewBuilder content: () -> Content
     ) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: Theme.Spacing.md) {
             HStack {
                 Image(systemName: icon)
                     .font(.title3)
@@ -344,7 +343,7 @@ struct HomeView: View {
             
             content()
         }
-        .padding(16)
+        .padding(Theme.Spacing.lg)
         .background(
             ZStack {
                 Theme.card
@@ -367,7 +366,7 @@ struct HomeView: View {
                 )
         )
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .padding(.horizontal, 16)
+        .padding(.horizontal, Theme.Spacing.lg)
         .shadow(color: iconColor.opacity(0.2), radius: 10, x: 0, y: 5)
         .accessibilityElement(
             label: title,
@@ -402,7 +401,7 @@ struct HomeView: View {
     }
 
     private func enhancedMetric(_ label: String, _ value: String, icon: String, color: Color) -> some View {
-        VStack(spacing: 4) {
+        VStack(spacing: Theme.Spacing.xxs) {
             Image(systemName: icon)
                 .font(.title2)
                 .foregroundStyle(color)
@@ -413,7 +412,7 @@ struct HomeView: View {
             Text(value)
                 .font(.title3)
                 .fontWeight(.bold)
-                .dynamicTypeSize()
+                .applyDynamicTypeSize()
                 .foregroundStyle(
                     LinearGradient(
                         colors: [color, color.opacity(0.7)],
@@ -425,14 +424,12 @@ struct HomeView: View {
             Text(label)
                 .font(.caption)
                 .foregroundStyle(Theme.mutedFg)
-                .dynamicTypeSize()
+                .applyDynamicTypeSize()
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
-        .accessibleStatus(
-            label: label,
-            value: value
-        )
+        .padding(.vertical, Theme.Spacing.sm)
+        .accessibilityLabel(label)
+        .accessibleStatus(value)
     }
     
     private func usageChart(tokens: Int) -> some View {

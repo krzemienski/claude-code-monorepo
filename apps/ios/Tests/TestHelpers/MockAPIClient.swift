@@ -51,7 +51,7 @@ class MockAPIClient: APIClientProtocol {
             return try JSONDecoder().decode(T.self, from: data)
         }
         
-        throw APIError.noData
+        throw MockAPIError.noData
     }
     
     func postJSON<T: Decodable, U: Encodable>(
@@ -79,7 +79,7 @@ class MockAPIClient: APIClientProtocol {
             return try JSONDecoder().decode(T.self, from: data)
         }
         
-        throw APIError.noData
+        throw MockAPIError.noData
     }
     
     func deleteJSON(
@@ -133,7 +133,13 @@ class MockAPIClient: APIClientProtocol {
         if let error = mockErrors["health"] {
             throw error
         }
-        return mockResponses["health"] as? APIClient.HealthResponse ?? APIClient.HealthResponse(ok: true, version: "1.0.0", active_sessions: 0)
+        // Create mock response matching backend format
+        let mockData = try! JSONEncoder().encode([
+            "status": "healthy",
+            "timestamp": ISO8601DateFormatter().string(from: Date())
+        ])
+        return mockResponses["health"] as? APIClient.HealthResponse ?? 
+            (try! JSONDecoder().decode(APIClient.HealthResponse.self, from: mockData))
     }
     
     func listProjects() async throws -> [APIClient.Project] {
@@ -238,7 +244,8 @@ class MockAPIClient: APIClientProtocol {
         return mockResponses["debugCompletion"] as? APIClient.DebugResponse ?? APIClient.DebugResponse(
             sessionId: sessionId,
             context: includeContext ? "test context" : "",
-            tokens: 100
+            tokens: 100,
+            modelState: "Ready"
         )
     }
     
@@ -260,7 +267,7 @@ class MockAPIClient: APIClientProtocol {
 }
 
 // Mock API Error
-enum APIError: Error {
+enum MockAPIError: Error {
     case noData
     case invalidResponse
     case networkError

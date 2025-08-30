@@ -5,7 +5,7 @@ public extension Font {
     /// Creates a scalable font that respects Dynamic Type
     static func scalableFont(_ style: Font.TextStyle, size: CGFloat? = nil) -> Font {
         if let size = size {
-            return .system(size: size, design: .default).dynamicTypeSize()
+            return .system(size: size, design: .default)
         }
         return Font.system(style)
     }
@@ -13,7 +13,7 @@ public extension Font {
 
 public extension View {
     /// Applies Dynamic Type scaling to any font
-    func dynamicTypeSize() -> some View {
+    func applyDynamicTypeSize() -> some View {
         self.modifier(DynamicTypeSizeModifier())
     }
 }
@@ -23,12 +23,12 @@ struct DynamicTypeSizeModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .scaleEffect(dynamicTypeSize.scale)
+            .scaleEffect(dynamicTypeSize.uiScale)
     }
 }
 
 extension DynamicTypeSize {
-    var scale: CGFloat {
+    var uiScale: CGFloat {
         switch self {
         case .xSmall: return 0.8
         case .small: return 0.85
@@ -47,10 +47,74 @@ extension DynamicTypeSize {
     }
 }
 
+// MARK: - Adaptive Stack Layout
+public struct AdaptiveStack<Content: View>: View {
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
+    
+    var horizontalAlignment: HorizontalAlignment = .center
+    var verticalAlignment: VerticalAlignment = .center
+    var spacing: CGFloat? = nil
+    @ViewBuilder var content: () -> Content
+    
+    public init(
+        horizontalAlignment: HorizontalAlignment = .center,
+        verticalAlignment: VerticalAlignment = .center,
+        spacing: CGFloat? = nil,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self.horizontalAlignment = horizontalAlignment
+        self.verticalAlignment = verticalAlignment
+        self.spacing = spacing
+        self.content = content
+    }
+    
+    public var body: some View {
+        if horizontalSizeClass == .compact || verticalSizeClass == .compact {
+            VStack(alignment: horizontalAlignment, spacing: spacing, content: content)
+        } else {
+            HStack(alignment: verticalAlignment, spacing: spacing, content: content)
+        }
+    }
+}
+
+// MARK: - Adaptive Padding
+public extension View {
+    /// Applies adaptive padding based on device and size class
+    func adaptivePadding(_ edges: Edge.Set = .all, _ amount: CGFloat? = nil) -> some View {
+        self.modifier(AdaptivePaddingModifier(edges: edges, amount: amount))
+    }
+}
+
+struct AdaptivePaddingModifier: ViewModifier {
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
+    
+    let edges: Edge.Set
+    let amount: CGFloat?
+    
+    func body(content: Content) -> some View {
+        let padding = computePadding()
+        return content.padding(edges, padding)
+    }
+    
+    private func computePadding() -> CGFloat {
+        let baseAmount = amount ?? Theme.Spacing.md
+        
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return baseAmount * 1.5
+        } else if horizontalSizeClass == .regular && verticalSizeClass == .regular {
+            return baseAmount * 1.2
+        } else {
+            return baseAmount
+        }
+    }
+}
+
 // MARK: - Touch Target Enforcement
 public extension View {
     /// Ensures minimum touch target size (default 44pt)
-    func accessibleTouchTarget(minSize: CGFloat = 44) -> some View {
+    func ensureAccessibleTouchTarget(minSize: CGFloat = 44) -> some View {
         self.modifier(TouchTargetModifier(minSize: minSize))
     }
 }
@@ -228,7 +292,7 @@ public struct PullToRefreshIndicator: View {
         }
         .accessibilityElement(
             label: isRefreshing ? "Refreshing content" : "Pull to refresh",
-            traits: isRefreshing ? .updatesFrequently : .none
+            traits: isRefreshing ? .updatesFrequently : []
         )
     }
 }
@@ -400,7 +464,7 @@ public struct AnimatedPlaceholder: View {
 }
 
 // MARK: - Progress Bar with Animation
-public struct AnimatedProgressBar: View {
+public struct EnhancedProgressBar: View {
     let progress: Double
     let color: Color
     @State private var animatedProgress: Double = 0
@@ -452,5 +516,65 @@ public struct AnimatedProgressBar: View {
             label: "Progress",
             value: "\(Int(progress * 100)) percent"
         )
+    }
+}
+
+// MARK: - Accessibility Extensions
+
+public extension View {
+    /// Announces screen changes to VoiceOver
+    func accessibilityScreenChanged() -> some View {
+        self.onAppear {
+            UIAccessibility.post(notification: .screenChanged, argument: nil)
+        }
+    }
+    
+    /// Creates an accessible navigation link
+    func accessibleNavigationLink(
+        label: String,
+        hint: String? = nil,
+        traits: AccessibilityTraits = []
+    ) -> some View {
+        self
+            .accessibilityLabel(label)
+            .accessibilityHint(hint ?? "")
+            .accessibilityAddTraits(traits)
+            .accessibilityAddTraits(.isLink)
+    }
+    
+    /// Applies animation with reduced motion support
+    func reducedMotionAnimation<V: Hashable>(
+        _ animation: Animation?,
+        value: V
+    ) -> some View {
+        self.modifier(ReducedMotionAnimationModifier(animation: animation, value: value))
+    }
+    
+    /// Sets accessibility status description
+    func accessibleStatus(
+        _ status: String
+    ) -> some View {
+        self.accessibilityValue(status)
+    }
+    
+    /// Ensures minimum touch target size for accessibility
+    func accessibleTouchTarget(minSize: CGFloat = 44) -> some View {
+        self.frame(minWidth: minSize, minHeight: minSize)
+    }
+}
+
+// MARK: - Reduced Motion Animation Modifier
+
+struct ReducedMotionAnimationModifier<V: Hashable>: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
+    let animation: Animation?
+    let value: V
+    
+    func body(content: Content) -> some View {
+        if reduceMotion {
+            content
+        } else {
+            content.animation(animation, value: value)
+        }
     }
 }

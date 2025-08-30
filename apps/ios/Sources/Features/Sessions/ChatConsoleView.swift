@@ -27,7 +27,7 @@ struct ChatConsoleView: View {
     @Environment(\.accessibilityReduceMotion) var reduceMotion
     @Environment(\.accessibilityVoiceOverEnabled) var voiceOverEnabled
     @Environment(\.accessibilityReduceTransparency) var reduceTransparency
-    @AccessibilityFocusState private var isInputFocused: Bool
+    @FocusState private var isInputFocused: Bool
     
     @Namespace private var transcriptBottom
     
@@ -52,7 +52,7 @@ struct ChatConsoleView: View {
             // Cyberpunk background
             backgroundView
             
-            VStack(spacing: 0) {
+            VStack(spacing: Theme.Spacing.none) {
                 headerBar
                 
                 // Simplified main content
@@ -83,7 +83,7 @@ struct ChatConsoleView: View {
     
     @ViewBuilder
     private var mainContentView: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: Theme.Spacing.md) {
             chatAreaView
             toolTimelineView
         } // End of HStack (Main chat area + Tool timeline)
@@ -93,7 +93,7 @@ struct ChatConsoleView: View {
     private var chatAreaView: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 12) {
+                LazyVStack(alignment: .leading, spacing: Theme.Spacing.md) {
                     ForEach(viewModel.messages) { message in
                         enhancedBubbleView(message)
                             .frame(maxWidth: .infinity, alignment: message.role == .user ? .trailing : .leading)
@@ -114,10 +114,10 @@ struct ChatConsoleView: View {
                     
                     // Scroll anchor
                     Color.clear
-                        .frame(height: 1)
+                        .frame(height: Theme.Spacing.xxs)
                         .id(transcriptBottom)
                 }
-                .padding(.vertical, 8)
+                .padding(.vertical, Theme.Spacing.sm)
                 .animation(reduceMotion ? .none : .spring(response: 0.3, dampingFraction: 0.8), value: viewModel.messages.count)
             }
             .background(reduceTransparency ? Theme.background : Theme.background.opacity(0.5))
@@ -143,7 +143,7 @@ struct ChatConsoleView: View {
     @ViewBuilder
     private var toolTimelineView: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 10) {
+            LazyVStack(alignment: .leading, spacing: Theme.Spacing.sm) {
                 toolTimelineHeader
                 connectionStatusView
                 tokenUsageView
@@ -200,10 +200,10 @@ struct ChatConsoleView: View {
     @ViewBuilder
     private var connectionStatusView: some View {
         if viewModel.connectionStatus != .connected {
-            HStack(spacing: 6) {
+            HStack(spacing: Theme.Spacing.xs) {
                 Circle()
                     .fill(colorForConnectionStatus(viewModel.connectionStatus))
-                    .frame(width: 8, height: 8)
+                    .frame(width: Theme.Spacing.sm, height: Theme.Spacing.sm)
                 Text(viewModel.connectionStatus.rawValue)
                     .font(.caption)
                     .foregroundStyle(Theme.mutedFg)
@@ -211,7 +211,7 @@ struct ChatConsoleView: View {
             .adaptivePadding(.horizontal, Theme.Spacing.sm)
             .adaptivePadding(.vertical, Theme.Spacing.xs)
             .background(Theme.card)
-            .clipShape(RoundedRectangle(cornerRadius: 6))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Spacing.xs))
             .accessibilityElement(
                 label: "Connection status",
                 value: viewModel.connectionStatus.rawValue
@@ -222,7 +222,7 @@ struct ChatConsoleView: View {
     @ViewBuilder
     private var tokenUsageView: some View {
         if viewModel.totalTokens > 0 {
-            HStack(spacing: 4) {
+            HStack(spacing: Theme.Spacing.xxs) {
                 Image(systemName: "square.stack.3d.up")
                     .font(.caption)
                 Text("Tokens: \(viewModel.totalTokens)")
@@ -236,7 +236,7 @@ struct ChatConsoleView: View {
             .adaptivePadding(.horizontal, Theme.Spacing.sm)
             .adaptivePadding(.vertical, Theme.Spacing.xs)
             .background(Theme.card)
-            .clipShape(RoundedRectangle(cornerRadius: 6))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Spacing.xs))
             .accessibilityElement(
                 label: "Token usage",
                 value: "\(viewModel.totalTokens) tokens, cost $\(String(format: "%.4f", viewModel.totalCost))"
@@ -290,9 +290,9 @@ struct ChatConsoleView: View {
     }
     
     private var headerBar: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: Theme.Spacing.md) {
             // Session info
-            HStack(spacing: 6) {
+            HStack(spacing: Theme.Spacing.xs) {
                 Image(systemName: "cube.transparent.fill")
                     .foregroundStyle(Color(h: 220, s: 100, l: 50))
                     // .symbolEffect(.pulse, value: viewModel.isStreaming) // iOS 17+
@@ -306,10 +306,10 @@ struct ChatConsoleView: View {
                     .fontWeight(.medium)
                     .foregroundStyle(Theme.primary)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
+            .padding(.horizontal, Theme.Spacing.sm)
+            .padding(.vertical, Theme.Spacing.xxs)
             .background(Theme.card)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Spacing.sm))
             
             Spacer()
             
@@ -325,7 +325,7 @@ struct ChatConsoleView: View {
             
             // Streaming toggle
             Toggle(isOn: $viewModel.streamingEnabled) {
-                HStack(spacing: 4) {
+                HStack(spacing: Theme.Spacing.xxs) {
                     Image(systemName: viewModel.streamingEnabled ? "dot.radiowaves.forward" : "text.bubble")
                     Text("Stream")
                 }
@@ -349,7 +349,7 @@ struct ChatConsoleView: View {
             .animation(.easeInOut(duration: 0.2), value: viewModel.isStreaming)
         }
         .padding(.horizontal)
-        .padding(.vertical, 8)
+        .padding(.vertical, Theme.Spacing.sm)
         .background(
             Theme.card.opacity(0.8)
                 .overlay(
@@ -363,8 +363,8 @@ struct ChatConsoleView: View {
     }
     
     private var composerBar: some View {
-        VStack(spacing: 8) {
-            HStack(alignment: .bottom, spacing: 12) {
+        VStack(spacing: Theme.Spacing.sm) {
+            HStack(alignment: .bottom, spacing: Theme.Spacing.md) {
                 // Enhanced input field with animation
                 AnimatedTextEditor(
                     placeholder: "Type your message...",
@@ -372,7 +372,7 @@ struct ChatConsoleView: View {
                     minHeight: 44,
                     maxHeight: 120
                 )
-                .accessibilityFocused($isInputFocused)
+                .focused($isInputFocused)
                 .accessibilityElement(
                     label: "Message input",
                     hint: "Type your message and press send",
@@ -388,14 +388,14 @@ struct ChatConsoleView: View {
                         composing = ""
                     }
                 } label: {
-                    HStack(spacing: 6) {
+                    HStack(spacing: Theme.Spacing.xs) {
                         Image(systemName: "paperplane.fill")
                             // .symbolEffect(.bounce, value: !composing.isEmpty) // iOS 17+
                         Text("Send")
                             .fontWeight(.medium)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
+                    .padding(.horizontal, Theme.Spacing.md)
+                    .padding(.vertical, Theme.Spacing.md)
                 }
                 .background(
                     LinearGradient(
@@ -407,12 +407,12 @@ struct ChatConsoleView: View {
                     )
                 )
                 .foregroundStyle(composing.isEmpty ? Theme.mutedFg : .white)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Spacing.md))
                 .disabled(viewModel.isStreaming || composing.isEmpty)
                 .shadow(
                     color: composing.isEmpty ? .clear : Color(h: 250, s: 100, l: 50).opacity(0.4),
-                    radius: 8,
-                    x: 0, y: 4
+                    radius: Theme.Spacing.sm,
+                    x: 0, y: Theme.Spacing.xxs
                 )
                 .animation(.spring(response: 0.3, dampingFraction: 0.7), value: composing.isEmpty)
             }

@@ -6,18 +6,21 @@ final class APIClientTests: XCTestCase {
     
     var sut: APIClient!
     var mockSettings: AppSettings!
+    var mockURLSession: URLSessionMock!
     
     override func setUp() async throws {
         try await super.setUp()
         mockSettings = AppSettings.shared
         mockSettings.baseURL = "http://localhost:8000"
-        mockSettings.apiKey = nil
-        sut = APIClient(settings: mockSettings)
+        mockSettings.apiKeyPlaintext = ""
+        mockURLSession = URLSessionMock()
+        sut = APIClient(settings: mockSettings, session: mockURLSession)
     }
     
     override func tearDown() async throws {
         sut = nil
         mockSettings = nil
+        mockURLSession = nil
         try await super.tearDown()
     }
     
@@ -30,17 +33,11 @@ final class APIClientTests: XCTestCase {
         }
         
         let expectedResponse = TestResponse(message: "Success", value: 42)
-        let responseData = try JSONEncoder().encode(expectedResponse)
         
-        mockURLSession.mockData = responseData
-        mockURLSession.mockResponse = HTTPURLResponse(
-            url: URL(string: "http://localhost:8000/test")!,
-            statusCode: 200,
-            httpVersion: nil,
-            headerFields: nil
-        )
+        mockURLSession.mockResponse = expectedResponse
+        mockURLSession.statusCode = 200
         
-        let result: TestResponse = try await sut.getJSON("/test")
+        let result: TestResponse = try await sut.getJSON("/test", as: TestResponse.self)
         
         XCTAssertEqual(result, expectedResponse)
         XCTAssertEqual(mockURLSession.lastRequest?.httpMethod, "GET")
@@ -48,37 +45,23 @@ final class APIClientTests: XCTestCase {
     }
     
     func testGetJSONWithHeaders() async throws {
-        struct EmptyResponse: Codable {}
-        
-        mockURLSession.mockData = Data("{}")
-        mockURLSession.mockResponse = HTTPURLResponse(
-            url: URL(string: "http://localhost:8000/test")!,
-            statusCode: 200,
-            httpVersion: nil,
-            headerFields: nil
-        )
+        mockURLSession.mockResponse = APITestEmptyResponse()
+        mockURLSession.statusCode = 200
         
         let customHeaders = ["X-Custom": "Value"]
-        _ = try await sut.getJSON("/test", headers: customHeaders) as EmptyResponse
+        _ = try await sut.getJSON("/test", as: APITestEmptyResponse.self)
         
         XCTAssertEqual(mockURLSession.lastRequest?.value(forHTTPHeaderField: "X-Custom"), "Value")
     }
     
     func testGetJSONAuthHeader() async throws {
-        struct EmptyResponse: Codable {}
-        
         // Set API key
-        AppSettings.shared.apiKey = "test-api-key"
+        AppSettings.shared.apiKeyPlaintext = "test-api-key"
         
-        mockURLSession.mockData = Data("{}")
-        mockURLSession.mockResponse = HTTPURLResponse(
-            url: URL(string: "http://localhost:8000/test")!,
-            statusCode: 200,
-            httpVersion: nil,
-            headerFields: nil
-        )
+        mockURLSession.mockResponse = APITestEmptyResponse()
+        mockURLSession.statusCode = 200
         
-        _ = try await sut.getJSON("/test") as EmptyResponse
+        _ = try await sut.getJSON("/test", as: APITestEmptyResponse.self)
         
         XCTAssertEqual(
             mockURLSession.lastRequest?.value(forHTTPHeaderField: "Authorization"),
@@ -86,7 +69,7 @@ final class APIClientTests: XCTestCase {
         )
         
         // Clean up
-        AppSettings.shared.apiKey = nil
+        AppSettings.shared.apiKeyPlaintext = ""
     }
     
     // MARK: - POST Tests
@@ -104,17 +87,11 @@ final class APIClientTests: XCTestCase {
         
         let request = TestRequest(name: "Test", age: 30)
         let expectedResponse = TestResponse(id: "123", created: true)
-        let responseData = try JSONEncoder().encode(expectedResponse)
         
-        mockURLSession.mockData = responseData
-        mockURLSession.mockResponse = HTTPURLResponse(
-            url: URL(string: "http://localhost:8000/create")!,
-            statusCode: 201,
-            httpVersion: nil,
-            headerFields: nil
-        )
+        mockURLSession.mockResponse = expectedResponse
+        mockURLSession.statusCode = 201
         
-        let result: TestResponse = try await sut.postJSON("/create", body: request)
+        let result: TestResponse = try await sut.postJSON("/create", body: request, as: TestResponse.self)
         
         XCTAssertEqual(result, expectedResponse)
         XCTAssertEqual(mockURLSession.lastRequest?.httpMethod, "POST")
@@ -131,15 +108,10 @@ final class APIClientTests: XCTestCase {
     // MARK: - DELETE Tests
     
     func testDeleteJSONSuccess() async throws {
-        mockURLSession.mockData = Data()
-        mockURLSession.mockResponse = HTTPURLResponse(
-            url: URL(string: "http://localhost:8000/delete/123")!,
-            statusCode: 204,
-            httpVersion: nil,
-            headerFields: nil
-        )
+        mockURLSession.mockResponse = [:]
+        mockURLSession.statusCode = 204
         
-        try await sut.deleteJSON("/delete/123")
+        try await sut.delete("/delete/123")
         
         XCTAssertEqual(mockURLSession.lastRequest?.httpMethod, "DELETE")
         XCTAssertTrue(mockURLSession.lastRequest?.url?.absoluteString.contains("/delete/123") ?? false)
@@ -148,16 +120,11 @@ final class APIClientTests: XCTestCase {
     // MARK: - Error Handling Tests
     
     func testHTTPErrorResponse() async {
-        mockURLSession.mockData = Data()
-        mockURLSession.mockResponse = HTTPURLResponse(
-            url: URL(string: "http://localhost:8000/test")!,
-            statusCode: 404,
-            httpVersion: nil,
-            headerFields: nil
-        )
+        mockURLSession.statusCode = 404
+        mockURLSession.shouldFail = true
         
         do {
-            _ = try await sut.getJSON("/test") as EmptyResponse
+            _ = try await sut.getJSON("/test", as: APITestEmptyResponse.self)
             XCTFail("Should have thrown error")
         } catch {
             // Expected error
@@ -169,7 +136,7 @@ final class APIClientTests: XCTestCase {
         mockURLSession.mockError = URLError(.notConnectedToInternet)
         
         do {
-            _ = try await sut.getJSON("/test") as EmptyResponse
+            _ = try await sut.getJSON("/test", as: APITestEmptyResponse.self)
             XCTFail("Should have thrown error")
         } catch {
             XCTAssertTrue(error is URLError)
@@ -177,13 +144,9 @@ final class APIClientTests: XCTestCase {
     }
     
     func testInvalidJSONResponse() async {
-        mockURLSession.mockData = Data("Invalid JSON")
-        mockURLSession.mockResponse = HTTPURLResponse(
-            url: URL(string: "http://localhost:8000/test")!,
-            statusCode: 200,
-            httpVersion: nil,
-            headerFields: nil
-        )
+        // Configure mock to return raw invalid JSON data
+        mockURLSession.mockResponse = Data("Invalid JSON")
+        mockURLSession.statusCode = 200
         
         do {
             _ = try await sut.getJSON("/test") as TestResponse
@@ -195,32 +158,9 @@ final class APIClientTests: XCTestCase {
     }
 }
 
-// MARK: - Mock URLSession
+// Test response structs
+struct APITestAPITestEmptyResponse: Codable {}
 
-class MockURLSession: URLSessionProtocol {
-    var mockData: Data?
-    var mockResponse: URLResponse?
-    var mockError: Error?
-    var lastRequest: URLRequest?
-    
-    func data(for request: URLRequest) async throws -> (Data, URLResponse) {
-        lastRequest = request
-        
-        if let error = mockError {
-            throw error
-        }
-        
-        let data = mockData ?? Data()
-        let response = mockResponse ?? URLResponse()
-        
-        return (data, response)
-    }
-}
-
-// Empty response for tests
-struct EmptyResponse: Codable {}
-
-// Test response struct
 struct TestResponse: Codable, Equatable {
     let message: String
 }

@@ -24,16 +24,16 @@ struct ProjectsListView: View {
             }
             ForEach(filtered(projects)) { p in
                 NavigationLink(destination: ProjectDetailView(projectId: p.id)) {
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: Theme.Spacing.xxs) {
                         Text(p.name)
                             .font(.body)
-                            .dynamicTypeSize()
+                            .applyDynamicTypeSize()
                         Text(p.path ?? "—")
                             .font(.caption)
                             .foregroundStyle(Theme.mutedFg)
-                            .dynamicTypeSize()
+                            .applyDynamicTypeSize()
                     }
-                    .padding(.vertical, 4)
+                    .padding(.vertical, Theme.Spacing.xs)
                 }
                 .accessibleNavigationLink(
                     label: "Project \(p.name)",
@@ -109,32 +109,32 @@ private struct CreateProjectSheet: View {
                 Section {
                     TextField("Name", text: $name)
                         .focused($focusedField, equals: .name)
-                        .dynamicTypeSize()
+                        .applyDynamicTypeSize()
                         .accessibilityElement(
                             label: "Project name",
-                            hint: "Required. Enter the name for your new project",
-                            value: name
+                            value: name,
+                            hint: "Required. Enter the name for your new project"
                         )
                     
                     TextField("Description", text: $desc)
                         .focused($focusedField, equals: .description)
-                        .dynamicTypeSize()
+                        .applyDynamicTypeSize()
                         .accessibilityElement(
                             label: "Project description",
-                            hint: "Optional. Describe your project",
-                            value: desc
+                            value: desc,
+                            hint: "Optional. Describe your project"
                         )
                     
                     TextField("Path (optional)", text: $path)
                         .focused($focusedField, equals: .path)
-                        .dynamicTypeSize()
+                        .applyDynamicTypeSize()
                         .accessibilityElement(
                             label: "Project path",
-                            hint: "Optional. Specify the file system path for your project",
-                            value: path
+                            value: path,
+                            hint: "Optional. Specify the file system path for your project"
                         )
                 }
-                .padding(.vertical, 4)
+                .padding(.vertical, Theme.Spacing.xs)
             }
             .navigationTitle("New Project")
             .toolbar {
@@ -142,6 +142,7 @@ private struct CreateProjectSheet: View {
                     Button("Cancel") { dismiss() }
                         .accessibilityElement(
                             label: "Cancel",
+                            value: "",
                             hint: "Dismiss without creating project",
                             traits: .isButton
                         )
@@ -153,6 +154,7 @@ private struct CreateProjectSheet: View {
                     .disabled(name.isEmpty)
                     .accessibilityElement(
                         label: "Create project",
+                        value: "",
                         hint: name.isEmpty ? "Enter a project name first" : "Create the new project",
                         traits: .isButton
                     )

@@ -10,6 +10,9 @@ public struct AdaptiveChatView: View {
     
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
+    @Environment(\.accessibilityVoiceOverEnabled) var voiceOverEnabled
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     
     public init() {}
     
@@ -52,7 +55,7 @@ public struct AdaptiveChatView: View {
                         )
                     }
                 }
-                .navigationSplitViewStyle(.balanced)
+                .navigationSplitViewStyle(.automatic)
                 .toolbar {
                     ToolbarItemGroup(placement: .navigationBarTrailing) {
                         Button {
@@ -64,6 +67,9 @@ public struct AdaptiveChatView: View {
                             Label("New Session", systemImage: "plus.circle.fill")
                                 .foregroundStyle(Theme.primary)
                         }
+                        .accessibilityLabel("Create new session")
+                        .accessibilityHint("Creates a new chat session")
+                        .accessibilityAddTraits(.isButton)
                     }
                 }
             } else {
@@ -93,6 +99,9 @@ public struct AdaptiveChatView: View {
                                 Label("New Session", systemImage: "plus.circle.fill")
                                     .foregroundStyle(Theme.primary)
                             }
+                            .accessibilityLabel("Create new session")
+                            .accessibilityHint("Creates a new chat session")
+                            .accessibilityAddTraits(.isButton)
                         }
                     }
                 }
@@ -118,6 +127,7 @@ struct SessionsListView: View {
     
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    @Environment(\.accessibilityVoiceOverEnabled) var voiceOverEnabled
     
     var body: some View {
         List(selection: $selectedSessionId) {
@@ -146,10 +156,17 @@ struct SessionsListView: View {
         }
         // TODO: Add search functionality when searchQuery is added to SessionsViewModel
         // .searchable(text: $viewModel.searchQuery, prompt: "Search sessions...")
-        .accessibilityElement(
-            label: "Sessions list",
-            hint: "Select a session to view the chat"
-        )
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Sessions list")
+        .accessibilityHint("Swipe to navigate sessions, double tap to select")
+        .onAppear {
+            if voiceOverEnabled && viewModel.sessions.isEmpty {
+                UIAccessibility.post(
+                    notification: .announcement,
+                    argument: "No sessions available. Use the New Session button to create one."
+                )
+            }
+        }
     }
 }
 
@@ -159,6 +176,8 @@ struct SessionRowView: View {
     let session: APIClient.Session
     
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.adaptive(Theme.Spacing.xs)) {
@@ -169,8 +188,12 @@ struct SessionRowView: View {
                     .foregroundStyle(
                         session.isActive ? Theme.neonGreen : Theme.mutedFg
                     )
-                    .scaleEffect(session.isActive ? 1.1 : 1.0)
-                    .animation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true), value: session.isActive)
+                    .scaleEffect(session.isActive && !reduceMotion ? 1.1 : 1.0)
+                    .animation(
+                        reduceMotion ? nil : .easeInOut(duration: 0.6).repeatForever(autoreverses: true),
+                        value: session.isActive
+                    )
+                    .accessibilityHidden(true) // Hide decorative icon from VoiceOver
                 
                 // Session title
                 Text(session.title ?? "Untitled Session")
@@ -185,13 +208,18 @@ struct SessionRowView: View {
                 if let messageCount = session.messageCount, messageCount > 0 {
                     Text("\(messageCount)")
                         .font(.system(size: Theme.FontSize.scalable(Theme.FontSize.xs, for: dynamicTypeSize)))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(differentiateWithoutColor ? Theme.foreground : .white)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
                         .background(
                             Capsule()
                                 .fill(Theme.primary.opacity(0.8))
                         )
+                        .overlay(
+                            differentiateWithoutColor ?
+                            Capsule().stroke(Theme.foreground, lineWidth: 1) : nil
+                        )
+                        .accessibilityLabel("\(messageCount) messages")
                 }
             }
             
@@ -222,10 +250,15 @@ struct SessionRowView: View {
             }
         }
         .padding(.vertical, Theme.Spacing.adaptive(Theme.Spacing.xs))
-        .accessibilityElement(
-            label: session.title ?? "Untitled Session",
-            value: "\(session.messageCount ?? 0) messages, last updated \(formatRelativeTime(dateFromString(session.updatedAt)))"
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            "\(session.title ?? "Untitled Session")\(session.isActive ? ", active" : "")"
         )
+        .accessibilityValue(
+            "\(session.messageCount ?? 0) messages, \(formatModelName(session.model)) model, last updated \(formatRelativeTime(dateFromString(session.updatedAt)))"
+        )
+        .accessibilityHint("Double tap to open this session")
+        .accessibilityAddTraits(.isButton)
     }
     
     private func formatRelativeTime(_ date: Date) -> String {

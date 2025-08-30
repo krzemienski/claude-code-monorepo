@@ -218,8 +218,8 @@ public struct ShimmeringText: View {
 
 // MARK: - Animated Progress Bar
 
-/// A progress bar with smooth animations and gradient effects
-public struct AnimatedProgressBar: View {
+/// A progress bar with smooth animations and gradient effects (renamed to avoid conflict)
+public struct AnimatedProgressBarComponent: View {
     let progress: Double
     let total: Double
     var height: CGFloat = 8
@@ -445,7 +445,7 @@ public struct TypingAnimationText: View {
 struct AnimatedComponents_Previews: PreviewProvider {
     static var previews: some View {
         ScrollView {
-            VStack(spacing: 30) {
+            VStack(spacing: Theme.Spacing.xxl) {
                 PulsingAvatar(systemName: "person.fill", color: Theme.neonCyan)
                 
                 AnimatedCard {
@@ -455,7 +455,7 @@ struct AnimatedComponents_Previews: PreviewProvider {
                 
                 ShimmeringText("Shimmering Title", font: .largeTitle)
                 
-                AnimatedProgressBar(progress: 0.7, total: 1.0)
+                EnhancedProgressBar(progress: 0.7)
                     .padding(.horizontal)
                 
                 AnimatedTabBar(

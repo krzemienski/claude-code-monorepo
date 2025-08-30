@@ -3,23 +3,100 @@ import SwiftUI
 // MARK: - iPad Layout Configuration
 
 struct iPadLayoutConfiguration {
-    static let sidebarMinWidth: CGFloat = 320
-    static let sidebarIdealWidth: CGFloat = 400
-    static let sidebarMaxWidth: CGFloat = 500
+    // iPad Model-Specific Optimizations
+    enum iPadModel {
+        case mini        // 8.3" - 744 x 1133 points
+        case regular     // 10.2" - 810 x 1080 points
+        case air         // 10.9" - 820 x 1180 points
+        case pro11       // 11" - 834 x 1194 points
+        case pro12_9     // 12.9" - 1024 x 1366 points
+        
+        static func current(width: CGFloat) -> iPadModel {
+            switch width {
+            case ..<760: return .mini
+            case ..<820: return .regular
+            case ..<830: return .air
+            case ..<1000: return .pro11
+            default: return .pro12_9
+            }
+        }
+        
+        var sidebarConfig: (min: CGFloat, ideal: CGFloat, max: CGFloat) {
+            switch self {
+            case .mini:
+                return (280, 320, 380)
+            case .regular:
+                return (300, 360, 420)
+            case .air:
+                return (320, 380, 450)
+            case .pro11:
+                return (340, 400, 480)
+            case .pro12_9:
+                return (380, 450, 550)
+            }
+        }
+        
+        var detailConfig: (min: CGFloat, ideal: CGFloat) {
+            switch self {
+            case .mini:
+                return (400, 500)
+            case .regular:
+                return (450, 600)
+            case .air:
+                return (500, 650)
+            case .pro11:
+                return (550, 700)
+            case .pro12_9:
+                return (650, 850)
+            }
+        }
+    }
     
-    static let detailMinWidth: CGFloat = 600
-    static let detailIdealWidth: CGFloat = 800
+    // Multitasking Support
+    enum MultitaskingMode: Equatable {
+        case fullScreen
+        case splitView(ratio: CGFloat)  // 0.5 = half, 0.33 = one-third
+        case slideOver
+        
+        static func detect(screenWidth: CGFloat, windowWidth: CGFloat) -> MultitaskingMode {
+            let ratio = windowWidth / screenWidth
+            
+            if ratio > 0.9 {
+                return .fullScreen
+            } else if ratio > 0.6 {
+                return .splitView(ratio: ratio)
+            } else if ratio > 0.4 {
+                return .splitView(ratio: 0.5)
+            } else if ratio > 0.3 {
+                return .splitView(ratio: 0.33)
+            } else {
+                return .slideOver
+            }
+        }
+    }
     
     static let compactBreakpoint: CGFloat = 768
     static let regularBreakpoint: CGFloat = 1024
     static let largeBreakpoint: CGFloat = 1366
     
-    static func columnsFor(width: CGFloat) -> Int {
-        switch width {
-        case ..<compactBreakpoint: return 1
-        case ..<regularBreakpoint: return 2
-        case ..<largeBreakpoint: return 3
-        default: return 4
+    static func columnsFor(width: CGFloat, multitaskingMode: MultitaskingMode) -> Int {
+        switch multitaskingMode {
+        case .fullScreen:
+            switch width {
+            case ..<compactBreakpoint: return 1
+            case ..<regularBreakpoint: return 2
+            case ..<largeBreakpoint: return 3
+            default: return 3  // Max 3 columns for better readability
+            }
+        case .splitView(let ratio):
+            // Reduce columns in split view based on available space
+            if ratio > 0.6 {
+                return width < regularBreakpoint ? 1 : 2
+            } else {
+                return 1  // Always single column in narrow split
+            }
+        case .slideOver:
+            return 1  // Always single column in slide over
         }
     }
 }
@@ -31,6 +108,8 @@ struct AdaptiveSplitView<Sidebar: View, Detail: View, Secondary: View>: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass
     @State private var columnVisibility = NavigationSplitViewVisibility.all
     @State private var selectedItem: String?
+    @State private var currentOrientation = UIDevice.current.orientation
+    @State private var multitaskingMode: iPadLayoutConfiguration.MultitaskingMode = .fullScreen
     
     let sidebar: () -> Sidebar
     let detail: () -> Detail
@@ -56,45 +135,26 @@ struct AdaptiveSplitView<Sidebar: View, Detail: View, Secondary: View>: View {
     }
     
     var body: some View {
-        Group {
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                if let secondary = secondary {
-                    // Three-column layout for larger iPads
-                    NavigationSplitView(columnVisibility: $columnVisibility) {
-                        sidebar()
-                            .navigationSplitViewColumnWidth(
-                                min: iPadLayoutConfiguration.sidebarMinWidth,
-                                ideal: iPadLayoutConfiguration.sidebarIdealWidth,
-                                max: iPadLayoutConfiguration.sidebarMaxWidth
-                            )
-                    } content: {
-                        detail()
-                            .navigationSplitViewColumnWidth(
-                                min: iPadLayoutConfiguration.detailMinWidth,
-                                ideal: iPadLayoutConfiguration.detailIdealWidth
-                            )
-                    } detail: {
-                        secondary()
-                    }
-                    .navigationSplitViewStyle(.balanced)
+        GeometryReader { geometry in
+            Group {
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    iPadLayout(geometry: geometry)
                 } else {
-                    // Two-column layout for standard iPads
-                    NavigationSplitView(columnVisibility: $columnVisibility) {
+                    // iPhone layout
+                    NavigationStack {
                         sidebar()
-                            .navigationSplitViewColumnWidth(
-                                min: iPadLayoutConfiguration.sidebarMinWidth,
-                                ideal: iPadLayoutConfiguration.sidebarIdealWidth,
-                                max: iPadLayoutConfiguration.sidebarMaxWidth
-                            )
-                    } detail: {
-                        detail()
                     }
-                    .navigationSplitViewStyle(.balanced)
                 }
-            } else {
-                // iPhone layout
-                NavigationStack {
-                    sidebar()
+            }
+            .onAppear {
+                detectMultitaskingMode(geometry: geometry)
+            }
+            .onChange(of: geometry.size) { _ in
+                detectMultitaskingMode(geometry: geometry)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    currentOrientation = UIDevice.current.orientation
                 }
             }
         }
@@ -104,6 +164,70 @@ struct AdaptiveSplitView<Sidebar: View, Detail: View, Secondary: View>: View {
                 "Split view navigation with sidebar and detail" : 
                 "Stack navigation"
         )
+    }
+    
+    @ViewBuilder
+    private func iPadLayout(geometry: GeometryProxy) -> some View {
+        let iPadModel = iPadLayoutConfiguration.iPadModel.current(width: geometry.size.width)
+        let sidebarConfig = iPadModel.sidebarConfig
+        let detailConfig = iPadModel.detailConfig
+        
+        // Adjust column visibility based on multitasking mode
+        let shouldShowAllColumns = multitaskingMode == .fullScreen && geometry.size.width > iPadLayoutConfiguration.regularBreakpoint
+        
+        if let secondary = secondary, shouldShowAllColumns {
+            // Three-column layout for larger iPads in full screen
+            NavigationSplitView(columnVisibility: $columnVisibility) {
+                sidebar()
+                    .navigationSplitViewColumnWidth(
+                        min: sidebarConfig.min,
+                        ideal: sidebarConfig.ideal,
+                        max: sidebarConfig.max
+                    )
+            } content: {
+                detail()
+                    .navigationSplitViewColumnWidth(
+                        min: detailConfig.min,
+                        ideal: detailConfig.ideal
+                    )
+            } detail: {
+                secondary()
+            }
+            .navigationSplitViewStyle(.automatic)
+        } else {
+            // Two-column layout for standard iPads or multitasking
+            NavigationSplitView(columnVisibility: $columnVisibility) {
+                sidebar()
+                    .navigationSplitViewColumnWidth(
+                        min: adjustForMultitasking(sidebarConfig.min),
+                        ideal: adjustForMultitasking(sidebarConfig.ideal),
+                        max: adjustForMultitasking(sidebarConfig.max)
+                    )
+            } detail: {
+                detail()
+            }
+            .navigationSplitViewStyle(.automatic)
+        }
+    }
+    
+    private func detectMultitaskingMode(geometry: GeometryProxy) {
+        let screenWidth = UIScreen.main.bounds.width
+        let windowWidth = geometry.size.width
+        multitaskingMode = iPadLayoutConfiguration.MultitaskingMode.detect(
+            screenWidth: screenWidth,
+            windowWidth: windowWidth
+        )
+    }
+    
+    private func adjustForMultitasking(_ value: CGFloat) -> CGFloat {
+        switch multitaskingMode {
+        case .fullScreen:
+            return value
+        case .splitView(let ratio):
+            return value * ratio
+        case .slideOver:
+            return value * 0.8  // Reduce sizes for slide over
+        }
     }
 }
 
@@ -263,32 +387,38 @@ struct KeyboardNavigationModifier: ViewModifier {
     }
     
     func body(content: Content) -> some View {
-        content
-            .focused($isFocused)
-            .onKeyPress(.return) {
-                onEnter()
-                return .handled
-            }
-            .onKeyPress(.escape) {
-                onEscape?()
-                return .handled
-            }
-            .onKeyPress(.upArrow) {
-                onArrowKeys?(.up)
-                return .handled
-            }
-            .onKeyPress(.downArrow) {
-                onArrowKeys?(.down)
-                return .handled
-            }
-            .onKeyPress(.leftArrow) {
-                onArrowKeys?(.left)
-                return .handled
-            }
-            .onKeyPress(.rightArrow) {
-                onArrowKeys?(.right)
-                return .handled
-            }
+        if #available(iOS 17.0, *) {
+            content
+                .focused($isFocused)
+                .onKeyPress(.return) {
+                    onEnter()
+                    return .handled
+                }
+                .onKeyPress(.escape) {
+                    onEscape?()
+                    return .handled
+                }
+                .onKeyPress(.upArrow) {
+                    onArrowKeys?(.up)
+                    return .handled
+                }
+                .onKeyPress(.downArrow) {
+                    onArrowKeys?(.down)
+                    return .handled
+                }
+                .onKeyPress(.leftArrow) {
+                    onArrowKeys?(.left)
+                    return .handled
+                }
+                .onKeyPress(.rightArrow) {
+                    onArrowKeys?(.right)
+                    return .handled
+                }
+        } else {
+            // Fallback for iOS 16.0 - keyboard navigation not available
+            content
+                .focused($isFocused)
+        }
     }
 }
 

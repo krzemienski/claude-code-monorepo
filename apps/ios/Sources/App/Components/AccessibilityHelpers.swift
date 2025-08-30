@@ -1,388 +1,500 @@
 import SwiftUI
-import Combine
 
-// MARK: - Accessibility Settings Observer
+// MARK: - Accessibility Extensions
 
-class AccessibilitySettings: ObservableObject {
-    @Published var isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
-    @Published var isDynamicTypeEnabled = UIApplication.shared.preferredContentSizeCategory != .large
-    @Published var isReduceMotionEnabled = UIAccessibility.isReduceMotionEnabled
-    @Published var isIncreaseContrastEnabled = UIAccessibility.isDarkerSystemColorsEnabled
-    @Published var isSwitchControlRunning = UIAccessibility.isSwitchControlRunning
-    @Published var preferredContentSizeCategory = UIApplication.shared.preferredContentSizeCategory
-    
-    private var cancellables = Set<AnyCancellable>()
-    
-    init() {
-        setupNotifications()
-    }
-    
-    private func setupNotifications() {
-        NotificationCenter.default.publisher(for: UIAccessibility.voiceOverStatusDidChangeNotification)
-            .sink { [weak self] _ in
-                self?.isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
-            }
-            .store(in: &cancellables)
-        
-        NotificationCenter.default.publisher(for: UIAccessibility.reduceMotionStatusDidChangeNotification)
-            .sink { [weak self] _ in
-                self?.isReduceMotionEnabled = UIAccessibility.isReduceMotionEnabled
-            }
-            .store(in: &cancellables)
-        
-        NotificationCenter.default.publisher(for: UIAccessibility.darkerSystemColorsStatusDidChangeNotification)
-            .sink { [weak self] _ in
-                self?.isIncreaseContrastEnabled = UIAccessibility.isDarkerSystemColorsEnabled
-            }
-            .store(in: &cancellables)
-        
-        NotificationCenter.default.publisher(for: UIContentSizeCategory.didChangeNotification)
-            .sink { [weak self] _ in
-                self?.preferredContentSizeCategory = UIApplication.shared.preferredContentSizeCategory
-                self?.isDynamicTypeEnabled = UIApplication.shared.preferredContentSizeCategory != .large
-            }
-            .store(in: &cancellables)
-    }
-}
-
-// MARK: - Accessibility View Modifiers
-
-extension View {
-    /// Adds comprehensive accessibility support
+public extension View {
+    /// Enhanced accessibility label with automatic trait detection
     func accessibilityElement(
         label: String,
+        value: String? = nil,
         hint: String? = nil,
-        traits: AccessibilityTraits = [],
-        value: String? = nil
+        traits: AccessibilityTraits = []
     ) -> some View {
         self
             .accessibilityLabel(label)
+            .accessibilityValue(value ?? "")
             .accessibilityHint(hint ?? "")
             .accessibilityAddTraits(traits)
-            .accessibilityValue(value ?? "")
     }
     
-    /// Adaptive layout modifier for iPad
-    func adaptiveFrame(
-        minWidth: CGFloat? = nil,
-        idealWidth: CGFloat? = nil,
-        maxWidth: CGFloat? = nil,
-        minHeight: CGFloat? = nil,
-        idealHeight: CGFloat? = nil,
-        maxHeight: CGFloat? = nil
-    ) -> some View {
-        let idiom = UIDevice.current.userInterfaceIdiom
-        let multiplier: CGFloat = idiom == .pad ? 1.3 : 1.0
-        
-        return self.frame(
-            minWidth: minWidth.map { $0 * multiplier },
-            idealWidth: idealWidth.map { $0 * multiplier },
-            maxWidth: maxWidth.map { $0 * multiplier },
-            minHeight: minHeight.map { $0 * multiplier },
-            idealHeight: idealHeight.map { $0 * multiplier },
-            maxHeight: maxHeight.map { $0 * multiplier }
-        )
-    }
-    
-    /// Adaptive padding for different device sizes
-    func adaptivePadding(_ edges: Edge.Set = .all, _ length: CGFloat? = nil) -> some View {
-        let spacing = length ?? Theme.Spacing.md
-        let adaptiveSpacing = Theme.Spacing.adaptive(spacing)
-        return self.padding(edges, adaptiveSpacing)
-    }
-    
-    /// Dynamic type support for text
-    func dynamicTypeSize() -> some View {
-        self.dynamicTypeSize(...DynamicTypeSize.accessibility5)
-    }
-    
-    /// Interactive element with proper accessibility
+    /// Create accessible button with proper traits
     func accessibleButton(
         label: String,
         hint: String? = nil,
         action: @escaping () -> Void
     ) -> some View {
         self
+            .accessibilityLabel(label)
+            .accessibilityHint(hint ?? "")
+            .accessibilityAddTraits(.isButton)
             .onTapGesture(perform: action)
-            .accessibilityElement(
-                label: label,
-                hint: hint,
-                traits: .isButton
-            )
     }
     
-    /// Navigation link with accessibility
-    func accessibleNavigationLink(
-        label: String,
-        hint: String? = nil
+    /// Add focus border for keyboard navigation
+    func accessibilityFocusBorder(
+        isFocused: Bool,
+        color: Color = Theme.neonCyan
+    ) -> some View {
+        self.overlay(
+            RoundedRectangle(cornerRadius: Theme.CornerRadius.md)
+                .stroke(color, lineWidth: isFocused ? 3 : 0)
+                .animation(.easeInOut(duration: 0.2), value: isFocused)
+        )
+    }
+    
+    /// Dynamic Type support with min/max constraints
+    func dynamicTypeAccessibility(
+        minimumScaleFactor: CGFloat = 0.5,
+        lineLimit: Int? = nil
     ) -> some View {
         self
-            .accessibilityElement(
-                label: label,
-                hint: hint ?? "Double tap to navigate",
-                traits: [.isLink, .isButton]
-            )
+            .minimumScaleFactor(minimumScaleFactor)
+            .lineLimit(lineLimit)
     }
     
-    /// Header with accessibility
-    func accessibleHeader(label: String) -> some View {
-        self
-            .accessibilityElement(
-                label: label,
-                traits: .isHeader
-            )
+    /// High contrast mode support
+    func highContrastCompatible(
+        normalColor: Color,
+        highContrastColor: Color
+    ) -> some View {
+        self.foregroundColor(
+            UIAccessibility.isDarkerSystemColorsEnabled ? highContrastColor : normalColor
+        )
     }
     
-    /// Status indicator with accessibility
-    func accessibleStatus(
+    /// Reduce motion support
+    func reduceMotionCompatible<T: Equatable>(
+        animation: Animation?,
+        value: T
+    ) -> some View {
+        self.animation(
+            UIAccessibility.isReduceMotionEnabled ? .none : animation,
+            value: value
+        )
+    }
+    
+    /// Voice Control support
+    func voiceControlCompatible(
         label: String,
-        value: String,
-        isUpdating: Bool = false
+        alternativeLabels: [String] = []
     ) -> some View {
         self
-            .accessibilityElement(
-                label: label,
-                traits: isUpdating ? [.updatesFrequently] : [],
-                value: value
-            )
+            .accessibilityLabel(label)
+            .accessibilityInputLabels([label] + alternativeLabels)
+    }
+    
+    /// Announcement for screen readers
+    func announceToVoiceOver(_ message: String, delay: Double = 0.1) -> some View {
+        self.onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                UIAccessibility.post(
+                    notification: .announcement,
+                    argument: message
+                )
+            }
+        }
+    }
+    
+    /// Screen change notification for major updates
+    func notifyScreenChange(delay: Double = 0.1) -> some View {
+        self.onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                UIAccessibility.post(
+                    notification: .screenChanged,
+                    argument: nil
+                )
+            }
+        }
+    }
+    
+    /// Layout change notification for minor updates
+    func notifyLayoutChange(_ element: Any? = nil, delay: Double = 0.1) -> some View {
+        self.onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                UIAccessibility.post(
+                    notification: .layoutChanged,
+                    argument: element
+                )
+            }
+        }
     }
 }
 
-// MARK: - Adaptive Layout Helpers
+// MARK: - Accessibility Container View
 
-struct AdaptiveStack<Content: View>: View {
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    @Environment(\.dynamicTypeSize) var dynamicTypeSize
-    
+public struct AccessibleContainer<Content: View>: View {
+    let label: String
+    let role: AccessibilityRole
     let content: () -> Content
     
-    init(@ViewBuilder content: @escaping () -> Content) {
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
+    @Environment(\.accessibilityReduceTransparency) var reduceTransparency
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    @Environment(\.colorSchemeContrast) var colorSchemeContrast
+    
+    public init(
+        label: String,
+        role: AccessibilityRole = .none,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self.label = label
+        self.role = role
         self.content = content
     }
     
-    var body: some View {
-        let isCompact = horizontalSizeClass == .compact
-        let isLargeText = dynamicTypeSize >= .accessibility1
-        
-        if isCompact || isLargeText {
-            VStack(alignment: .leading, spacing: Theme.Spacing.md) {
-                content()
-            }
-        } else {
-            HStack(spacing: Theme.Spacing.lg) {
-                content()
-            }
-        }
-    }
-}
-
-struct AdaptiveGrid<Content: View>: View {
-    @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
-    let content: () -> Content
-    
-    var columns: [GridItem] {
-        let count = horizontalSizeClass == .regular ? 3 : 2
-        return Array(repeating: GridItem(.flexible()), count: count)
-    }
-    
-    var body: some View {
-        LazyVGrid(columns: columns, spacing: Theme.Spacing.adaptive(Theme.Spacing.lg)) {
-            content()
-        }
-    }
-}
-
-// MARK: - iPad Split View Helper
-
-struct AdaptiveNavigationView<Sidebar: View, Detail: View>: View {
-    let sidebar: () -> Sidebar
-    let detail: () -> Detail
-    
-    var body: some View {
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            NavigationSplitView {
-                sidebar()
-                    .navigationSplitViewColumnWidth(
-                        min: 320,
-                        ideal: 400,
-                        max: 500
-                    )
-            } detail: {
-                detail()
-            }
-            .navigationSplitViewStyle(.balanced)
-        } else {
-            NavigationStack {
-                sidebar()
-            }
-        }
-    }
-}
-
-// MARK: - Focus Management
-
-struct FocusableModifier: ViewModifier {
-    @FocusState private var isFocused: Bool
-    let label: String
-    
-    func body(content: Content) -> some View {
-        content
-            .focused($isFocused)
-            .accessibilityElement(
-                label: label,
-                traits: isFocused ? [.isSelected] : []
-            )
-    }
-}
-
-extension View {
-    func focusableAccessibility(label: String) -> some View {
-        self.modifier(FocusableModifier(label: label))
-    }
-}
-
-// MARK: - Voice Control Support
-
-extension View {
-    func voiceControlLabel(_ label: String) -> some View {
-        self
-            .accessibilityLabel(label)
-            .accessibilityInputLabels([label])
-    }
-    
-    /// VoiceOver custom actions support
-    func accessibilityCustomActions(_ actions: [AccessibilityCustomAction]) -> some View {
-        self.accessibilityElement(children: .combine)
-            .accessibilityActions {
-                ForEach(actions, id: \.self) { action in
-                    Button(action.name) {
-                        action.handler()
-                    }
-                }
-            }
-    }
-    
-    /// VoiceOver rotor support
-    func accessibilityRotor<Content>(
-        _ label: String,
-        entries: [String],
-        @ViewBuilder content: @escaping (String) -> Content
-    ) -> some View where Content: View {
-        self.accessibilityRotor(label) {
-            ForEach(entries, id: \.self) { entry in
-                AccessibilityRotorEntry(entry, id: entry)
-            }
-        }
-    }
-}
-
-// MARK: - Accessibility Custom Action
-
-struct AccessibilityCustomAction: Hashable {
-    let id = UUID()
-    let name: String
-    let handler: () -> Void
-    
-    static func == (lhs: AccessibilityCustomAction, rhs: AccessibilityCustomAction) -> Bool {
-        lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-}
-
-// MARK: - Semantic Content
-
-struct SemanticContent: ViewModifier {
-    let role: AccessibilityRole
-    let label: String
-    let importance: AccessibilityImportance
-    
-    func body(content: Content) -> some View {
-        content
+    public var body: some View {
+        content()
+            .accessibilityElement(children: .contain)
             .accessibilityLabel(label)
             .accessibilityAddTraits(traitsForRole(role))
-            .accessibilitySortPriority(importance == .high ? 1 : 0)
     }
     
     private func traitsForRole(_ role: AccessibilityRole) -> AccessibilityTraits {
         switch role {
         case .button: return .isButton
-        case .link: return [.isLink, .isButton]
-        case .search: return .isSearchField
+        case .link: return .isLink
+        case .search: return [.isSearchField]
         case .image: return .isImage
-        case .text: return .isStaticText
+        case .adjustable: return []  // adjustable trait not available in SwiftUI
         case .header: return .isHeader
         case .summary: return .isSummaryElement
+        case .tabBar:
+            if #available(iOS 17.0, *) {
+                return .isTabBar
+            } else {
+                return []
+            }
+        case .none: return []
         @unknown default: return []
         }
     }
 }
 
-enum AccessibilityRole {
-    case button, link, search, image, text, header, summary
+// MARK: - Accessibility Role
+
+public enum AccessibilityRole {
+    case button
+    case link
+    case search
+    case image
+    case adjustable
+    case header
+    case summary
+    case tabBar
+    case none
 }
 
-enum AccessibilityImportance {
-    case high, normal, low
+// MARK: - Accessibility Preferences
+
+public struct AccessibilityPreferences {
+    public static var shared = AccessibilityPreferences()
+    
+    public var isVoiceOverRunning: Bool {
+        UIAccessibility.isVoiceOverRunning
+    }
+    
+    public var isSwitchControlRunning: Bool {
+        UIAccessibility.isSwitchControlRunning
+    }
+    
+    public var isReduceMotionEnabled: Bool {
+        UIAccessibility.isReduceMotionEnabled
+    }
+    
+    public var isReduceTransparencyEnabled: Bool {
+        UIAccessibility.isReduceTransparencyEnabled
+    }
+    
+    public var isDarkerSystemColorsEnabled: Bool {
+        UIAccessibility.isDarkerSystemColorsEnabled
+    }
+    
+    public var isBoldTextEnabled: Bool {
+        UIAccessibility.isBoldTextEnabled
+    }
+    
+    public var isGrayscaleEnabled: Bool {
+        UIAccessibility.isGrayscaleEnabled
+    }
+    
+    public var isInvertColorsEnabled: Bool {
+        UIAccessibility.isInvertColorsEnabled
+    }
+    
+    public var isMonoAudioEnabled: Bool {
+        UIAccessibility.isMonoAudioEnabled
+    }
+    
+    public var prefersCrossFadeTransitions: Bool {
+        UIAccessibility.prefersCrossFadeTransitions
+    }
+    
+    public var isVideoAutoplayEnabled: Bool {
+        UIAccessibility.isVideoAutoplayEnabled
+    }
+    
+    public var isSpeakScreenEnabled: Bool {
+        UIAccessibility.isSpeakScreenEnabled
+    }
+    
+    public var isSpeakSelectionEnabled: Bool {
+        UIAccessibility.isSpeakSelectionEnabled
+    }
+    
+    public var isShakeToUndoEnabled: Bool {
+        UIAccessibility.isShakeToUndoEnabled
+    }
+    
+    public var isAssistiveTouchRunning: Bool {
+        UIAccessibility.isAssistiveTouchRunning
+    }
+    
+    public var shouldDifferentiateWithoutColor: Bool {
+        UIAccessibility.shouldDifferentiateWithoutColor
+    }
+    
+    public var isOnOffSwitchLabelsEnabled: Bool {
+        UIAccessibility.isOnOffSwitchLabelsEnabled
+    }
 }
 
-extension View {
-    func semanticContent(
-        role: AccessibilityRole,
-        label: String,
-        importance: AccessibilityImportance = .normal
-    ) -> some View {
-        self.modifier(SemanticContent(role: role, label: label, importance: importance))
+// MARK: - Focus Management
+
+public struct AppAccessibilityFocusState {
+    @FocusState private var isFocused: Bool
+    
+    public mutating func focus() {
+        isFocused = true
     }
     
-    /// Reduce motion support
-    func reducedMotionAnimation<V>(
-        _ animation: Animation?,
-        value: V
-    ) -> some View where V: Equatable {
-        @Environment(\.accessibilityReduceMotion) var reduceMotion
-        return self.animation(reduceMotion ? .none : animation, value: value)
+    public mutating func unfocus() {
+        isFocused = false
     }
     
-    /// High contrast color support
-    func highContrastColor(
-        normal: Color,
-        highContrast: Color
-    ) -> some View {
-        @Environment(\.colorSchemeContrast) var contrast
-        return self.foregroundColor(contrast == .increased ? highContrast : normal)
+    public var isCurrentlyFocused: Bool {
+        isFocused
+    }
+}
+
+// MARK: - Accessible Loading Indicator
+
+public struct AccessibleLoadingIndicator: View {
+    let message: String
+    let progress: Double?
+    
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
+    @State private var announcementTimer: Timer?
+    @State private var lastAnnouncedProgress: Int = -1
+    
+    public init(message: String = "Loading", progress: Double? = nil) {
+        self.message = message
+        self.progress = progress
     }
     
-    /// Minimum touch target size for accessibility (44x44 points)
-    func accessibleTouchTarget(minSize: CGFloat = 44) -> some View {
-        self.frame(minWidth: minSize, minHeight: minSize)
+    public var body: some View {
+        Group {
+            if let progress = progress {
+                ProgressView(value: progress)
+                    .progressViewStyle(LinearProgressViewStyle())
+                    .accessibilityLabel("\(message), \(Int(progress * 100)) percent complete")
+                    .onChange(of: progress) { newValue in
+                        announceProgressChange(newValue)
+                    }
+            } else {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .accessibilityLabel("\(message), please wait")
+            }
+        }
+        .accessibilityAddTraits(.updatesFrequently)
     }
     
-    /// Scalable font for Dynamic Type
-    func scalableFont(_ font: Font, minSize: CGFloat? = nil, maxSize: CGFloat? = nil) -> some View {
-        @Environment(\.sizeCategory) var sizeCategory
+    private func announceProgressChange(_ progress: Double) {
+        let currentProgress = Int(progress * 100)
         
-        // For dynamic type support, we'll use the font directly
-        // The system automatically handles dynamic type scaling
-        return self.font(font)
-    }
-    
-    /// Accessibility announcement
-    func accessibilityAnnouncement(_ text: String, delay: Double = 0.1) -> some View {
-        self.onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                UIAccessibility.post(notification: .announcement, argument: text)
+        // Only announce at 25%, 50%, 75%, and 100%
+        let milestones = [25, 50, 75, 100]
+        
+        for milestone in milestones {
+            if currentProgress >= milestone && lastAnnouncedProgress < milestone {
+                UIAccessibility.post(
+                    notification: .announcement,
+                    argument: "\(milestone) percent complete"
+                )
+                lastAnnouncedProgress = milestone
+                break
             }
         }
     }
+}
+
+// MARK: - Accessible Error View
+
+public struct AccessibleErrorView: View {
+    let title: String
+    let message: String
+    let retryAction: (() -> Void)?
     
-    /// Accessibility screen change notification
-    func accessibilityScreenChanged() -> some View {
-        self.onAppear {
-            UIAccessibility.post(notification: .screenChanged, argument: nil)
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    
+    public init(
+        title: String = "Error",
+        message: String,
+        retryAction: (() -> Void)? = nil
+    ) {
+        self.title = title
+        self.message = message
+        self.retryAction = retryAction
+    }
+    
+    public var body: some View {
+        VStack(spacing: Theme.Spacing.lg) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 48))
+                .foregroundColor(Theme.error)
+                .accessibilityHidden(true)
+            
+            Text(title)
+                .font(.headline)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility3)
+                .accessibilityAddTraits(.isHeader)
+            
+            Text(message)
+                .font(.body)
+                .multilineTextAlignment(.center)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility3)
+            
+            if let retryAction = retryAction {
+                Button(action: retryAction) {
+                    Label("Try Again", systemImage: "arrow.clockwise")
+                        .font(.headline)
+                }
+                .buttonStyle(.borderedProminent)
+                .accessibilityHint("Double tap to retry the operation")
+            }
         }
+        .padding()
+        .accessibilityElement(children: .combine)
+        .announceToVoiceOver("\(title). \(message)")
+    }
+}
+
+// MARK: - Semantic HTML Role Mapping
+
+public enum SemanticRole: String {
+    case navigation = "navigation"
+    case main = "main"
+    case complementary = "complementary"
+    case contentInfo = "contentinfo"
+    case banner = "banner"
+    case search = "search"
+    case form = "form"
+    case region = "region"
+    case article = "article"
+    case section = "section"
+    
+    var accessibilityTraits: AccessibilityTraits {
+        switch self {
+        case .navigation: 
+            if #available(iOS 17.0, *) {
+                return .isTabBar
+            } else {
+                return []
+            }
+        case .search: return .isSearchField
+        default: return []
+        }
+    }
+}
+
+// MARK: - Keyboard Navigation Support
+
+public struct KeyboardNavigatable: ViewModifier {
+    @FocusState private var isFocused: Bool
+    let onReturn: () -> Void
+    let onEscape: (() -> Void)?
+    
+    public init(
+        onReturn: @escaping () -> Void,
+        onEscape: (() -> Void)? = nil
+    ) {
+        self.onReturn = onReturn
+        self.onEscape = onEscape
+    }
+    
+    public func body(content: Content) -> some View {
+        if #available(iOS 17.0, *) {
+            content
+                .focused($isFocused)
+                .onKeyPress(.return) {
+                    onReturn()
+                    return .handled
+                }
+                .onKeyPress(.escape) {
+                    onEscape?()
+                    return .handled
+                }
+        } else {
+            content
+                .focused($isFocused)
+                .accessibilityFocusBorder(isFocused: isFocused)
+        }
+    }
+}
+
+// MARK: - WCAG Compliance Helpers
+
+public struct WCAGCompliance {
+    /// Check if text color has sufficient contrast against background
+    public static func checkContrast(
+        text: UIColor,
+        background: UIColor,
+        level: WCAGLevel = .AA
+    ) -> Bool {
+        let ratio = contrastRatio(between: text, and: background)
+        
+        switch level {
+        case .AA:
+            return ratio >= 4.5 // Normal text
+        case .AAA:
+            return ratio >= 7.0 // Enhanced contrast
+        case .AALarge:
+            return ratio >= 3.0 // Large text (18pt+)
+        case .AAALarge:
+            return ratio >= 4.5 // Large text enhanced
+        }
+    }
+    
+    public enum WCAGLevel {
+        case AA
+        case AAA
+        case AALarge
+        case AAALarge
+    }
+    
+    private static func contrastRatio(between color1: UIColor, and color2: UIColor) -> Double {
+        let l1 = relativeLuminance(of: color1)
+        let l2 = relativeLuminance(of: color2)
+        
+        let lighter = max(l1, l2)
+        let darker = min(l1, l2)
+        
+        return (lighter + 0.05) / (darker + 0.05)
+    }
+    
+    private static func relativeLuminance(of color: UIColor) -> Double {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        
+        color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        
+        let r = red <= 0.03928 ? red / 12.92 : pow((red + 0.055) / 1.055, 2.4)
+        let g = green <= 0.03928 ? green / 12.92 : pow((green + 0.055) / 1.055, 2.4)
+        let b = blue <= 0.03928 ? blue / 12.92 : pow((blue + 0.055) / 1.055, 2.4)
+        
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b
     }
 }

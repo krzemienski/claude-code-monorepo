@@ -130,7 +130,13 @@ final class MockAPIClient: APIClientProtocol {
     let apiKey: String? = nil
     
     func health() async throws -> APIClient.HealthResponse {
-        APIClient.HealthResponse(ok: true, version: "1.0.0", active_sessions: 5)
+        // Return a mock healthy response matching the actual backend format
+        struct MockHealthResponse: Decodable {
+            let status: String = "healthy"
+            let timestamp: String? = ISO8601DateFormatter().string(from: Date())
+        }
+        let mockData = try! JSONEncoder().encode(["status": "healthy", "timestamp": ISO8601DateFormatter().string(from: Date())])
+        return try! JSONDecoder().decode(APIClient.HealthResponse.self, from: mockData)
     }
     
     func listProjects() async throws -> [APIClient.Project] {

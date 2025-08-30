@@ -312,15 +312,4 @@ final class APIIntegrationTests: XCTestCase {
 }
 
 // MARK: - Enhanced URLSession Mock
-
-extension URLSessionMock {
-    var lastRequest: URLRequest? {
-        // Implementation to track last request
-        return nil
-    }
-    
-    var requestHandler: ((URLRequest) async throws -> (Data, URLResponse))? {
-        get { nil }
-        set { /* Implementation */ }
-    }
-}
+// Note: URLSessionMock properties are defined in TestHelpers/URLSessionMock.swift

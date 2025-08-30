@@ -54,7 +54,33 @@ struct APIClient {
 
     // ---- Typed endpoints
 
-    struct HealthResponse: Decodable { let ok: Bool; let version: String?; let active_sessions: Int? }
+    struct HealthResponse: Decodable { 
+        let ok: Bool
+        let version: String?
+        let active_sessions: Int?
+        
+        // Custom decoder to handle both response formats
+        enum CodingKeys: String, CodingKey {
+            case ok, status, version, active_sessions, timestamp
+        }
+        
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            
+            // Try to decode 'ok' field first (old format)
+            if let okValue = try? container.decode(Bool.self, forKey: .ok) {
+                self.ok = okValue
+                self.version = try? container.decode(String.self, forKey: .version)
+                self.active_sessions = try? container.decode(Int.self, forKey: .active_sessions)
+            } else {
+                // Fall back to 'status' field (new format)
+                let status = try container.decode(String.self, forKey: .status)
+                self.ok = (status == "healthy")
+                self.version = nil
+                self.active_sessions = nil
+            }
+        }
+    }
     func health() async throws -> HealthResponse { try await getJSON("/health", as: HealthResponse.self) }
 
     struct Project: Decodable, Identifiable {

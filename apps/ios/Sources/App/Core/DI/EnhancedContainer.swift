@@ -332,7 +332,7 @@ protocol NetworkingServiceProtocol {
     func cancelAllRequests()
 }
 
-protocol AuthenticationServiceProtocol {
+protocol AuthenticationServiceProtocol: AnyObject {
     var isAuthenticated: Bool { get }
     func authenticate(apiKey: String) async throws
     func logout()
@@ -363,7 +363,7 @@ struct NetworkingService: NetworkingServiceProtocol {
 }
 
 @MainActor
-struct AuthenticationService: AuthenticationServiceProtocol {
+final class AuthenticationService: AuthenticationServiceProtocol {
     private let settings: AppSettings
     
     init(settings: AppSettings) {
@@ -394,7 +394,7 @@ struct MockNetworkingService: NetworkingServiceProtocol {
     func cancelAllRequests() {}
 }
 
-struct MockAuthenticationService: AuthenticationServiceProtocol {
+final class MockAuthenticationService: AuthenticationServiceProtocol {
     var isAuthenticated: Bool { false }
     func authenticate(apiKey: String) async throws {}
     func logout() {}

@@ -46,7 +46,7 @@ public struct ErrorAlertView: View {
     
     @State private var isPresented = true
     @Environment(\.dismiss) private var dismiss
-    @AccessibilityFocusState private var isFocused: Bool
+    @FocusState private var isFocused: Bool
     
     public init(
         title: String,
@@ -96,7 +96,7 @@ public struct ErrorAlertView: View {
                 .foregroundStyle(Theme.foreground)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .accessibilityFocused($isFocused)
+                .focused($isFocused)
             
             // Actions
             HStack(spacing: 12) {

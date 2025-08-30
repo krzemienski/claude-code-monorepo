@@ -4,12 +4,7 @@ import Combine
 
 // MARK: - Test Utilities
 
-enum TestError: Error {
-    case mockError
-    case networkError
-    case validationError
-    case timeout
-}
+// TestError is defined in XCTestCase+Extensions.swift
 
 // MARK: - Async Test Helpers
 
@@ -287,7 +282,9 @@ extension XCTestCase {
 // MARK: - SwiftUI Preview Test Helpers
 
 #if DEBUG
+@MainActor
 struct PreviewTestHelper {
+    @MainActor
     static func makeTestContainer() -> Container {
         let container = Container.shared
         container.reset()
@@ -298,6 +295,7 @@ struct PreviewTestHelper {
         return container
     }
     
+    @MainActor
     static func makeTestSettings() -> AppSettings {
         let settings = AppSettings()
         settings.apiKeyPlaintext = "test-api-key"
@@ -316,7 +314,7 @@ struct TestFixtures {
         bundle: Bundle = Bundle(for: MemoryLeakTests.self)
     ) throws -> T {
         guard let url = bundle.url(forResource: filename, withExtension: "json") else {
-            throw TestError.mockError
+            throw TestError.invalidState
         }
         
         let data = try Data(contentsOf: url)
@@ -329,7 +327,7 @@ struct TestFixtures {
         bundle: Bundle = Bundle(for: MemoryLeakTests.self)
     ) throws -> Data {
         guard let url = bundle.url(forResource: filename, withExtension: ext) else {
-            throw TestError.mockError
+            throw TestError.invalidState
         }
         
         return try Data(contentsOf: url)

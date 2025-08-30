@@ -80,7 +80,7 @@ struct FileBrowserView: View {
         
         return Text(line)
             .font(.system(size: Theme.FontSize.adaptive(Theme.FontSize.xs)))
-            .dynamicTypeSize()
+            .applyDynamicTypeSize()
             .accessibilityElement(
                 label: label,
                 traits: traits
@@ -92,7 +92,7 @@ struct FileBrowserView: View {
             previewPath = IdentifiableString(resolvedPath(from: line))
         }
         .buttonStyle(.bordered)
-        .dynamicTypeSize()
+        .applyDynamicTypeSize()
         .accessibilityElement(
             label: "Preview \(line)",
             hint: "Opens file preview",
@@ -107,29 +107,29 @@ struct FileBrowserView: View {
                     .textInputAutocapitalization(.never)
                     .disableAutocorrection(true)
                     .focused($focusedField, equals: .host)
-                    .dynamicTypeSize()
+                    .applyDynamicTypeSize()
                     .accessibilityElement(
                         label: "SSH Host",
-                        hint: "Enter the hostname or IP address",
-                        value: host
+                        value: host,
+                        hint: "Enter the hostname or IP address"
                     )
                 TextField("User", text: $user)
                     .textInputAutocapitalization(.never)
                     .disableAutocorrection(true)
                     .focused($focusedField, equals: .user)
-                    .dynamicTypeSize()
+                    .applyDynamicTypeSize()
                     .accessibilityElement(
                         label: "Username",
-                        hint: "Enter SSH username",
-                        value: user
+                        value: user,
+                        hint: "Enter SSH username"
                     )
                 SecureField("Pass", text: $pass)
                     .focused($focusedField, equals: .pass)
-                    .dynamicTypeSize()
+                    .applyDynamicTypeSize()
                     .accessibilityElement(
                         label: "Password",
-                        hint: "Enter SSH password",
-                        value: pass.isEmpty ? "Not set" : "Set"
+                        value: pass.isEmpty ? "Not set" : "Set",
+                        hint: "Enter SSH password"
                     )
             }
             HStack(spacing: Theme.Spacing.adaptive(Theme.Spacing.sm)) {
@@ -137,17 +137,17 @@ struct FileBrowserView: View {
                     .textInputAutocapitalization(.never)
                     .disableAutocorrection(true)
                     .focused($focusedField, equals: .path)
-                    .dynamicTypeSize()
+                    .applyDynamicTypeSize()
                     .accessibilityElement(
                         label: "Directory path",
-                        hint: "Enter path to browse",
-                        value: path
+                        value: path,
+                        hint: "Enter path to browse"
                     )
                 Button("List") { 
                     Task { await list() } 
                 }
                 .buttonStyle(.borderedProminent)
-                .dynamicTypeSize()
+                .applyDynamicTypeSize()
                 .accessibilityElement(
                     label: "List files",
                     hint: "Browse files in specified directory",

@@ -10,7 +10,9 @@ struct LoadingStateView: View {
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) var reduceMotion
     @Environment(\.accessibilityVoiceOverEnabled) var voiceOverEnabled
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @State private var animationPhase = 0.0
+    @State private var lastAnnouncedProgress: Int = -1
     
     init(message: String = "Loading...", showProgress: Bool = false, progress: Double? = nil) {
         self.message = message
@@ -53,7 +55,6 @@ struct LoadingStateView: View {
             // Loading message
             Text(message)
                 .font(.headline)
-                .dynamicTypeSize(dynamicTypeSize)
                 .foregroundColor(Theme.foreground)
                 .multilineTextAlignment(.center)
                 .accessibilityAddTraits(.updatesFrequently)
@@ -67,9 +68,9 @@ struct LoadingStateView: View {
                     
                     Text("\(Int(progress * 100))%")
                         .font(.caption)
-                        .dynamicTypeSize(dynamicTypeSize)
                         .foregroundColor(Theme.mutedFg)
                         .accessibilityLabel("\(Int(progress * 100)) percent complete")
+                        .accessibilityAddTraits(.updatesFrequently)
                 }
             }
         }
@@ -96,6 +97,40 @@ struct LoadingStateView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel(progress != nil ? "\(message), \(Int((progress ?? 0) * 100)) percent complete" : message)
         .accessibilityHint("Loading in progress")
+        .accessibilityAddTraits(.updatesFrequently)
+        .onChange(of: progress) { newValue in
+            announceProgressChange(newValue)
+        }
+        .onAppear {
+            // Announce loading state for VoiceOver users
+            if voiceOverEnabled {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    UIAccessibility.post(
+                        notification: .announcement,
+                        argument: message
+                    )
+                }
+            }
+        }
+    }
+    
+    private func announceProgressChange(_ progress: Double?) {
+        guard let progress = progress, voiceOverEnabled else { return }
+        let currentProgress = Int(progress * 100)
+        
+        // Announce at milestones: 25%, 50%, 75%, 100%
+        let milestones = [25, 50, 75, 100]
+        
+        for milestone in milestones {
+            if currentProgress >= milestone && lastAnnouncedProgress < milestone {
+                UIAccessibility.post(
+                    notification: .announcement,
+                    argument: "\(milestone) percent complete"
+                )
+                lastAnnouncedProgress = milestone
+                break
+            }
+        }
     }
 }
 
@@ -199,13 +234,12 @@ struct ErrorStateView: View {
             // Error title
             Text(title)
                 .font(.headline)
-                .dynamicTypeSize(dynamicTypeSize)
                 .foregroundColor(Theme.foreground)
                 .multilineTextAlignment(.center)
             
             // Error message
             Text(message)
-                .font(.body.dynamicTypeSize(dynamicTypeSize))
+                .font(.body)
                 .foregroundColor(Theme.mutedFg)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
@@ -217,7 +251,7 @@ struct ErrorStateView: View {
                         Image(systemName: "arrow.clockwise")
                         Text("Try Again")
                     }
-                    .font(.headline.dynamicTypeSize(dynamicTypeSize))
+                    .font(.headline)
                     .padding(.horizontal, Theme.Spacing.lg)
                     .padding(.vertical, Theme.Spacing.md)
                 }
@@ -248,7 +282,19 @@ struct ErrorStateView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title). \(message)")
-        .accessibilityHint(retryAction != nil ? Text("Button available to retry") : Text(""))
+        .accessibilityHint(retryAction != nil ? "Button available to retry" : "")
+        .accessibilityAddTraits(.isStaticText)
+        .onAppear {
+            // Announce error immediately for VoiceOver users
+            if UIAccessibility.isVoiceOverRunning {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    UIAccessibility.post(
+                        notification: .announcement,
+                        argument: "\(title). \(message)"
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -297,14 +343,12 @@ struct EmptyStateView: View {
             // Title
             Text(title)
                 .font(.headline)
-                .dynamicTypeSize(dynamicTypeSize)
                 .foregroundColor(Theme.foreground)
                 .multilineTextAlignment(.center)
             
             // Message
             Text(message)
                 .font(.body)
-                .dynamicTypeSize(dynamicTypeSize)
                 .foregroundColor(Theme.mutedFg)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
@@ -313,7 +357,7 @@ struct EmptyStateView: View {
             if let action = action, let actionTitle = actionTitle {
                 Button(action: action) {
                     Text(actionTitle)
-                        .font(.headline.dynamicTypeSize(dynamicTypeSize))
+                        .font(.headline)
                         .padding(.horizontal, Theme.Spacing.lg)
                         .padding(.vertical, Theme.Spacing.md)
                 }
@@ -335,7 +379,8 @@ struct EmptyStateView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title). \(message)")
-        .accessibilityHint(action != nil && actionTitle != nil ? Text("\(actionTitle!) button available") : Text(""))
+        .accessibilityHint(action != nil && actionTitle != nil ? "\(actionTitle!) button available" : "")
+        .accessibilityAddTraits(.isStaticText)
     }
 }
 
@@ -415,7 +460,7 @@ struct CyberpunkButtonStyle: ButtonStyle {
 
 struct LoadingStateView_Previews: PreviewProvider {
     static var previews: some View {
-        VStack(spacing: 40) {
+        VStack(spacing: Theme.Spacing.xxl) {
             LoadingStateView(message: "Loading data...")
             
             LoadingStateView(

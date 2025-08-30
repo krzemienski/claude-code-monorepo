@@ -4,6 +4,10 @@ import OSLog
 @main
 struct ClaudeCodeApp: App {
     init() {
+        // Initialize the dependency container first
+        _ = EnhancedContainer.shared
+        _ = Container.shared
+        
         // Setup logging
         #if DEBUG
         DebugLogger.setup()
