@@ -1,0 +1,27 @@
+# Backend Test Container
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy backend code (will be mounted in compose)
+COPY services/backend /app
+
+# Install Python test dependencies
+RUN pip install --no-cache-dir \
+    pytest==7.4.3 \
+    pytest-asyncio==0.21.1 \
+    pytest-cov==4.1.0 \
+    pytest-mock==3.12.0 \
+    pytest-timeout==2.2.0 \
+    httpx==0.25.2 \
+    respx==0.20.2 \
+    faker==20.1.0
+
+# Run tests
+CMD ["pytest", "-v", "--cov=/app", "--cov-report=term-missing", "--cov-report=html:/coverage"]

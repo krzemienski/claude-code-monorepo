@@ -1,0 +1,312 @@
+version: '3.9'
+
+services:
+  # Main API service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: claude-code-api
+    environment:
+      # API Configuration
+      - PORT=${PORT:-8000}
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      
+      # Anthropic Configuration
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ANTHROPIC_MODEL=${ANTHROPIC_MODEL:-claude-3-sonnet-20240229}
+      - ANTHROPIC_MAX_TOKENS=${ANTHROPIC_MAX_TOKENS:-4096}
+      
+      # Database Configuration
+      - DATABASE_URL=postgresql+asyncpg://claude:claude@postgres:5432/claude_code
+      
+      # Redis Configuration
+      - REDIS_URL=redis://redis:6379/0
+      - CACHE_TTL=${CACHE_TTL:-3600}
+      
+      # Security
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here-change-in-production}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:8000}
+      
+      # Rate Limiting
+      - RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED:-true}
+      - RATE_LIMIT_REQUESTS=${RATE_LIMIT_REQUESTS:-100}
+      - RATE_LIMIT_PERIOD=${RATE_LIMIT_PERIOD:-60}
+      
+      # MCP Configuration
+      - MCP_CONFIG_DIR=/workspace/.claude
+      - MCP_DISCOVERY_ENABLED=${MCP_DISCOVERY_ENABLED:-true}
+      - MCP_AUDIT_LOGGING=${MCP_AUDIT_LOGGING:-true}
+      
+      # Workspace
+      - WORKSPACE_DIR=/workspace
+      
+      # Analytics
+      - ANALYTICS_ENABLED=${ANALYTICS_ENABLED:-true}
+      - METRICS_ENABLED=${METRICS_ENABLED:-true}
+    
+    volumes:
+      # Workspace for file operations
+      - ./files/workspace:/workspace
+      
+      # MCP configuration
+      - ./files/mcp-config:/workspace/.claude
+      
+      # Logs
+      - ./logs:/workspace/logs
+      
+      # Optional: Mount local code for development
+      # - ./services/backend:/app:ro
+    
+    ports:
+      - "${PORT:-8000}:8000"
+    
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    restart: unless-stopped
+    
+    networks:
+      - claude-network
+    
+    init: true
+    tty: true
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:16-alpine
+    container_name: claude-postgres
+    environment:
+      - POSTGRES_USER=claude
+      - POSTGRES_PASSWORD=claude
+      - POSTGRES_DB=claude_code
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    
+    volumes:
+      # Persistent data
+      - postgres_data:/var/lib/postgresql/data
+      
+      # Custom initialization scripts
+      - ./deploy/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U claude -d claude_code"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    
+    restart: unless-stopped
+    
+    networks:
+      - claude-network
+    
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
+  # Redis for caching and rate limiting
+  redis:
+    image: redis:7-alpine
+    container_name: claude-redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    
+    volumes:
+      - redis_data:/data
+    
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    
+    restart: unless-stopped
+    
+    networks:
+      - claude-network
+    
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # Nginx reverse proxy (optional, for production)
+  nginx:
+    image: nginx:alpine
+    container_name: claude-nginx
+    volumes:
+      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./deploy/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./deploy/nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_cache:/var/cache/nginx
+    
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    
+    depends_on:
+      - api
+    
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    
+    restart: unless-stopped
+    
+    networks:
+      - claude-network
+    
+    profiles:
+      - production
+
+  # Prometheus for metrics (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: claude-prometheus
+    volumes:
+      - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    
+    depends_on:
+      - api
+    
+    restart: unless-stopped
+    
+    networks:
+      - claude-network
+    
+    profiles:
+      - monitoring
+
+  # Grafana for visualization (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: claude-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_INSTALL_PLUGINS=
+    
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    
+    depends_on:
+      - prometheus
+    
+    restart: unless-stopped
+    
+    networks:
+      - claude-network
+    
+    profiles:
+      - monitoring
+
+  # Loki for log aggregation (optional)
+  loki:
+    image: grafana/loki:latest
+    container_name: claude-loki
+    volumes:
+      - ./deploy/loki/loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    
+    command: -config.file=/etc/loki/local-config.yaml
+    
+    ports:
+      - "${LOKI_PORT:-3100}:3100"
+    
+    restart: unless-stopped
+    
+    networks:
+      - claude-network
+    
+    profiles:
+      - monitoring
+
+  # Promtail for log shipping (optional)
+  promtail:
+    image: grafana/promtail:latest
+    container_name: claude-promtail
+    volumes:
+      - ./deploy/promtail/promtail-config.yaml:/etc/promtail/config.yml:ro
+      - ./logs:/var/log/claude:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    
+    command: -config.file=/etc/promtail/config.yml
+    
+    depends_on:
+      - loki
+    
+    restart: unless-stopped
+    
+    networks:
+      - claude-network
+    
+    profiles:
+      - monitoring
+
+networks:
+  claude-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  nginx_cache:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  loki_data:
+    driver: local

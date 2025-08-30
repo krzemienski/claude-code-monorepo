@@ -1,27 +1,66 @@
 import Foundation
+import OSLog
 
-struct APIClient {
+struct APIClient: APIClientProtocol {
     let baseURL: URL
     let apiKey: String?
+    private let logger = Logger(subsystem: "com.claudecode.ios", category: "APIClient")
 
+    @MainActor
     init?(settings: AppSettings) {
-        guard let url = settings.baseURLValidated else { return nil }
+        guard let url = settings.baseURLValidated else { 
+            Logger(subsystem: "com.claudecode.ios", category: "APIClient").error("Invalid base URL from settings")
+            return nil 
+        }
         self.baseURL = url
         self.apiKey = settings.apiKeyPlaintext.isEmpty ? nil : settings.apiKeyPlaintext
+        logger.info("APIClient initialized with baseURL: \(url.absoluteString)")
     }
 
     private func request(path: String, method: String = "GET", body: Data? = nil) -> URLRequest {
-        var req = URLRequest(url: baseURL.appendingPathComponent(path))
+        let url = baseURL.appendingPathComponent(path)
+        logger.debug("Creating \(method) request to: \(url.absoluteString)")
+        
+        var req = URLRequest(url: url)
         req.httpMethod = method
-        if let body { req.httpBody = body; req.setValue("application/json", forHTTPHeaderField: "Content-Type") }
-        if let apiKey { req.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization") }
+        req.timeoutInterval = 30 // 30 second timeout
+        
+        if let body { 
+            req.httpBody = body
+            req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            logger.debug("Request body size: \(body.count) bytes")
+        }
+        
+        if let apiKey { 
+            req.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+            logger.debug("Added authorization header")
+        }
+        
         return req
     }
 
     private func data(for req: URLRequest) async throws -> (Data, HTTPURLResponse) {
-        let (data, resp) = try await URLSession.shared.data(for: req)
-        guard let http = resp as? HTTPURLResponse else { throw URLError(.badServerResponse) }
-        return (data, http)
+        logger.info("Sending request to: \(req.url?.absoluteString ?? "unknown")")
+        
+        do {
+            let (data, resp) = try await URLSession.shared.data(for: req)
+            guard let http = resp as? HTTPURLResponse else { 
+                logger.error("Response is not HTTPURLResponse")
+                throw URLError(.badServerResponse) 
+            }
+            
+            logger.info("Response status: \(http.statusCode), data size: \(data.count) bytes")
+            
+            if !(200..<300).contains(http.statusCode) {
+                let bodyString = String(data: data, encoding: .utf8) ?? "No body"
+                logger.error("HTTP error \(http.statusCode): \(bodyString)")
+            }
+            
+            return (data, http)
+        } catch {
+            logger.error("Request failed: \(error.localizedDescription)")
+            throw error
+        }
     }
 
     // Generic JSON helpers
@@ -57,7 +96,7 @@ struct APIClient {
     struct HealthResponse: Decodable { let ok: Bool; let version: String?; let active_sessions: Int? }
     func health() async throws -> HealthResponse { try await getJSON("/health", as: HealthResponse.self) }
 
-    struct Project: Decodable, Identifiable {
+    struct Project: Codable, Identifiable {
         let id: String; let name: String; let description: String; let path: String?
         let createdAt: String; let updatedAt: String
     }
@@ -68,11 +107,11 @@ struct APIClient {
     }
     func getProject(id: String) async throws -> Project { try await getJSON("/v1/projects/\(id)", as: Project.self) }
 
-    struct Session: Decodable, Identifiable {
+    struct Session: Codable, Identifiable {
         let id: String; let projectId: String; let title: String?
         let model: String; let systemPrompt: String?
         let createdAt: String; let updatedAt: String
-        let isActive: Bool; let totalTokens: Int?; let totalCost: Double?; let messageCount: Int?
+        var isActive: Bool; let totalTokens: Int?; let totalCost: Double?; let messageCount: Int?
     }
     func listSessions(projectId: String? = nil) async throws -> [Session] {
         let path = projectId.map { "/v1/sessions?project_id=\($0)" } ?? "/v1/sessions"
@@ -93,6 +132,53 @@ struct APIClient {
         try await getJSON("/v1/models/capabilities", as: CapabilitiesEnvelope.self).models
     }
 
-    struct SessionStats: Decodable { let activeSessions: Int; let totalTokens: Int; let totalCost: Double; let totalMessages: Int }
+    struct SessionStats: Codable { let activeSessions: Int; let totalTokens: Int; let totalCost: Double; let totalMessages: Int }
     func sessionStats() async throws -> SessionStats { try await getJSON("/v1/sessions/stats", as: SessionStats.self) }
+    
+    // Additional missing endpoints
+    func deleteCompletion(id: String) async throws {
+        try await delete("/v1/chat/completions/\(id)")
+    }
+    
+    struct DebugRequest: Encodable {
+        let sessionId: String
+        let prompt: String
+        let includeContext: Bool
+    }
+    
+    struct DebugResponse: Decodable {
+        let sessionId: String
+        let context: String
+        let tokens: Int
+        let modelState: String
+    }
+    
+    func debugCompletion(sessionId: String, prompt: String, includeContext: Bool = true) async throws -> DebugResponse {
+        let body = DebugRequest(sessionId: sessionId, prompt: prompt, includeContext: includeContext)
+        return try await postJSON("/v1/chat/completions/debug", body: body, as: DebugResponse.self)
+    }
+    
+    struct SessionToolsRequest: Encodable {
+        let tools: [String]
+        let priority: Int?
+    }
+    
+    struct SessionToolsResponse: Decodable {
+        let sessionId: String
+        let enabledTools: [String]
+        let message: String
+    }
+    
+    func updateSessionTools(sessionId: String, tools: [String], priority: Int? = nil) async throws -> SessionToolsResponse {
+        let body = SessionToolsRequest(tools: tools, priority: priority)
+        return try await postJSON("/v1/sessions/\(sessionId)/tools", body: body, as: SessionToolsResponse.self)
+    }
+    
+    // MARK: - Request Cancellation
+    func cancelAllRequests() {
+        // Cancel all ongoing URLSession tasks
+        URLSession.shared.getAllTasks { tasks in
+            tasks.forEach { $0.cancel() }
+        }
+    }
 }

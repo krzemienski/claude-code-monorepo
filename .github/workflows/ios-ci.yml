@@ -1,0 +1,221 @@
+name: iOS CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'apps/ios/**'
+      - '.github/workflows/ios-ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'apps/ios/**'
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+  IOS_DESTINATION: 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.0'
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: macos-14
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_15.2.app
+      
+    - name: Install dependencies
+      run: |
+        cd apps/ios
+        brew install xcodegen swiftlint
+        
+    - name: Generate Xcode project
+      run: |
+        cd apps/ios
+        xcodegen generate
+        
+    - name: Cache Swift Package Manager
+      uses: actions/cache@v3
+      with:
+        path: ~/Library/Developer/Xcode/DerivedData
+        key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+        restore-keys: |
+          ${{ runner.os }}-spm-
+          
+    - name: Run SwiftLint
+      run: |
+        cd apps/ios
+        swiftlint --config .swiftlint.yml
+        
+    - name: Build for testing
+      run: |
+        cd apps/ios
+        xcodebuild build-for-testing \
+          -project ClaudeCode.xcodeproj \
+          -scheme ClaudeCode \
+          -destination "${{ env.IOS_DESTINATION }}" \
+          -derivedDataPath build/ \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          | xcpretty
+          
+    - name: Run unit tests
+      run: |
+        cd apps/ios
+        xcodebuild test-without-building \
+          -project ClaudeCode.xcodeproj \
+          -scheme ClaudeCode \
+          -destination "${{ env.IOS_DESTINATION }}" \
+          -derivedDataPath build/ \
+          -enableCodeCoverage YES \
+          | xcpretty
+          
+    - name: Generate code coverage report
+      run: |
+        cd apps/ios
+        xcrun llvm-cov export \
+          -format="lcov" \
+          -instr-profile build/Build/ProfileData/*/Coverage.profdata \
+          build/Build/Products/Debug-iphonesimulator/ClaudeCode.app/ClaudeCode \
+          > coverage.lcov
+          
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: apps/ios/coverage.lcov
+        flags: ios
+        name: ios-coverage
+        
+    - name: Run UI tests
+      if: github.event_name == 'push'
+      run: |
+        cd apps/ios
+        xcodebuild test \
+          -project ClaudeCode.xcodeproj \
+          -scheme ClaudeCodeUITests \
+          -destination "${{ env.IOS_DESTINATION }}" \
+          -derivedDataPath build/ \
+          | xcpretty
+          
+    - name: Archive test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: |
+          apps/ios/build/Logs/Test/*.xcresult
+          
+  deploy-testflight:
+    name: Deploy to TestFlight
+    runs-on: macos-14
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup certificates
+      env:
+        CERTIFICATES_P12: ${{ secrets.CERTIFICATES_P12 }}
+        CERTIFICATES_PASSWORD: ${{ secrets.CERTIFICATES_PASSWORD }}
+        PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      run: |
+        # Create temporary keychain
+        security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+        
+        # Import certificates
+        echo "$CERTIFICATES_P12" | base64 --decode > certificate.p12
+        security import certificate.p12 -k build.keychain -P "$CERTIFICATES_PASSWORD" -T /usr/bin/codesign
+        
+        # Import provisioning profile
+        echo "$PROVISIONING_PROFILE" | base64 --decode > profile.mobileprovision
+        mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+        cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+        
+        security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+        
+    - name: Generate Xcode project
+      run: |
+        cd apps/ios
+        brew install xcodegen
+        xcodegen generate
+        
+    - name: Increment build number
+      run: |
+        cd apps/ios
+        BUILD_NUMBER=$(date +%Y%m%d%H%M)
+        /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" Info.plist
+        
+    - name: Build and archive
+      run: |
+        cd apps/ios
+        xcodebuild archive \
+          -project ClaudeCode.xcodeproj \
+          -scheme ClaudeCode \
+          -archivePath build/ClaudeCode.xcarchive \
+          -destination generic/platform=iOS \
+          -allowProvisioningUpdates \
+          | xcpretty
+          
+    - name: Export IPA
+      run: |
+        cd apps/ios
+        xcodebuild -exportArchive \
+          -archivePath build/ClaudeCode.xcarchive \
+          -exportPath build/ \
+          -exportOptionsPlist ExportOptions.plist \
+          -allowProvisioningUpdates \
+          | xcpretty
+          
+    - name: Upload to TestFlight
+      env:
+        APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+        APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+      run: |
+        cd apps/ios
+        xcrun altool --upload-app \
+          --type ios \
+          --file build/ClaudeCode.ipa \
+          --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
+          --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
+          --verbose
+          
+    - name: Clean up keychain
+      if: always()
+      run: |
+        security delete-keychain build.keychain || true
+        rm -f ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision
+        
+  notify-slack:
+    name: Notify Slack
+    runs-on: ubuntu-latest
+    needs: [build-and-test, deploy-testflight]
+    if: always()
+    
+    steps:
+    - name: Send Slack notification
+      uses: slack/slack-github-action@v1
+      with:
+        payload: |
+          {
+            "text": "iOS CI/CD Pipeline",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*iOS Build Status:* ${{ needs.build-and-test.result }}\n*TestFlight Deploy:* ${{ needs.deploy-testflight.result }}\n*Branch:* ${{ github.ref_name }}\n*Commit:* ${{ github.sha }}"
+                }
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

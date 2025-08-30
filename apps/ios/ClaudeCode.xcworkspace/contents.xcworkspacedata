@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:ClaudeCode.xcodeproj">
+   </FileRef>
+   <Group
+      location = "container:"
+      name = "Dependencies">
+      <FileRef
+         location = "group:Tuist/.build/tuist-derived/DGCharts/DGCharts.xcodeproj">
+      </FileRef>
+      <FileRef
+         location = "group:Tuist/.build/tuist-derived/KeychainAccess/KeychainAccess.xcodeproj">
+      </FileRef>
+      <FileRef
+         location = "group:Tuist/.build/tuist-derived/LDSwiftEventSource/LDSwiftEventSource.xcodeproj">
+      </FileRef>
+      <FileRef
+         location = "group:Tuist/.build/tuist-derived/swift-collections/swift-collections.xcodeproj">
+      </FileRef>
+      <FileRef
+         location = "group:Tuist/.build/tuist-derived/swift-log/swift-log.xcodeproj">
+      </FileRef>
+      <FileRef
+         location = "group:Tuist/.build/tuist-derived/swift-metrics/swift-metrics.xcodeproj">
+      </FileRef>
+   </Group>
+</Workspace>

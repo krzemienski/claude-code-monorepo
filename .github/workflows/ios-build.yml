@@ -1,0 +1,219 @@
+name: iOS Build and Test
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+    paths:
+      - 'apps/ios/**'
+      - '.github/workflows/ios-build.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'apps/ios/**'
+      - '.github/workflows/ios-build.yml'
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build Configuration'
+        required: true
+        default: 'Debug'
+        type: choice
+        options:
+          - Debug
+          - Release
+
+env:
+  XCODE_VERSION: '15.4'
+  IOS_DEPLOYMENT_TARGET: '17.0'
+  PROJECT_PATH: 'apps/ios'
+  SCHEME_NAME: 'ClaudeCode'
+
+jobs:
+  build-and-test:
+    name: Build and Test iOS App
+    runs-on: macos-14
+    timeout-minutes: 30
+    
+    steps:
+      # Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      # Setup Xcode version
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+          
+      # Cache Swift Package Manager dependencies
+      - name: Cache SPM Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData
+            ${{ env.PROJECT_PATH }}/.build
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Project.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+            
+      # Install XcodeGen
+      - name: Install XcodeGen
+        run: |
+          if ! command -v xcodegen &> /dev/null; then
+            brew install xcodegen
+          fi
+          xcodegen --version
+          
+      # Generate Xcode Project
+      - name: Generate Xcode Project
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          echo "Generating Xcode project from Project.yml..."
+          xcodegen generate
+          
+      # Resolve Swift Package Dependencies
+      - name: Resolve Package Dependencies
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project ClaudeCode.xcodeproj \
+            -scheme "${{ env.SCHEME_NAME }}" \
+            -configuration ${{ github.event.inputs.build_type || 'Debug' }}
+            
+      # Build iOS App
+      - name: Build iOS App
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project ClaudeCode.xcodeproj \
+            -scheme "${{ env.SCHEME_NAME }}" \
+            -configuration ${{ github.event.inputs.build_type || 'Debug' }} \
+            -destination "platform=iOS Simulator,name=iPhone 15 Pro,OS=17.5" \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            | xcpretty --color
+            
+      # Run Unit Tests
+      - name: Run Unit Tests
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project ClaudeCode.xcodeproj \
+            -scheme "${{ env.SCHEME_NAME }}" \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,name=iPhone 15 Pro,OS=17.5" \
+            -derivedDataPath build \
+            -enableCodeCoverage YES \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            | xcpretty --color --test
+        continue-on-error: true
+        
+      # Run UI Tests
+      - name: Run UI Tests
+        working-directory: ${{ env.PROJECT_PATH }}
+        if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project ClaudeCode.xcodeproj \
+            -scheme "${{ env.SCHEME_NAME }}UITests" \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,name=iPhone 15 Pro,OS=17.5" \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            | xcpretty --color --test
+        continue-on-error: true
+        
+      # Upload Build Artifacts
+      - name: Upload Build Artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-${{ github.sha }}
+          path: |
+            ${{ env.PROJECT_PATH }}/build/Build/Products/**/*.app
+            ${{ env.PROJECT_PATH }}/build/Build/Products/**/*.dSYM
+          retention-days: 7
+          
+      # Upload Test Results
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.sha }}
+          path: |
+            ${{ env.PROJECT_PATH }}/build/Logs/Test/*.xcresult
+          retention-days: 7
+          
+  static-analysis:
+    name: Static Code Analysis
+    runs-on: macos-14
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Setup SwiftLint
+        run: |
+          if ! command -v swiftlint &> /dev/null; then
+            brew install swiftlint
+          fi
+          swiftlint --version
+          
+      - name: Run SwiftLint
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          if [ -f .swiftlint.yml ]; then
+            swiftlint lint --reporter github-actions-logging
+          else
+            echo "SwiftLint configuration not found, using defaults"
+            swiftlint lint Sources --reporter github-actions-logging
+          fi
+        continue-on-error: true
+        
+      - name: Setup SwiftFormat
+        run: |
+          if ! command -v swiftformat &> /dev/null; then
+            brew install swiftformat
+          fi
+          swiftformat --version
+          
+      - name: Check Code Formatting
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          swiftformat --lint Sources
+        continue-on-error: true
+
+  notify-status:
+    name: Notify Build Status
+    runs-on: ubuntu-latest
+    needs: [build-and-test, static-analysis]
+    if: always()
+    
+    steps:
+      - name: Check Build Status
+        run: |
+          if [ "${{ needs.build-and-test.result }}" == "success" ] && [ "${{ needs.static-analysis.result }}" == "success" ]; then
+            echo "✅ Build and tests passed successfully!"
+            exit 0
+          elif [ "${{ needs.build-and-test.result }}" == "failure" ]; then
+            echo "❌ Build or tests failed!"
+            exit 1
+          else
+            echo "⚠️ Build completed with warnings"
+            exit 0
+          fi

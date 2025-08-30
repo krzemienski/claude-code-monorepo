@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "1010"
+   version = "1.3">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES">
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0B38F1CC986D8B120C00FDBB"
+               BuildableName = "BitCollections.framework"
+               BlueprintName = "BitCollections"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-collections/swift-collections.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D0773ECE9CC6E76DA2FC1473"
+               BuildableName = "ClaudeCode.app"
+               BlueprintName = "ClaudeCode"
+               ReferencedContainer = "container:ClaudeCode.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8E46333C5041F8CB83DBA004"
+               BuildableName = "ClaudeCodeTests.xctest"
+               BlueprintName = "ClaudeCodeTests"
+               ReferencedContainer = "container:ClaudeCode.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E78D8363A5A4EA28CF1EDAD4"
+               BuildableName = "ClaudeCodeUITests.xctest"
+               BlueprintName = "ClaudeCodeUITests"
+               ReferencedContainer = "container:ClaudeCode.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "2D341577929450B91B22C074"
+               BuildableName = "Collections.framework"
+               BlueprintName = "Collections"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-collections/swift-collections.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "9E31DD2E553014ADB4520BAA"
+               BuildableName = "CoreMetrics.framework"
+               BlueprintName = "CoreMetrics"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-metrics/swift-metrics.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "02616C62DF15646DF5A2A7A8"
+               BuildableName = "DGCharts.framework"
+               BlueprintName = "DGCharts"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/DGCharts/DGCharts.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "707F0BCAE2A3711F8A9E52F0"
+               BuildableName = "DequeModule.framework"
+               BlueprintName = "DequeModule"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-collections/swift-collections.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "22BE3C7B06C5C834CEC9B766"
+               BuildableName = "HashTreeCollections.framework"
+               BlueprintName = "HashTreeCollections"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-collections/swift-collections.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "24E7AD7E86CE40B2A403899D"
+               BuildableName = "HeapModule.framework"
+               BlueprintName = "HeapModule"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-collections/swift-collections.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "6A7B38BD8A72F03E40DC88E0"
+               BuildableName = "InternalCollectionsUtilities.framework"
+               BlueprintName = "InternalCollectionsUtilities"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-collections/swift-collections.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FC8983B65BEFA93EC9015ECE"
+               BuildableName = "KeychainAccess.framework"
+               BlueprintName = "KeychainAccess"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/KeychainAccess/KeychainAccess.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "74E9ECE42A53F35D9E8F74FE"
+               BuildableName = "LDSwiftEventSource.framework"
+               BlueprintName = "LDSwiftEventSource"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/LDSwiftEventSource/LDSwiftEventSource.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "628BD83AFACADF6FABBE54EB"
+               BuildableName = "Logging.framework"
+               BlueprintName = "Logging"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-log/swift-log.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0B9643496F66AECD759F5301"
+               BuildableName = "Metrics.framework"
+               BlueprintName = "Metrics"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-metrics/swift-metrics.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E07053DCBDB7F16C14688195"
+               BuildableName = "OrderedCollections.framework"
+               BlueprintName = "OrderedCollections"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-collections/swift-collections.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "C0D6D83586899AD15DD9C41C"
+               BuildableName = "_RopeModule.framework"
+               BlueprintName = "_RopeModule"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-collections/swift-collections.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8E46333C5041F8CB83DBA004"
+               BuildableName = "ClaudeCodeTests.xctest"
+               BlueprintName = "ClaudeCodeTests"
+               ReferencedContainer = "container:ClaudeCode.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E78D8363A5A4EA28CF1EDAD4"
+               BuildableName = "ClaudeCodeUITests.xctest"
+               BlueprintName = "ClaudeCodeUITests"
+               ReferencedContainer = "container:ClaudeCode.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+   </TestAction>
+   <LaunchAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
+      allowLocationSimulation = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "0B38F1CC986D8B120C00FDBB"
+            BuildableName = "BitCollections.framework"
+            BlueprintName = "BitCollections"
+            ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-collections/swift-collections.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+   </LaunchAction>
+   <ProfileAction
+      buildConfiguration = "Release"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "0B38F1CC986D8B120C00FDBB"
+            BuildableName = "BitCollections.framework"
+            BlueprintName = "BitCollections"
+            ReferencedContainer = "container:Tuist/.build/tuist-derived/swift-collections/swift-collections.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Release"
+      revealArchiveInOrganizer = "YES">
+   </ArchiveAction>
+</Scheme>

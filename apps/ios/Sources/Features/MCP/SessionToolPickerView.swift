@@ -21,7 +21,16 @@ struct SessionToolPickerView: View {
             Form {
                 Section("Enabled Servers") { TokenEditor(tokens: $enabledServers, placeholder: "server id") }
                 Section("Enabled Tools") { TokenEditor(tokens: $enabledTools, placeholder: "tool name") }
-                Section("Priority (drag)") { ReorderableList(items: $priority) }
+                Section("Priority (drag to reorder)") {
+                    List {
+                        ForEach(priority, id: \.self) { item in
+                            Text(item)
+                        }
+                        .onMove { indices, newOffset in
+                            priority.move(fromOffsets: indices, toOffset: newOffset)
+                        }
+                    }
+                }
                 Section { Toggle("Audit Log", isOn: $auditLog) }
             }
             .navigationTitle("Session Tools")

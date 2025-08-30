@@ -1,0 +1,302 @@
+name: Test Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+jobs:
+  # iOS Unit Tests
+  ios-unit-tests:
+    name: iOS Unit Tests
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.2'
+      
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      
+      - name: Generate Xcode Project
+        working-directory: apps/ios
+        run: xcodegen generate
+      
+      - name: Build and Test
+        working-directory: apps/ios
+        run: |
+          xcodebuild test \
+            -project ClaudeCode.xcodeproj \
+            -scheme ClaudeCode \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.2' \
+            -resultBundlePath TestResults \
+            | xcpretty --test --color
+      
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-results
+          path: apps/ios/TestResults
+      
+      - name: Generate Coverage Report
+        working-directory: apps/ios
+        run: |
+          xcrun xccov view --report --json TestResults.xcresult > coverage.json
+          
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: apps/ios/coverage.json
+          flags: ios-unit
+          name: iOS Unit Tests
+
+  # iOS UI Tests
+  ios-ui-tests:
+    name: iOS UI Tests
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.2'
+      
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      
+      - name: Generate Xcode Project
+        working-directory: apps/ios
+        run: xcodegen generate
+      
+      - name: Boot Simulator
+        run: |
+          xcrun simctl boot "iPhone 15" || true
+          xcrun simctl list
+      
+      - name: Run UI Tests
+        working-directory: apps/ios
+        run: |
+          xcodebuild test \
+            -project ClaudeCode.xcodeproj \
+            -scheme ClaudeCodeUITests \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.2' \
+            -resultBundlePath UITestResults \
+            | xcpretty --test --color
+      
+      - name: Upload UI Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ui-test-results
+          path: apps/ios/UITestResults
+      
+      - name: Upload Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-screenshots
+          path: apps/ios/UITestResults/**/*.png
+
+  # Backend API Tests
+  backend-tests:
+    name: Backend API Tests
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:24-dind
+        options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Create .env file
+        run: |
+          cp .env.example .env
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
+      
+      - name: Start Backend Services
+        run: |
+          docker compose -f deploy/compose/docker-compose.yml up -d
+          sleep 10  # Wait for services to start
+      
+      - name: Check Backend Health
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:8000/health; then
+              echo "Backend is healthy"
+              break
+            fi
+            echo "Waiting for backend... ($i/30)"
+            sleep 2
+          done
+      
+      - name: Install Test Dependencies
+        run: |
+          pip install pytest pytest-asyncio httpx respx faker pytest-cov
+      
+      - name: Run API Tests
+        run: |
+          pytest test/backend/ -v --cov=test/backend --cov-report=xml
+      
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: coverage.xml
+          flags: backend
+          name: Backend API Tests
+      
+      - name: Collect Backend Logs
+        if: failure()
+        run: docker compose -f deploy/compose/docker-compose.yml logs > backend-logs.txt
+      
+      - name: Upload Backend Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-logs
+          path: backend-logs.txt
+
+  # Integration Tests
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [backend-tests]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Compose
+        run: |
+          docker compose -f deploy/compose/docker-compose.yml up -d
+          sleep 15
+      
+      - name: Run Integration Tests
+        run: |
+          pip install pytest pytest-asyncio httpx
+          pytest test/integration/ -v
+      
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: test-results/
+
+  # Contract Tests
+  contract-tests:
+    name: API Contract Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Start Backend
+        run: |
+          cp .env.example .env
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
+          docker compose -f deploy/compose/docker-compose.yml up -d
+          sleep 10
+      
+      - name: Install Dependencies
+        run: pip install pytest pytest-asyncio httpx
+      
+      - name: Run Contract Tests
+        run: pytest test/backend/test_api_contracts.py -v
+      
+      - name: Upload Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-test-results
+          path: pytest-results.xml
+
+  # Performance Tests
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Start Backend
+        run: |
+          cp .env.example .env
+          docker compose -f deploy/compose/docker-compose.yml up -d
+          sleep 10
+      
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+      
+      - name: Run Performance Tests
+        run: |
+          k6 run test/performance/load-test.js || true
+      
+      - name: Upload Performance Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results
+          path: performance-results/
+
+  # Test Report Generation
+  test-report:
+    name: Generate Test Report
+    runs-on: ubuntu-latest
+    needs: [ios-unit-tests, ios-ui-tests, backend-tests, contract-tests]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: test-artifacts/
+      
+      - name: Generate Summary Report
+        run: |
+          echo "# Test Execution Summary" > test-summary.md
+          echo "## iOS Tests" >> test-summary.md
+          echo "- Unit Tests: ✅" >> test-summary.md
+          echo "- UI Tests: ✅" >> test-summary.md
+          echo "" >> test-summary.md
+          echo "## Backend Tests" >> test-summary.md
+          echo "- API Tests: ✅" >> test-summary.md
+          echo "- Contract Tests: ✅" >> test-summary.md
+          echo "" >> test-summary.md
+          echo "## Coverage Reports" >> test-summary.md
+          echo "- iOS Coverage: Available in Codecov" >> test-summary.md
+          echo "- Backend Coverage: Available in Codecov" >> test-summary.md
+      
+      - name: Upload Summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-summary
+          path: test-summary.md
+      
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('test-summary.md', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });

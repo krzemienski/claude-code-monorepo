@@ -1,0 +1,10 @@
+=== Performance Metrics Collection ===
+
+iPhone 16 Pro Performance:
+getpwuid_r did not find a match for uid 501
+Filtering the log data using "process == "ClaudeCode""
+Timestamp               Ty Process[PID:TID]
+
+System Diagnostics:
+Current Status Bar Overrides:
+=============================

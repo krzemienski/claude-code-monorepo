@@ -7,24 +7,53 @@ public final class SSEClient: NSObject, URLSessionDataDelegate {
     public var onEvent: ((Event) -> Void)?
     public var onDone: (() -> Void)?
     public var onError: ((Error) -> Void)?
+    public var onMessage: ((String) -> Void)?  // For simplified message handling
+    public var onComplete: (() -> Void)?  // Alternative completion handler
 
     private var buffer = Data()
     private var task: URLSessionDataTask?
     private lazy var session: URLSession = {
         URLSession(configuration: .default, delegate: self, delegateQueue: nil)
     }()
-    private let log = Logger(subsystem: "com.yourorg.claudecode", category: "SSE")
+    private let log = Logger(subsystem: "com.claudecode", category: "SSE")
+    private let url: String
+    private let headers: [String: String]
+    private let body: Data?
+    
+    public init(url: String = "", headers: [String: String] = [:], body: Data? = nil) {
+        self.url = url
+        self.headers = headers
+        self.body = body
+        super.init()
+    }
 
-    public func connect(url: URL, body: Data, headers: [String: String] = [:]) {
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.httpBody = body
+    public func connect(url: URL? = nil, body: Data? = nil, headers: [String: String] = [:]) {
+        let connectURL = url ?? URL(string: self.url)!
+        let connectBody = body ?? self.body
+        let connectHeaders = headers.isEmpty ? self.headers : headers
+        
+        var req = URLRequest(url: connectURL)
+        req.httpMethod = connectBody != nil ? "POST" : "GET"
+        req.httpBody = connectBody
+        req.setValue("text/event-stream", forHTTPHeaderField: "Accept")
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        headers.forEach { k, v in req.setValue(v, forHTTPHeaderField: k) }
+        connectHeaders.forEach { k, v in req.setValue(v, forHTTPHeaderField: k) }
 
-        log.info("SSE connect %{public}@", url.absoluteString)
+        log.info("SSE connect \(connectURL.absoluteString)")
         task = session.dataTask(with: req)
         task?.resume()
+    }
+    
+    public func connect() {
+        guard !url.isEmpty else {
+            log.error("SSE URL is empty")
+            return
+        }
+        connect(url: URL(string: url), body: body, headers: headers)
+    }
+    
+    public func close() {
+        stop()
     }
 
     public func stop() {
@@ -46,16 +75,18 @@ public final class SSEClient: NSObject, URLSessionDataDelegate {
                 if payload == "[DONE]" {
                     log.debug("SSE received [DONE]")
                     onDone?()
+                    onComplete?()
                     return
                 }
                 onEvent?(Event(raw: payload))
+                onMessage?(payload)
             }
         }
     }
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         if let error {
-            log.error("SSE error: %{public}@", error.localizedDescription)
+            log.error("SSE error: \(error.localizedDescription)")
             onError?(error)
         }
     }

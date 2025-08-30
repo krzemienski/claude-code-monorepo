@@ -1,0 +1,237 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -workspace ClaudeCode.xcworkspace -scheme ClaudeCode -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 16 Pro,OS=18.6" -enableCodeCoverage YES
+
+Build settings from command line:
+    SDKROOT = iphonesimulator18.5
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:BECB3FA0-518E-4F80-8B8E-7E10C16F3B36, OS:18.6, name:iPhone 16 Pro }
+{ platform:iOS Simulator, arch:x86_64, id:BECB3FA0-518E-4F80-8B8E-7E10C16F3B36, OS:18.6, name:iPhone 16 Pro }
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (17 targets)
+    Target 'ClaudeCodeUITests' in project 'ClaudeCode'
+        ➜ Explicit dependency on target 'ClaudeCode' in project 'ClaudeCode'
+    Target 'ClaudeCodeTests' in project 'ClaudeCode'
+        ➜ Explicit dependency on target 'ClaudeCode' in project 'ClaudeCode'
+        ➜ Implicit dependency on target 'Logging' in project 'swift-log' via file 'Logging.framework' in build phase 'Link Binary'
+    Target 'ClaudeCode' in project 'ClaudeCode'
+        ➜ Implicit dependency on target 'Collections' in project 'swift-collections' via file 'Collections.framework' in build phase 'Link Binary'
+        ➜ Implicit dependency on target 'DGCharts' in project 'DGCharts' via file 'DGCharts.framework' in build phase 'Link Binary'
+        ➜ Implicit dependency on target 'KeychainAccess' in project 'KeychainAccess' via file 'KeychainAccess.framework' in build phase 'Link Binary'
+        ➜ Implicit dependency on target 'LDSwiftEventSource' in project 'LDSwiftEventSource' via file 'LDSwiftEventSource.framework' in build phase 'Link Binary'
+        ➜ Implicit dependency on target 'Logging' in project 'swift-log' via file 'Logging.framework' in build phase 'Link Binary'
+        ➜ Implicit dependency on target 'Metrics' in project 'swift-metrics' via file 'Metrics.framework' in build phase 'Link Binary'
+    Target 'Metrics' in project 'swift-metrics'
+        ➜ Explicit dependency on target 'CoreMetrics' in project 'swift-metrics'
+    Target 'CoreMetrics' in project 'swift-metrics' (no dependencies)
+    Target 'Logging' in project 'swift-log' (no dependencies)
+    Target 'LDSwiftEventSource' in project 'LDSwiftEventSource' (no dependencies)
+    Target 'KeychainAccess' in project 'KeychainAccess' (no dependencies)
+    Target 'DGCharts' in project 'DGCharts' (no dependencies)
+    Target 'Collections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'BitCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'DequeModule' in project 'swift-collections'
+        ➜ Explicit dependency on target 'HashTreeCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'HeapModule' in project 'swift-collections'
+        ➜ Explicit dependency on target 'OrderedCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target '_RopeModule' in project 'swift-collections'
+        ➜ Implicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections' via file 'InternalCollectionsUtilities.framework' in build phase 'Link Binary'
+    Target '_RopeModule' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+    Target 'OrderedCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+    Target 'HeapModule' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+    Target 'HashTreeCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+    Target 'DequeModule' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+    Target 'BitCollections' in project 'swift-collections'
+        ➜ Explicit dependency on target 'InternalCollectionsUtilities' in project 'swift-collections'
+    Target 'InternalCollectionsUtilities' in project 'swift-collections' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk /Users/nick/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk -o /Users/nick/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache
+
+SwiftDriver ClaudeCodeUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ClaudeCodeUITests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ClaudeCodeUITests -Onone -enforce-exclusivity\=checked @/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeUITests.build/Objects-normal/arm64/ClaudeCodeUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk -target arm64-apple-ios16.0-simulator -g -module-cache-path /Users/nick/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Index.noindex/DataStore -swift-version 5 -I /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Products/Debug-iphonesimulator -I /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk/Developer/Library/Frameworks -c -j16 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -output-file-map /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeUITests.build/Objects-normal/arm64/ClaudeCodeUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeUITests.build/Objects-normal/arm64/ClaudeCodeUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/nick/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeUITests.build/Objects-normal/arm64/ClaudeCodeUITests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeUITests.build/ClaudeCodeUITests-generated-files.hmap -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeUITests.build/ClaudeCodeUITests-own-target-headers.hmap -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeUITests.build/ClaudeCodeUITests-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode-359f158a5242575e4146ecb786e66aa8-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeUITests.build/ClaudeCodeUITests-project-headers.hmap -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeUITests.build/DerivedSources-normal/arm64 -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeUITests.build/DerivedSources/arm64 -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeUITests.build/Objects-normal/arm64/ClaudeCodeUITests-Swift.h -working-directory /Users/nick/Documents/claude-code-monorepo/apps/ios -experimental-emit-module-separately -disable-cmo
+
+SwiftDriver ClaudeCodeTests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ClaudeCodeTests -Onone -enforce-exclusivity\=checked @/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/Objects-normal/arm64/ClaudeCodeTests.SwiftFileList -DDEBUG -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk -target arm64-apple-ios16.0-simulator -g -module-cache-path /Users/nick/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Index.noindex/DataStore -swift-version 5 -I /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Products/Debug-iphonesimulator -I /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk/Developer/Library/Frameworks -c -j16 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -output-file-map /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/Objects-normal/arm64/ClaudeCodeTests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/Objects-normal/arm64/ClaudeCodeTests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/nick/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/Objects-normal/arm64/ClaudeCodeTests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/ClaudeCodeTests-generated-files.hmap -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/ClaudeCodeTests-own-target-headers.hmap -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/ClaudeCodeTests-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode-359f158a5242575e4146ecb786e66aa8-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/ClaudeCodeTests-project-headers.hmap -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/DerivedSources-normal/arm64 -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/DerivedSources/arm64 -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/Objects-normal/arm64/ClaudeCodeTests-Swift.h -working-directory /Users/nick/Documents/claude-code-monorepo/apps/ios -experimental-emit-module-separately -disable-cmo
+
+SwiftDriver ClaudeCode normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ClaudeCode' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ClaudeCode -Onone -enforce-exclusivity\=checked @/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode.build/Objects-normal/arm64/ClaudeCode.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk -target arm64-apple-ios16.0-simulator -g -module-cache-path /Users/nick/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Index.noindex/DataStore -swift-version 5 -I /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Products/Debug-iphonesimulator -F /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Products/Debug-iphonesimulator -c -j16 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -output-file-map /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode.build/Objects-normal/arm64/ClaudeCode-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode.build/Objects-normal/arm64/ClaudeCode.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/nick/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode.build/Objects-normal/arm64/ClaudeCode_const_extract_protocols.json -Xcc -iquote -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode.build/ClaudeCode-generated-files.hmap -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode.build/ClaudeCode-own-target-headers.hmap -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode.build/ClaudeCode-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode-359f158a5242575e4146ecb786e66aa8-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode.build/ClaudeCode-project-headers.hmap -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode.build/DerivedSources-normal/arm64 -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode.build/DerivedSources/arm64 -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode.build/Objects-normal/arm64/ClaudeCode-Swift.h -working-directory /Users/nick/Documents/claude-code-monorepo/apps/ios -experimental-emit-module-separately -disable-cmo
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ ClaudeCodeUITests (in target 'ClaudeCodeUITests' from project 'ClaudeCode')
+EmitSwiftModule normal arm64 (in target 'ClaudeCodeUITests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftCompile normal arm64 Compiling\ CoreFlowTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/UITests/CoreFlowTests.swift (in target 'ClaudeCodeUITests' from project 'ClaudeCode')
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/UITests/CoreFlowTests.swift (in target 'ClaudeCodeUITests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftCompile normal arm64 Compiling\ ClaudeCodeUITests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/UITests/ClaudeCodeUITests.swift (in target 'ClaudeCodeUITests' from project 'ClaudeCode')
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/UITests/ClaudeCodeUITests.swift (in target 'ClaudeCodeUITests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftCompile normal arm64 Compiling\ ChatFlowUITests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/UITests/ChatFlowUITests.swift (in target 'ClaudeCodeUITests' from project 'ClaudeCode')
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/UITests/ChatFlowUITests.swift (in target 'ClaudeCodeUITests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftCompile normal arm64 Compiling\ ContainerTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/ContainerTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/ContainerTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftCompile normal arm64 Compiling\ EnhancedNetworkingTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/EnhancedNetworkingTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/EnhancedNetworkingTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftCompile normal arm64 Compiling\ ClaudeCodeTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/ClaudeCodeTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/ClaudeCodeTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftCompile normal arm64 Compiling\ NetworkingTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/NetworkingTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/NetworkingTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftCompile normal arm64 Compiling\ AppSettingsTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/Core/AppSettingsTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/Core/AppSettingsTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftCompile normal arm64 Compiling\ MockAPIClient.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/MockAPIClient.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+Failed frontend command:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/AuthenticationTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/ClaudeCodeTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/ContainerTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/Core/APIClientTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/Core/AppSettingsTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/EnhancedNetworkingTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/NetworkingTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/PerformanceTests.swift -primary-file /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/MockAPIClient.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/SSEClientMock.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/URLSessionMock.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/XCTestCase+Extensions.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/ViewModelTests.swift -emit-dependencies-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/Objects-normal/arm64/MockAPIClient.d -emit-const-values-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/Objects-normal/arm64/MockAPIClient.swiftconstvalues -emit-reference-dependencies-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/Objects-normal/arm64/MockAPIClient.swiftdeps -serialize-diagnostics-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/Objects-normal/arm64/MockAPIClient.dia -target arm64-apple-ios16.0-simulator -Xllvm -aarch64-use-tbi -enable-objc-interop -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk -I /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Products/Debug-iphonesimulator -I /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Products/Debug-iphonesimulator -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk/Developer/Library/Frameworks -no-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=4 -module-cache-path /Users/nick/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -profile-generate -profile-coverage-mapping -swift-version 5 -enforce-exclusivity\=checked -Onone -D DEBUG -serialize-debugging-options -const-gather-protocols-file /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/Objects-normal/arm64/ClaudeCodeTests_const_extract_protocols.json -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -empty-abi-descriptor -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -validate-clang-modules-once -clang-build-session-file /Users/nick/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/nick/Documents/claude-code-monorepo/apps/ios -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift -enable-anonymous-context-mangled-names -file-compilation-dir /Users/nick/Documents/claude-code-monorepo/apps/ios -Xcc -ivfsstatcache -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator18.5-22F76-d5fc8ad4295d2ef488fb7d0f804ce0c4.sdkstatcache -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/ClaudeCodeTests-generated-files.hmap -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/ClaudeCodeTests-own-target-headers.hmap -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/ClaudeCodeTests-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCode-359f158a5242575e4146ecb786e66aa8-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/ClaudeCodeTests-project-headers.hmap -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/DerivedSources-normal/arm64 -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/DerivedSources/arm64 -Xcc -I/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/DerivedSources -Xcc -DDEBUG\=1 -module-name ClaudeCodeTests -frontend-parseable-output -disable-clang-spi -target-sdk-version 18.5 -target-sdk-name iphonesimulator18.5 -external-plugin-path /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server -external-plugin-path /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/local/lib/swift/host/plugins\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/local/lib/swift/host/plugins -o /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Build/Intermediates.noindex/ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/Objects-normal/arm64/MockAPIClient.o -index-unit-output-path /ClaudeCode.build/Debug-iphonesimulator/ClaudeCodeTests.build/Objects-normal/arm64/MockAPIClient.o -index-store-path /Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Index.noindex/DataStore -index-system-modules
+
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/MockAPIClient.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+/Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/MockAPIClient.swift:136:105: error: extra argument 'status' in call
+        return mockResponses["health"] as? APIClient.HealthResponse ?? APIClient.HealthResponse(status: "ok", version: "1.0.0")
+                                                                                               ~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+/Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/MockAPIClient.swift:136:96: error: missing arguments for parameters 'ok', 'active_sessions' in call
+        return mockResponses["health"] as? APIClient.HealthResponse ?? APIClient.HealthResponse(status: "ok", version: "1.0.0")
+                                                                                               ^
+ClaudeCode.APIClient.HealthResponse.init:3:10: note: 'init(ok:version:active_sessions:)' declared here
+internal init(ok: Bool, version: String?, active_sessions: Int?)  }
+         ^
+/Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/MockAPIClient.swift:218:98: error: incorrect argument labels in call (have 'totalSessions:activeSessions:totalTokens:totalCost:', expected 'activeSessions:totalTokens:totalCost:totalMessages:')
+        return mockResponses["sessionStats"] as? APIClient.SessionStats ?? APIClient.SessionStats(
+                                                                                                 ^
+/Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/MockAPIClient.swift:238:103: error: extra arguments at positions #1, #2, #3 in call
+        return mockResponses["debugCompletion"] as? APIClient.DebugResponse ?? APIClient.DebugResponse(
+                                                                                                      ^
+ClaudeCode.APIClient.DebugResponse.init:3:10: note: 'init(from:)' declared here
+internal init(from decoder: any Decoder) throws  }
+         ^
+/Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/MockAPIClient.swift:239:13: error: missing argument for parameter 'from' in call
+            prompt: prompt,
+            ^
+            from: <#any Decoder#>, 
+ClaudeCode.APIClient.DebugResponse.init:3:10: note: 'init(from:)' declared here
+internal init(from decoder: any Decoder) throws  }
+         ^
+/Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/MockAPIClient.swift:250:120: error: incorrect argument labels in call (have 'sessionId:tools:priority:', expected 'sessionId:enabledTools:message:')
+        return mockResponses["updateSessionTools"] as? APIClient.SessionToolsResponse ?? APIClient.SessionToolsResponse(
+                                                                                                                       ^
+/Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/MockAPIClient.swift:253:32: error: cannot convert value of type 'Int' to expected argument type 'String'
+            priority: priority ?? 0
+                               ^
+
+SwiftCompile normal arm64 Compiling\ PerformanceTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/PerformanceTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/PerformanceTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftCompile normal arm64 Compiling\ AuthenticationTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/AuthenticationTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/AuthenticationTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftCompile normal arm64 Compiling\ APIClientTests.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/Core/APIClientTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/Core/APIClientTests.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ ClaudeCodeTests (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+
+EmitSwiftModule normal arm64 (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftCompile normal arm64 Compiling\ URLSessionMock.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/URLSessionMock.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/URLSessionMock.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftCompile normal arm64 Compiling\ XCTestCase+Extensions.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/XCTestCase+Extensions.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+
+SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/XCTestCase+Extensions.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ ClaudeCode (in target 'ClaudeCode' from project 'ClaudeCode')
+
+EmitSwiftModule normal arm64 (in target 'ClaudeCode' from project 'ClaudeCode')
+    cd /Users/nick/Documents/claude-code-monorepo/apps/ios
+    
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for ClaudeCodeUITests (in target 'ClaudeCodeUITests' from project 'ClaudeCode')
+
+
+Test session results, code coverage, and logs:
+	/Users/nick/Library/Developer/Xcode/DerivedData/ClaudeCode-dbeayzzxoroeeobvdseuayjwfmwm/Logs/Test/Test-ClaudeCode-2025.08.30_00-48-44--0400.xcresult
+
+Testing failed:
+	Extra argument 'status' in call
+	Missing arguments for parameters 'ok', 'active_sessions' in call
+	Incorrect argument labels in call (have 'totalSessions:activeSessions:totalTokens:totalCost:', expected 'activeSessions:totalTokens:totalCost:totalMessages:')
+	Extra arguments at positions #1, #2, #3 in call
+	Missing argument for parameter 'from' in call
+	Incorrect argument labels in call (have 'sessionId:tools:priority:', expected 'sessionId:enabledTools:message:')
+	Cannot convert value of type 'Int' to expected argument type 'String'
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ MockAPIClient.swift /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/MockAPIClient.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+	SwiftCompile normal arm64 /Users/nick/Documents/claude-code-monorepo/apps/ios/Tests/TestHelpers/MockAPIClient.swift (in target 'ClaudeCodeTests' from project 'ClaudeCode')
+	Testing workspace ClaudeCode with scheme ClaudeCode
+(3 failures)

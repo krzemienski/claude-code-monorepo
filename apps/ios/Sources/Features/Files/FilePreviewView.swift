@@ -29,13 +29,10 @@ struct FilePreviewView: View, Identifiable {
     }
 
     private func load() async {
-        do {
-            let ssh = SSHClient()
-            let hostObj = SSHHost(hostname: host, username: user, password: pass)
-            let (status, output) = try ssh.runCaptureAll("cat \(shellEscape(filePath))", on: hostObj)
-            guard status == 0 else { throw NSError(domain: "ssh", code: Int(status), userInfo: [NSLocalizedDescriptionKey: output]) }
-            content = output
-        } catch { errorMsg = "\(error)" }
+        // SSH functionality has been removed from the iOS app
+        // This feature will need to be reimplemented using a backend API
+        errorMsg = "SSH functionality not available. File preview requires backend API integration."
+        content = ""
     }
 
     private func shellEscape(_ s: String) -> String { "'" + s.replacingOccurrences(of: "'", with: "'\\''") + "'" }

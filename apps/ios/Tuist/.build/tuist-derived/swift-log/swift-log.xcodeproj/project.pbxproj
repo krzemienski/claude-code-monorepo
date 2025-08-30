@@ -1,0 +1,459 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2519731487964E11295A5B0C /* Locks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DCB0FA3BA123E3C94FC62DB /* Locks.swift */; };
+		5E83B5F006486A71AD20A6F7 /* LogHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D595285DAFFA707BD0D6623E /* LogHandler.swift */; };
+		B5A299295B63CE57CCC912D3 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1982A723489F5CAAB497A8 /* Logging.swift */; };
+		B6B48E3B4761A768FBE12E16 /* MetadataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1734A3DB8510794E860F3B43 /* MetadataProvider.swift */; };
+		DB9B39A68518DE83154FC899 /* Docs.docc in Sources */ = {isa = PBXBuildFile; fileRef = 3D12AE91D2022547FBFC4A4B /* Docs.docc */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1E7E624E4EE0F4593F7D8A5B /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1734A3DB8510794E860F3B43 /* MetadataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataProvider.swift; sourceTree = "<group>"; };
+		3D12AE91D2022547FBFC4A4B /* Docs.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Docs.docc; sourceTree = "<group>"; };
+		3DCB0FA3BA123E3C94FC62DB /* Locks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Locks.swift; sourceTree = "<group>"; };
+		D595285DAFFA707BD0D6623E /* LogHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogHandler.swift; sourceTree = "<group>"; };
+		D5F5437FE3ADC9E711153608 /* Logging-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Logging-Info.plist"; sourceTree = "<group>"; };
+		DE1982A723489F5CAAB497A8 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		FC30F3AA3B0F46F2DFE134CB /* Logging.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Logging.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DEEB124E3FA71705FCC4D608 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		029742D128AF95A86D4E721E /* tuist-derived */ = {
+			isa = PBXGroup;
+			children = (
+				7EF9D70FE03CB77C29EA4765 /* Logging */,
+			);
+			name = "tuist-derived";
+			path = "../../tuist-derived";
+			sourceTree = "<group>";
+		};
+		1402175E137C3A842A513851 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				8BA59EE036CC1838CEC2943B /* Logging */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		201BFA7D6AE69D78BB53E629 /* Project */ = {
+			isa = PBXGroup;
+			children = (
+				1402175E137C3A842A513851 /* Sources */,
+				029742D128AF95A86D4E721E /* tuist-derived */,
+			);
+			name = Project;
+			sourceTree = "<group>";
+		};
+		24EDFF39362ADDE5AEE24808 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FC30F3AA3B0F46F2DFE134CB /* Logging.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		715A7F6C83D6E3D0F87A731B /* ../../checkouts/swift-log */ = {
+			isa = PBXGroup;
+			children = (
+				201BFA7D6AE69D78BB53E629 /* Project */,
+				24EDFF39362ADDE5AEE24808 /* Products */,
+			);
+			path = "../../checkouts/swift-log";
+			sourceTree = "<group>";
+		};
+		7EF9D70FE03CB77C29EA4765 /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				FEECB2DA47053802FA8E5E60 /* InfoPlists */,
+			);
+			path = Logging;
+			sourceTree = "<group>";
+		};
+		8BA59EE036CC1838CEC2943B /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				3D12AE91D2022547FBFC4A4B /* Docs.docc */,
+				3DCB0FA3BA123E3C94FC62DB /* Locks.swift */,
+				DE1982A723489F5CAAB497A8 /* Logging.swift */,
+				D595285DAFFA707BD0D6623E /* LogHandler.swift */,
+				1734A3DB8510794E860F3B43 /* MetadataProvider.swift */,
+			);
+			path = Logging;
+			sourceTree = "<group>";
+		};
+		FEECB2DA47053802FA8E5E60 /* InfoPlists */ = {
+			isa = PBXGroup;
+			children = (
+				D5F5437FE3ADC9E711153608 /* Logging-Info.plist */,
+			);
+			path = InfoPlists;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		628BD83AFACADF6FABBE54EB /* Logging */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 07650501C025753D2CC2C0EF /* Build configuration list for PBXNativeTarget "Logging" */;
+			buildPhases = (
+				AFAF1D3B907FA3B91E3F262B /* Sources */,
+				6D7E63B70FD798DDF5A0F9F1 /* Resources */,
+				DEEB124E3FA71705FCC4D608 /* Frameworks */,
+				1E7E624E4EE0F4593F7D8A5B /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Logging;
+			packageProductDependencies = (
+			);
+			productName = Logging;
+			productReference = FC30F3AA3B0F46F2DFE134CB /* Logging.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FE8F9085437529338E32B8F8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 9999;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 21F44BBB8E8F4C3FB4C0096E /* Build configuration list for PBXProject "swift-log" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 715A7F6C83D6E3D0F87A731B /* ../../checkouts/swift-log */;
+			productRefGroup = 24EDFF39362ADDE5AEE24808 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				628BD83AFACADF6FABBE54EB /* Logging */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6D7E63B70FD798DDF5A0F9F1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AFAF1D3B907FA3B91E3F262B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB9B39A68518DE83154FC899 /* Docs.docc in Sources */,
+				2519731487964E11295A5B0C /* Locks.swift in Sources */,
+				5E83B5F006486A71AD20A6F7 /* LogHandler.swift in Sources */,
+				B5A299295B63CE57CCC912D3 /* Logging.swift in Sources */,
+				B6B48E3B4761A768FBE12E16 /* MetadataProvider.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		15817A24E0E21D50A1946184 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "$(SRCROOT)/../../tuist-derived/Logging/InfoPlists/Logging-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_SWIFT_FLAGS = (
+					"$(inherited)",
+					"-enable-experimental-feature \"StrictConcurrency=complete\"",
+					"-enable-upcoming-feature \"MemberImportVisibility\"",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = Logging;
+				PRODUCT_NAME = Logging;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,6";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		2293F24FC20B726AC6822516 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "$(SRCROOT)/../../tuist-derived/Logging/InfoPlists/Logging-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_SWIFT_FLAGS = (
+					"$(inherited)",
+					"-enable-experimental-feature \"StrictConcurrency=complete\"",
+					"-enable-upcoming-feature \"MemberImportVisibility\"",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = Logging;
+				PRODUCT_NAME = Logging;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,6";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		5FD948788C4E2565A196FD2D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
+				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+					"SWIFT_PACKAGE=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = (
+					"$(inherited)",
+					"-package-name",
+					"swift-log",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SRCROOT = "../../checkouts/swift-log";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					SWIFT_PACKAGE,
+				);
+				SWIFT_SUPPRESS_WARNINGS = YES;
+				USE_HEADERMAP = NO;
+			};
+			name = Debug;
+		};
+		8A15B1299A6DAEAB67785B41 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"SWIFT_PACKAGE=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_INHIBIT_ALL_WARNINGS = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_SWIFT_FLAGS = (
+					"$(inherited)",
+					"-package-name",
+					"swift-log",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SRCROOT = "../../checkouts/swift-log";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					SWIFT_PACKAGE,
+				);
+				SWIFT_SUPPRESS_WARNINGS = YES;
+				USE_HEADERMAP = NO;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		07650501C025753D2CC2C0EF /* Build configuration list for PBXNativeTarget "Logging" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				15817A24E0E21D50A1946184 /* Debug */,
+				2293F24FC20B726AC6822516 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		21F44BBB8E8F4C3FB4C0096E /* Build configuration list for PBXProject "swift-log" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5FD948788C4E2565A196FD2D /* Debug */,
+				8A15B1299A6DAEAB67785B41 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FE8F9085437529338E32B8F8 /* Project object */;
+}
