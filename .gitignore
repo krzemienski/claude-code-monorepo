@@ -29,3 +29,4 @@ hive-mind-prompt-*.txt
 /services/backend/app/core/__pycache__
 /services/backend/app/db/__pycache__
 /apps/ios/Tuist/.build/repositories
+/apps/ios/Tuist/.build

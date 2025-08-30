@@ -16,9 +16,11 @@ import uvicorn
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.rate_limit import RateLimitMiddleware
+from app.core.redis_client import init_redis, close_redis
 from app.api.v1 import api_router
 from app.db.session import engine, Base
 from app.services.mcp import MCPManager
+from app.middleware.jwt_auth import JWTAuthMiddleware, RoleBasedAccessMiddleware
 
 # Setup logging
 logger = setup_logging()
@@ -37,6 +39,9 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     
+    # Initialize Redis for session management
+    await init_redis()
+    
     # Initialize MCP servers
     await mcp_manager.initialize()
     
@@ -48,6 +53,7 @@ async def lifespan(app: FastAPI):
     # Shutdown
     logger.info("Shutting down Claude Code Backend API...")
     await mcp_manager.shutdown()
+    await close_redis()
     await engine.dispose()
 
 
@@ -62,15 +68,33 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Add CORS middleware - fully open for all origins
+# Add CORS middleware - configure for specific origins in production
+allowed_origins = [
+    "http://localhost:3000",  # Local development
+    "http://localhost:8080",  # Alternative local port
+    "capacitor://localhost",  # iOS app
+    "ionic://localhost",  # Ionic framework
+    "app://localhost",  # Electron/Desktop apps
+]
+
+# In production, use specific origins from settings
+if settings.CORS_ORIGINS and settings.CORS_ORIGINS != ["*"]:
+    allowed_origins = settings.CORS_ORIGINS
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
+    allow_origins=allowed_origins if not settings.DEBUG else ["*"],  # All origins in debug mode
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods
-    allow_headers=["*"],  # Allow all headers
-    expose_headers=["*"],  # Expose all headers
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["*"],
+    expose_headers=["X-Total-Count", "X-Request-ID", "X-Process-Time"],
 )
+
+# Add JWT authentication middleware
+app.add_middleware(JWTAuthMiddleware)
+
+# Add role-based access control middleware
+app.add_middleware(RoleBasedAccessMiddleware)
 
 # Add rate limiting middleware
 app.add_middleware(RateLimitMiddleware)

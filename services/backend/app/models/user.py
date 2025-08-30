@@ -2,8 +2,9 @@
 
 from typing import List, Optional
 from uuid import uuid4
+from datetime import datetime
 
-from sqlalchemy import Boolean, String, Text
+from sqlalchemy import Boolean, String, Text, DateTime, JSON, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -35,11 +36,52 @@ class User(Base, TimestampMixin):
         index=True
     )
     
+    # Password hash (bcrypt)
+    password_hash: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False
+    )
+    
     api_key: Mapped[str] = mapped_column(
         String(255),
         unique=True,
         nullable=False,
         index=True
+    )
+    
+    # Roles and permissions for RBAC
+    roles: Mapped[Optional[list]] = mapped_column(
+        JSON,
+        nullable=True,
+        default=lambda: ["user"]
+    )
+    
+    permissions: Mapped[Optional[list]] = mapped_column(
+        JSON,
+        nullable=True,
+        default=list
+    )
+    
+    # Security tracking
+    last_login: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True
+    )
+    
+    last_password_change: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True
+    )
+    
+    failed_login_attempts: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        nullable=False
+    )
+    
+    locked_until: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True
     )
     
     is_active: Mapped[bool] = mapped_column(

@@ -46,7 +46,7 @@
 ## 📊 Key Metrics
 
 - **Build Time**: 45s (clean), 8s (incremental)
-- **Supported iOS**: 17.0+
+- **Supported iOS**: 16.0+ (with iOS 17.0+ progressive enhancements)
 - **Swift Version**: 6.0
 - **Architecture**: Universal (arm64, x86_64)
 - **Accessibility Score**: WCAG 2.1 Level AA

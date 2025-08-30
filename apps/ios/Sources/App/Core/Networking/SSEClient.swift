@@ -12,8 +12,9 @@ public final class SSEClient: NSObject, URLSessionDataDelegate {
 
     private var buffer = Data()
     private var task: URLSessionDataTask?
-    private lazy var session: URLSession = {
-        URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+    private lazy var session: URLSession = { [weak self] in
+        guard let self = self else { return URLSession.shared }
+        return URLSession(configuration: .default, delegate: self, delegateQueue: nil)
     }()
     private let log = Logger(subsystem: "com.claudecode", category: "SSE")
     private let url: String
@@ -28,7 +29,11 @@ public final class SSEClient: NSObject, URLSessionDataDelegate {
     }
 
     public func connect(url: URL? = nil, body: Data? = nil, headers: [String: String] = [:]) {
-        let connectURL = url ?? URL(string: self.url)!
+        guard let connectURL = url ?? URL(string: self.url) else {
+            log.error("Invalid URL provided")
+            onError?(URLError(.badURL))
+            return
+        }
         let connectBody = body ?? self.body
         let connectHeaders = headers.isEmpty ? self.headers : headers
         

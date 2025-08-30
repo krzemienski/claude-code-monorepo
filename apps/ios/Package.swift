@@ -1,7 +1,7 @@
 // swift-tools-version: 5.10
 import PackageDescription
 
-let package = Package(
+Package(
     name: "ClaudeCode",
     platforms: [
         .iOS(.v16)
@@ -18,7 +18,8 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-collections.git", from: "1.1.0"),
         .package(url: "https://github.com/LaunchDarkly/swift-eventsource.git", from: "3.0.0"),
         .package(url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: "4.2.0"),
-        .package(url: "https://github.com/danielgindi/Charts.git", from: "5.0.0")
+        .package(url: "https://github.com/danielgindi/Charts.git", from: "5.0.0"),
+        .package(url: "https://github.com/nalexn/ViewInspector.git", from: "0.9.0")
     ],
     targets: [
         .target(
@@ -37,7 +38,8 @@ let package = Package(
             name: "ClaudeCodeTests",
             dependencies: [
                 "ClaudeCode",
-                .product(name: "Logging", package: "swift-log")
+                .product(name: "Logging", package: "swift-log"),
+                .product(name: "ViewInspector", package: "ViewInspector")
             ],
             path: "Tests"
         )

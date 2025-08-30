@@ -71,7 +71,7 @@ xcodebuild build \
 # Install and run
 xcrun simctl boot "iPhone 15"
 xcrun simctl install booted build/Build/Products/Debug-iphonesimulator/ClaudeCode.app
-xcrun simctl launch booted com.anthropic.ClaudeCode
+xcrun simctl launch booted com.claudecode.ios
 ```
 
 ## Backend Connection

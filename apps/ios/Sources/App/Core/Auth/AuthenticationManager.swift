@@ -270,7 +270,10 @@ public class AuthenticationManager: ObservableObject {
     
     private func validateCredentials(apiKey: String, baseURL: String) async throws -> Bool {
         // Create API client with provided credentials
-        var request = URLRequest(url: URL(string: "\(baseURL)/health")!)
+        guard let healthURL = URL(string: "\(baseURL)/health") else {
+            throw APIError.invalidURL
+        }
+        var request = URLRequest(url: healthURL)
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.timeoutInterval = 10
         

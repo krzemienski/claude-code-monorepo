@@ -5,6 +5,7 @@ API v1 router aggregation
 from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
+    auth,
     chat,
     models,
     projects,
@@ -19,6 +20,7 @@ from app.api.v1.endpoints import (
 api_router = APIRouter()
 
 # Include all endpoint routers
+api_router.include_router(auth.router, tags=["authentication"])  # Auth endpoints first
 api_router.include_router(chat.router, prefix="/chat", tags=["chat"])
 api_router.include_router(models.router, prefix="/models", tags=["models"])
 api_router.include_router(projects.router, prefix="/projects", tags=["projects"])

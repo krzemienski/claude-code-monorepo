@@ -18,9 +18,9 @@ apps/ios/
 │   │   │   └── Networking/
 │   │   │       ├── APIClient.swift     # REST API client
 │   │   │       └── SSEClient.swift     # Server-sent events
-│   │   ├── SSH/               # SSH integration
-│   │   │   ├── SSHClient.swift
-│   │   │   └── HostStats.swift
+│   │   ├── Concurrency/       # Actor-based concurrency
+│   │   │   ├── ActorBasedTaskManagement.swift
+│   │   │   └── ActorBasedMemoryManagement.swift
 │   │   └── Theme/             # Design system
 │   │       ├── Theme.swift
 │   │       └── Tokens.css
@@ -41,7 +41,7 @@ apps/ios/
 
 ### Prerequisites
 
-1. **Xcode 15.4+** (iOS 17.0 SDK)
+1. **Xcode 15.0+** (iOS 16.0 SDK minimum, iOS 17.0 SDK recommended)
    ```bash
    # Check Xcode version
    xcodebuild -version
@@ -92,7 +92,7 @@ apps/ios/
 - **eventsource** (3.0.0+): SSE support
 - **KeychainAccess** (4.2.2+): Secure storage
 - **Charts** (5.1.0+): Data visualization
-- **Shout** (0.6.5+): SSH client
+- ~~**Shout**: SSH client~~ (Removed - not iOS compatible)
 
 ### Installation
 Dependencies are automatically resolved when opening the project in Xcode.
@@ -124,7 +124,7 @@ Feature flags can be implemented using:
 // AppSettings.swift extension
 extension AppSettings {
     @AppStorage("feature.newUI") var featureNewUI: Bool = false
-    @AppStorage("feature.betaSSH") var featureBetaSSH: Bool = false
+    @AppStorage("feature.betaMonitoring") var featureBetaMonitoring: Bool = false
     @AppStorage("feature.debugging") var featureDebugging: Bool = false
 }
 ```

@@ -126,7 +126,7 @@ extension View {
 // MARK: - Mock API Client for Testing
 @MainActor
 final class MockAPIClient: APIClientProtocol {
-    let baseURL = URL(string: "https://mock.api.com")!
+    let baseURL = URL(string: "https://mock.api.com") ?? URL(fileURLWithPath: "/")
     let apiKey: String? = nil
     
     func health() async throws -> APIClient.HealthResponse {
@@ -135,8 +135,13 @@ final class MockAPIClient: APIClientProtocol {
             let status: String = "healthy"
             let timestamp: String? = ISO8601DateFormatter().string(from: Date())
         }
-        let mockData = try! JSONEncoder().encode(["status": "healthy", "timestamp": ISO8601DateFormatter().string(from: Date())])
-        return try! JSONDecoder().decode(APIClient.HealthResponse.self, from: mockData)
+        do {
+            let mockData = try JSONEncoder().encode(["status": "healthy", "timestamp": ISO8601DateFormatter().string(from: Date())])
+            return try JSONDecoder().decode(APIClient.HealthResponse.self, from: mockData)
+        } catch {
+            // Return a default health response if encoding/decoding fails
+            return APIClient.HealthResponse(status: "healthy", timestamp: ISO8601DateFormatter().string(from: Date()))
+        }
     }
     
     func listProjects() async throws -> [APIClient.Project] {

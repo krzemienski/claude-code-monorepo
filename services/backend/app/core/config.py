@@ -61,13 +61,14 @@ class Settings(BaseSettings):
         env="ALLOWED_FILE_EXTENSIONS"
     )
     
-    # Security Configuration (Disabled - No Authentication)
+    # Security Configuration - JWT Authentication
     SECRET_KEY: str = Field(
-        default="no-auth-required",
+        default="CHANGE-THIS-IN-PRODUCTION-USE-SECURE-RANDOM-KEY",
         env="SECRET_KEY"
     )
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=0, env="ACCESS_TOKEN_EXPIRE_MINUTES")  # Disabled
-    ALGORITHM: str = Field(default="none", env="ALGORITHM")  # No algorithm needed
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=15, env="ACCESS_TOKEN_EXPIRE_MINUTES")
+    REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7, env="REFRESH_TOKEN_EXPIRE_DAYS")
+    ALGORITHM: str = Field(default="RS256", env="ALGORITHM")  # Using RS256 for JWT
     
     # Monitoring Configuration
     METRICS_ENABLED: bool = Field(default=True, env="METRICS_ENABLED")

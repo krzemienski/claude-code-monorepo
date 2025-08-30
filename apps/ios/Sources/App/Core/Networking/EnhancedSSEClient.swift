@@ -171,11 +171,9 @@ final class EnhancedSSEClient: NSObject, URLSessionDataDelegate, SSEClientProtoc
         logger.info("Scheduling reconnection attempt \(self.reconnectAttempts) after \(delay) seconds")
         
         let workItem = DispatchWorkItem { [weak self] in
-            guard let self = self else { return }
-            self.queue.async(flags: .barrier) {
-                if self.shouldReconnect {
-                    self.performConnection()
-                }
+            self?.queue.async(flags: .barrier) { [weak self] in
+                guard let self = self, self.shouldReconnect else { return }
+                self.performConnection()
             }
         }
         reconnectTimer = workItem

@@ -252,7 +252,9 @@ final class ChatViewModel: ObservableObject {
         do {
             let data = try JSONSerialization.data(withJSONObject: body)
             let baseURL = settings.baseURL
-            let url = URL(string: "\(baseURL)/api/v1/chat/completions")!
+            guard let url = URL(string: "\(baseURL)/api/v1/chat/completions") else {
+                throw URLError(.badURL)
+            }
             
             var headers: [String: String] = ["Content-Type": "application/json"]
             if !settings.apiKeyPlaintext.isEmpty {
@@ -286,7 +288,10 @@ final class ChatViewModel: ObservableObject {
             
             let data = try JSONSerialization.data(withJSONObject: body)
             let baseURL = settings.baseURL
-            var request = URLRequest(url: URL(string: "\(baseURL)/api/v1/chat/completions")!)
+            guard let completionsURL = URL(string: "\(baseURL)/api/v1/chat/completions") else {
+                throw URLError(.badURL)
+            }
+            var request = URLRequest(url: completionsURL)
             request.httpMethod = "POST"
             request.httpBody = data
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")

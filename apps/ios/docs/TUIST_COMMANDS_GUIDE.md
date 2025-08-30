@@ -269,7 +269,7 @@ Add to Project.swift:
 ```swift
 settings: Settings.settings(
     base: [
-        "SWIFT_VERSION": "5.9",
+        "SWIFT_VERSION": "5.10",
         "IPHONEOS_DEPLOYMENT_TARGET": "16.0",
         "CODE_SIGN_IDENTITY": ""
     ]
