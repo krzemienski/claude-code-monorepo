@@ -2,7 +2,12 @@ import Foundation
 import LocalAuthentication
 import Combine
 
-// MARK: - Authentication State
+// MARK: - NO AUTHENTICATION IMPLEMENTATION
+// This file is maintained for backward compatibility only.
+// The application now operates without authentication.
+// All methods return success/default values immediately.
+
+// MARK: - Authentication State (Deprecated)
 public enum AuthenticationState {
     case unauthenticated
     case authenticating
@@ -11,7 +16,7 @@ public enum AuthenticationState {
     case sessionExpired
 }
 
-// MARK: - Authentication Error
+// MARK: - Authentication Error (Deprecated)
 public enum AuthenticationError: LocalizedError {
     case invalidCredentials
     case biometricNotAvailable
@@ -22,32 +27,17 @@ public enum AuthenticationError: LocalizedError {
     case unknown(String)
     
     public var errorDescription: String? {
-        switch self {
-        case .invalidCredentials:
-            return "Invalid API key or credentials"
-        case .biometricNotAvailable:
-            return "Biometric authentication is not available"
-        case .biometricAuthenticationFailed:
-            return "Biometric authentication failed"
-        case .keychainError(let message):
-            return "Keychain error: \(message)"
-        case .networkError(let message):
-            return "Network error: \(message)"
-        case .sessionExpired:
-            return "Your session has expired. Please authenticate again"
-        case .unknown(let message):
-            return "Authentication error: \(message)"
-        }
+        return "Authentication is not required"
     }
 }
 
-// MARK: - Authenticated User
+// MARK: - Authenticated User (Deprecated)
 public struct AuthenticatedUser {
-    public let id: String
-    public let apiKey: String
-    public let baseURL: String
-    public let authenticatedAt: Date
-    public let biometricEnabled: Bool
+    public let id: String = "default-user"
+    public let apiKey: String = "" // No API key needed
+    public let baseURL: String = "http://localhost:8000"
+    public let authenticatedAt: Date = Date()
+    public let biometricEnabled: Bool = false
     
     public init(id: String, apiKey: String, baseURL: String, authenticatedAt: Date, biometricEnabled: Bool) {
         self.id = id

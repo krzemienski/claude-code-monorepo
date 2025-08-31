@@ -10,7 +10,6 @@ final class ActorAPIClient: APIClientProtocol {
     // MARK: - Properties
     
     let baseURL: URL
-    let apiKey: String?
     private let networkingActor: NetworkingActor
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "ActorAPIClient")
     
@@ -25,7 +24,6 @@ final class ActorAPIClient: APIClientProtocol {
         }
         
         self.baseURL = url
-        self.apiKey = settings.apiKeyPlaintext.isEmpty ? nil : settings.apiKeyPlaintext
         self.networkingActor = networkingActor ?? NetworkingActor(retryPolicy: .default)
         
         logger.info("🚀 ActorAPIClient initialized with base URL: \(url)")

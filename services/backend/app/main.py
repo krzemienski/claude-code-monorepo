@@ -8,7 +8,7 @@ import logging
 from contextlib import asynccontextmanager
 from typing import Optional
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
@@ -20,7 +20,13 @@ from app.core.redis_client import init_redis, close_redis
 from app.api.v1 import api_router
 from app.db.session import engine, Base
 from app.services.mcp import MCPManager
-from app.middleware.jwt_auth import JWTAuthMiddleware, RoleBasedAccessMiddleware
+# Authentication removed - all endpoints are now public
+from app.middleware.performance_monitoring import (
+    monitoring_middleware,
+    monitoring_lifespan,
+    metrics_app
+)
+from app.services.websocket_manager import websocket_manager, websocket_endpoint
 
 # Setup logging
 logger = setup_logging()
@@ -48,13 +54,26 @@ async def lifespan(app: FastAPI):
     # Store in app state
     app.state.mcp_manager = mcp_manager
     
+    # Start monitoring
+    await monitoring_middleware.start_monitoring()
+    await websocket_manager.start_monitoring()
+    
+    logger.info("All services initialized successfully")
+    
     yield
     
     # Shutdown
     logger.info("Shutting down Claude Code Backend API...")
+    
+    # Stop monitoring
+    await monitoring_middleware.stop_monitoring()
+    await websocket_manager.stop_monitoring()
+    
     await mcp_manager.shutdown()
     await close_redis()
     await engine.dispose()
+    
+    logger.info("Shutdown complete")
 
 
 # Create FastAPI app
@@ -90,14 +109,14 @@ app.add_middleware(
     expose_headers=["X-Total-Count", "X-Request-ID", "X-Process-Time"],
 )
 
-# Add JWT authentication middleware
-app.add_middleware(JWTAuthMiddleware)
-
-# Add role-based access control middleware
-app.add_middleware(RoleBasedAccessMiddleware)
+# Authentication removed - all endpoints are now public
+# Previously had JWT and RBAC middleware here
 
 # Add rate limiting middleware
 app.add_middleware(RateLimitMiddleware)
+
+# Add performance monitoring middleware
+app.middleware("http")(monitoring_middleware)
 
 # Add request ID middleware
 @app.middleware("http")
@@ -122,6 +141,20 @@ async def add_response_time(request: Request, call_next):
 
 # Include API routes
 app.include_router(api_router, prefix="/v1")
+
+# Mount Prometheus metrics app
+app.mount("/metrics", metrics_app)
+
+# WebSocket endpoint
+@app.websocket("/ws")
+async def websocket_route(
+    websocket: WebSocket,
+    client_id: Optional[str] = None,
+    session_id: Optional[str] = None,
+    reconnect_token: Optional[str] = None
+):
+    """WebSocket endpoint with reconnection support"""
+    await websocket_endpoint(websocket, client_id, session_id, reconnect_token)
 
 # Health check endpoint
 @app.get("/health")

@@ -4,6 +4,20 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>ClaudeCode-Tests.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>isShown</key>
+			<true/>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
+		<key>ClaudeCode-UITests.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>isShown</key>
+			<true/>
+			<key>orderHint</key>
+			<integer>5</integer>
+		</dict>
 		<key>ClaudeCode.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>isShown</key>

@@ -1,0 +1,595 @@
+{
+  "metadata": {
+    "generated": "2025-08-31",
+    "totalTasks": 45,
+    "highPriority": 8,
+    "mediumPriority": 18,
+    "lowPriority": 19
+  },
+  "tasks": [
+    {
+      "id": "IOS-001",
+      "priority": "HIGH",
+      "category": "Documentation",
+      "title": "Standardize iOS Deployment Target Documentation",
+      "description": "Update all documentation files to consistently reference iOS 16.0 as the deployment target",
+      "affectedFiles": [
+        "DEVELOPMENT_GUIDE.md",
+        "iOS-16-Deployment-Guide.md",
+        "README.md"
+      ],
+      "estimatedHours": 2,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-002",
+      "priority": "HIGH",
+      "category": "Documentation",
+      "title": "Remove Shout SSH Library References",
+      "description": "Remove all references to the Shout SSH library which has been removed from dependencies",
+      "affectedFiles": [
+        "DEVELOPMENT_GUIDE.md"
+      ],
+      "estimatedHours": 1,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-003",
+      "priority": "HIGH",
+      "category": "Accessibility",
+      "title": "Add Audio Graph Descriptions for Charts",
+      "description": "Implement accessibility descriptions for all chart components using audio graph patterns",
+      "affectedFiles": [
+        "AnalyticsView.swift",
+        "MonitoringView.swift",
+        "AccessibleChartComponents.swift"
+      ],
+      "estimatedHours": 8,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-004",
+      "priority": "HIGH",
+      "category": "Testing",
+      "title": "Fix Authentication Test Compilation Errors",
+      "description": "Update test files to match new AuthenticationManager API",
+      "affectedFiles": [
+        "AuthenticationFlowTests.swift",
+        "IntegrationTests.swift"
+      ],
+      "estimatedHours": 4,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-005",
+      "priority": "HIGH",
+      "category": "Code Quality",
+      "title": "Add Missing Error Handling in Async Operations",
+      "description": "Add proper do-catch blocks for all async/await operations",
+      "affectedFiles": [
+        "NetworkManager.swift",
+        "DataLoader.swift",
+        "SessionsViewModel.swift"
+      ],
+      "estimatedHours": 6,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-006",
+      "priority": "HIGH",
+      "category": "Documentation",
+      "title": "Update Bundle Identifier References",
+      "description": "Standardize all bundle identifier references to com.claudecode.ios",
+      "affectedFiles": [
+        "README.md",
+        "DEVELOPMENT_GUIDE.md"
+      ],
+      "estimatedHours": 1,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-007",
+      "priority": "HIGH",
+      "category": "Performance",
+      "title": "Add Task Cancellation Checks",
+      "description": "Implement Task.isCancelled checks in long-running operations",
+      "affectedFiles": [
+        "DataProcessor.swift",
+        "BackgroundTasks.swift"
+      ],
+      "estimatedHours": 4,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-008",
+      "priority": "HIGH",
+      "category": "Testing",
+      "title": "Implement AccessibilityAudit Class",
+      "description": "Create the missing AccessibilityAudit class for integration tests",
+      "affectedFiles": [
+        "AccessibilityIntegrationTests.swift"
+      ],
+      "estimatedHours": 6,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-009",
+      "priority": "MEDIUM",
+      "category": "Testing",
+      "title": "Increase SwiftUI View Test Coverage",
+      "description": "Increase test coverage for SwiftUI views from 72% to 80%",
+      "affectedFiles": [
+        "ViewTests/*"
+      ],
+      "estimatedHours": 12,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-010",
+      "priority": "MEDIUM",
+      "category": "Code Quality",
+      "title": "Migrate Completion Handlers to Async/Await",
+      "description": "Convert remaining completion handler APIs to async/await",
+      "affectedFiles": [
+        "LegacyNetworking.swift",
+        "FileManager+Extensions.swift"
+      ],
+      "estimatedHours": 8,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-011",
+      "priority": "MEDIUM",
+      "category": "SwiftUI",
+      "title": "Add @SceneStorage for State Restoration",
+      "description": "Implement scene storage for better app state restoration",
+      "affectedFiles": [
+        "HomeView.swift",
+        "SessionsView.swift",
+        "SettingsView.swift"
+      ],
+      "estimatedHours": 6,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-012",
+      "priority": "MEDIUM",
+      "category": "SwiftUI",
+      "title": "Implement Missing SwiftUI Previews",
+      "description": "Add preview providers for views lacking previews",
+      "affectedFiles": [
+        "DiagnosticsView.swift",
+        "MonitoringView.swift"
+      ],
+      "estimatedHours": 4,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-013",
+      "priority": "MEDIUM",
+      "category": "Architecture",
+      "title": "Extract Large View Files",
+      "description": "Refactor views exceeding 500 lines into smaller components",
+      "affectedFiles": [
+        "EnhancedChatConsoleView.swift",
+        "DiagnosticsView.swift",
+        "MCPSettingsView.swift"
+      ],
+      "estimatedHours": 10,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-014",
+      "priority": "MEDIUM",
+      "category": "Testing",
+      "title": "Add More Mock Implementations",
+      "description": "Create missing mock implementations for better test isolation",
+      "affectedFiles": [
+        "Mocks/*"
+      ],
+      "estimatedHours": 6,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-015",
+      "priority": "MEDIUM",
+      "category": "Performance",
+      "title": "Optimize Expensive View Computations",
+      "description": "Move expensive calculations out of SwiftUI body properties",
+      "affectedFiles": [
+        "AnalyticsView.swift",
+        "ChartViews.swift"
+      ],
+      "estimatedHours": 4,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-016",
+      "priority": "MEDIUM",
+      "category": "Accessibility",
+      "title": "Add Keyboard Alternatives for Gestures",
+      "description": "Provide keyboard navigation for drag gesture interactions",
+      "affectedFiles": [
+        "DraggableComponents.swift",
+        "GestureHandlers.swift"
+      ],
+      "estimatedHours": 6,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-017",
+      "priority": "MEDIUM",
+      "category": "Documentation",
+      "title": "Document Complex Navigation Flows",
+      "description": "Add documentation for complex coordinator navigation patterns",
+      "affectedFiles": [
+        "AppCoordinator.swift",
+        "NavigationDocs.md"
+      ],
+      "estimatedHours": 4,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-018",
+      "priority": "MEDIUM",
+      "category": "Code Quality",
+      "title": "Increase Sendable Conformance",
+      "description": "Add Sendable conformance to data models for better concurrency",
+      "affectedFiles": [
+        "Models/*"
+      ],
+      "estimatedHours": 6,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-019",
+      "priority": "MEDIUM",
+      "category": "SwiftUI",
+      "title": "Implement Transaction Animations",
+      "description": "Use animation transactions for multiple state changes",
+      "affectedFiles": [
+        "AnimatedComponents.swift"
+      ],
+      "estimatedHours": 3,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-020",
+      "priority": "MEDIUM",
+      "category": "Testing",
+      "title": "Add Snapshot Tests for Dark Mode",
+      "description": "Create snapshot tests for all views in dark mode",
+      "affectedFiles": [
+        "SnapshotTests/*"
+      ],
+      "estimatedHours": 8,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-021",
+      "priority": "LOW",
+      "category": "Code Quality",
+      "title": "Address TODO Comments",
+      "description": "Convert TODO comments to GitHub issues or implement",
+      "affectedFiles": [
+        "AdaptiveChatView.swift",
+        "AccessibilityIntegrationTests.swift"
+      ],
+      "estimatedHours": 2,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-022",
+      "priority": "LOW",
+      "category": "Documentation",
+      "title": "Add Code Documentation Coverage",
+      "description": "Increase documentation coverage from 85% to 95%",
+      "affectedFiles": [
+        "Sources/**/*.swift"
+      ],
+      "estimatedHours": 8,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-023",
+      "priority": "LOW",
+      "category": "SwiftUI",
+      "title": "Add @AppStorage for UI Preferences",
+      "description": "Persist user UI preferences using @AppStorage",
+      "affectedFiles": [
+        "PreferencesManager.swift",
+        "SettingsView.swift"
+      ],
+      "estimatedHours": 3,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-024",
+      "priority": "LOW",
+      "category": "Testing",
+      "title": "Create Performance Benchmarks",
+      "description": "Add performance testing benchmarks for critical paths",
+      "affectedFiles": [
+        "PerformanceTests.swift"
+      ],
+      "estimatedHours": 6,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-025",
+      "priority": "LOW",
+      "category": "SwiftUI",
+      "title": "Implement Protocol Abstractions",
+      "description": "Create protocol abstractions for complex views",
+      "affectedFiles": [
+        "Protocols/*"
+      ],
+      "estimatedHours": 4,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-026",
+      "priority": "MEDIUM",
+      "category": "iOS 17 Features",
+      "title": "Add Observable Macro Support",
+      "description": "Implement iOS 17 Observable macro with availability checks",
+      "affectedFiles": [
+        "ViewModels/*"
+      ],
+      "estimatedHours": 8,
+      "dependencies": ["IOS-001"]
+    },
+    {
+      "id": "IOS-027",
+      "priority": "LOW",
+      "category": "iOS 17 Features",
+      "title": "Implement TipKit Integration",
+      "description": "Add TipKit for user onboarding with iOS 17 availability",
+      "affectedFiles": [
+        "Onboarding/*"
+      ],
+      "estimatedHours": 6,
+      "dependencies": ["IOS-001"]
+    },
+    {
+      "id": "IOS-028",
+      "priority": "LOW",
+      "category": "iOS 17 Features",
+      "title": "Add SwiftData Support",
+      "description": "Implement SwiftData as alternative to Core Data for iOS 17+",
+      "affectedFiles": [
+        "DataLayer/*"
+      ],
+      "estimatedHours": 12,
+      "dependencies": ["IOS-001"]
+    },
+    {
+      "id": "IOS-029",
+      "priority": "MEDIUM",
+      "category": "Build System",
+      "title": "Update Tuist Configuration",
+      "description": "Optimize Tuist configuration for faster builds",
+      "affectedFiles": [
+        "Project.swift",
+        "Workspace.swift"
+      ],
+      "estimatedHours": 4,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-030",
+      "priority": "LOW",
+      "category": "CI/CD",
+      "title": "Add Fastlane Configuration",
+      "description": "Set up Fastlane for automated deployments",
+      "affectedFiles": [
+        "fastlane/*"
+      ],
+      "estimatedHours": 8,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-031",
+      "priority": "MEDIUM",
+      "category": "Security",
+      "title": "Implement Certificate Pinning",
+      "description": "Add certificate pinning for enhanced security",
+      "affectedFiles": [
+        "NetworkSecurity.swift"
+      ],
+      "estimatedHours": 6,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-032",
+      "priority": "LOW",
+      "category": "Localization",
+      "title": "Add Localization Support",
+      "description": "Implement multi-language support infrastructure",
+      "affectedFiles": [
+        "Localizable.strings",
+        "LocalizationManager.swift"
+      ],
+      "estimatedHours": 10,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-033",
+      "priority": "MEDIUM",
+      "category": "Analytics",
+      "title": "Implement Analytics Framework",
+      "description": "Add privacy-focused analytics tracking",
+      "affectedFiles": [
+        "AnalyticsManager.swift"
+      ],
+      "estimatedHours": 8,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-034",
+      "priority": "LOW",
+      "category": "UI Enhancement",
+      "title": "Add Haptic Feedback",
+      "description": "Implement haptic feedback for better user experience",
+      "affectedFiles": [
+        "HapticFeedback.swift"
+      ],
+      "estimatedHours": 3,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-035",
+      "priority": "MEDIUM",
+      "category": "Offline Support",
+      "title": "Implement Offline Mode",
+      "description": "Add offline caching and sync capabilities",
+      "affectedFiles": [
+        "OfflineManager.swift",
+        "CacheManager.swift"
+      ],
+      "estimatedHours": 12,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-036",
+      "priority": "LOW",
+      "category": "iPad Optimization",
+      "title": "Enhance iPad Multitasking",
+      "description": "Improve split view and slide over support",
+      "affectedFiles": [
+        "iPadLayouts.swift"
+      ],
+      "estimatedHours": 6,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-037",
+      "priority": "LOW",
+      "category": "watchOS",
+      "title": "Create watchOS Companion App",
+      "description": "Develop basic watchOS companion app",
+      "affectedFiles": [
+        "watchOS/*"
+      ],
+      "estimatedHours": 20,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-038",
+      "priority": "MEDIUM",
+      "category": "Widget",
+      "title": "Add Home Screen Widgets",
+      "description": "Implement iOS widgets for quick access",
+      "affectedFiles": [
+        "Widgets/*"
+      ],
+      "estimatedHours": 10,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-039",
+      "priority": "LOW",
+      "category": "Siri Integration",
+      "title": "Add Siri Shortcuts",
+      "description": "Implement Siri shortcuts for common actions",
+      "affectedFiles": [
+        "SiriIntents/*"
+      ],
+      "estimatedHours": 8,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-040",
+      "priority": "MEDIUM",
+      "category": "Push Notifications",
+      "title": "Implement Push Notifications",
+      "description": "Add push notification support",
+      "affectedFiles": [
+        "NotificationManager.swift"
+      ],
+      "estimatedHours": 8,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-041",
+      "priority": "LOW",
+      "category": "App Clips",
+      "title": "Create App Clip",
+      "description": "Develop lightweight App Clip for quick tasks",
+      "affectedFiles": [
+        "AppClip/*"
+      ],
+      "estimatedHours": 12,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-042",
+      "priority": "LOW",
+      "category": "AR Features",
+      "title": "Add ARKit Integration",
+      "description": "Experimental AR features using ARKit",
+      "affectedFiles": [
+        "ARFeatures/*"
+      ],
+      "estimatedHours": 16,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-043",
+      "priority": "MEDIUM",
+      "category": "Code Signing",
+      "title": "Document Code Signing Process",
+      "description": "Create comprehensive code signing documentation",
+      "affectedFiles": [
+        "docs/CodeSigning.md"
+      ],
+      "estimatedHours": 3,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-044",
+      "priority": "LOW",
+      "category": "TestFlight",
+      "title": "Set Up TestFlight Beta Testing",
+      "description": "Configure TestFlight for beta distribution",
+      "affectedFiles": [
+        "TestFlight/*"
+      ],
+      "estimatedHours": 4,
+      "dependencies": []
+    },
+    {
+      "id": "IOS-045",
+      "priority": "LOW",
+      "category": "App Store",
+      "title": "Prepare App Store Submission",
+      "description": "Create App Store assets and metadata",
+      "affectedFiles": [
+        "AppStore/*"
+      ],
+      "estimatedHours": 6,
+      "dependencies": []
+    }
+  ],
+  "summary": {
+    "totalEstimatedHours": 343,
+    "categoriesBreakdown": {
+      "Documentation": 6,
+      "Testing": 8,
+      "Code Quality": 6,
+      "SwiftUI": 7,
+      "Accessibility": 3,
+      "Performance": 3,
+      "Architecture": 2,
+      "iOS 17 Features": 3,
+      "Other": 7
+    },
+    "recommendedExecutionOrder": [
+      "HIGH priority tasks first (IOS-001 through IOS-008)",
+      "Testing improvements (IOS-009, IOS-014, IOS-020)",
+      "Code quality enhancements (IOS-010, IOS-013, IOS-018)",
+      "SwiftUI optimizations (IOS-011, IOS-012, IOS-019)",
+      "Feature additions (remaining tasks)"
+    ]
+  }
+}

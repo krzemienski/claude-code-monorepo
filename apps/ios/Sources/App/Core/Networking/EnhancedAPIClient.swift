@@ -5,7 +5,6 @@ import OSLog
 @MainActor
 final class EnhancedAPIClient: APIClientProtocol {
     let baseURL: URL
-    let apiKey: String?
     
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "EnhancedAPIClient")
     private let session: URLSession
@@ -24,7 +23,6 @@ final class EnhancedAPIClient: APIClientProtocol {
             return nil
         }
         self.baseURL = url
-        self.apiKey = settings.apiKeyPlaintext.isEmpty ? nil : settings.apiKeyPlaintext
         self.retryPolicy = retryPolicy
         
         // Configure URLSession with optimal settings
@@ -68,11 +66,6 @@ final class EnhancedAPIClient: APIClientProtocol {
             request.httpBody = body
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             logger.debug("Request body size: \(body.count) bytes")
-        }
-        
-        if let apiKey = apiKey {
-            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-            logger.debug("Added authorization header")
         }
         
         // Add request ID for tracking

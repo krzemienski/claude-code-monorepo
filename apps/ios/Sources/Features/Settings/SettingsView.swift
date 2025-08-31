@@ -4,7 +4,6 @@ struct SettingsView: View {
     @StateObject private var settings = AppSettings()
     @State private var validating = false
     @State private var healthText: String = "Not validated"
-    @State private var showKey = false
     @State private var errorMsg: String?
     
     // Environment values for adaptive layout
@@ -13,7 +12,7 @@ struct SettingsView: View {
     @FocusState private var focusedField: Field?
     
     enum Field: Hashable {
-        case baseURL, apiKey
+        case baseURL
     }
 
     var body: some View {
@@ -28,32 +27,6 @@ struct SettingsView: View {
                         value: settings.baseURL,
                         hint: "Enter the URL of your Claude Code server"
                     )
-
-                HStack(spacing: Theme.Spacing.adaptive(Theme.Spacing.sm)) {
-                    if showKey {
-                        TextField("API Key", text: $settings.apiKeyPlaintext)
-                            .textInputAutocapitalization(.never)
-                            .disableAutocorrection(true)
-                            .focused($focusedField, equals: .apiKey)
-                    } else {
-                        SecureField("API Key", text: $settings.apiKeyPlaintext)
-                            .focused($focusedField, equals: .apiKey)
-                    }
-                    Button(showKey ? "Hide" : "Show") { 
-                        showKey.toggle() 
-                    }
-                    .buttonStyle(.bordered)
-                    .accessibilityElement(
-                        label: showKey ? "Hide API key" : "Show API key",
-                        hint: showKey ? "Hide the API key for security" : "Show the API key to verify it",
-                        traits: .isButton
-                    )
-                }
-                .accessibilityElement(
-                    label: "API Key",
-                    value: showKey ? settings.apiKeyPlaintext : "Hidden",
-                    hint: "Enter your API key for authentication"
-                )
 
                 Toggle("Streaming by default", isOn: $settings.streamingDefault)
                     .applyDynamicTypeSize()
@@ -142,7 +115,6 @@ struct SettingsView: View {
         do {
             validating = true
             let health = try await client.health()
-            try settings.saveAPIKey()
             healthText = health.ok ? "OK • v\(health.version ?? "?") • sessions \(health.active_sessions ?? 0)" : "Unhealthy"
         } catch {
             errorMsg = "\(error)"; healthText = "Unhealthy"

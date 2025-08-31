@@ -1,0 +1,724 @@
+{
+  "auditMetadata": {
+    "auditDate": "2025-08-31",
+    "iosMinVersion": "17.0",
+    "swiftUIVersion": "5.0",
+    "totalComponents": 89,
+    "totalViews": 45,
+    "totalViewModels": 12,
+    "totalHelpers": 32
+  },
+  "componentCategories": {
+    "coreViews": {
+      "count": 21,
+      "components": [
+        {
+          "name": "ClaudeCodeApp",
+          "path": "Sources/App/ClaudeCodeApp.swift",
+          "type": "App",
+          "swiftUIFeatures": ["@main", "WindowGroup", "Scene"],
+          "hasPreview": false
+        },
+        {
+          "name": "HomeView",
+          "path": "Sources/Features/Home/HomeView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["TabView", "@State", "@Environment"],
+          "hasPreview": true
+        },
+        {
+          "name": "HomeViewRefactored",
+          "path": "Sources/Features/Home/HomeViewRefactored.swift",
+          "type": "View",
+          "swiftUIFeatures": ["NavigationSplitView", "@StateObject"],
+          "hasPreview": true
+        },
+        {
+          "name": "SessionsView",
+          "path": "Sources/Features/Sessions/SessionsView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["List", "NavigationStack", "@StateObject"],
+          "hasPreview": true
+        },
+        {
+          "name": "NewSessionView",
+          "path": "Sources/Features/Sessions/NewSessionView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["Form", "@State", "@Environment"],
+          "hasPreview": true
+        },
+        {
+          "name": "ChatConsoleView",
+          "path": "Sources/Features/Sessions/ChatConsoleView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["ScrollView", "@StateObject", "@FocusState"],
+          "hasPreview": true
+        },
+        {
+          "name": "EnhancedChatConsoleView",
+          "path": "Sources/Features/Sessions/EnhancedChatConsoleView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["GeometryReader", "@StateObject", "Task"],
+          "hasPreview": true
+        },
+        {
+          "name": "AdaptiveChatView",
+          "path": "Sources/Features/Sessions/AdaptiveChatView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["@Environment", "HorizontalSizeClass", "iPad optimization"],
+          "hasPreview": true
+        },
+        {
+          "name": "ProjectsListView",
+          "path": "Sources/Features/Projects/ProjectsListView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["List", "searchable", "@StateObject"],
+          "hasPreview": true
+        },
+        {
+          "name": "ProjectDetailView",
+          "path": "Sources/Features/Projects/ProjectDetailView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["Form", "NavigationStack", "@ObservedObject"],
+          "hasPreview": true
+        },
+        {
+          "name": "SettingsView",
+          "path": "Sources/Features/Settings/SettingsView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["Form", "Section", "@AppStorage"],
+          "hasPreview": true
+        },
+        {
+          "name": "MCPSettingsView",
+          "path": "Sources/Features/MCP/MCPSettingsView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["List", "Toggle", "@StateObject"],
+          "hasPreview": true
+        },
+        {
+          "name": "SessionToolPickerView",
+          "path": "Sources/Features/MCP/SessionToolPickerView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["Picker", "@Binding", "@State"],
+          "hasPreview": true
+        },
+        {
+          "name": "AnalyticsView",
+          "path": "Sources/Features/Analytics/AnalyticsView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["Charts", "@StateObject", "@Environment"],
+          "hasPreview": true
+        },
+        {
+          "name": "MonitoringView",
+          "path": "Sources/Features/Monitoring/MonitoringView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["LazyVGrid", "@StateObject", "Timer"],
+          "hasPreview": true
+        },
+        {
+          "name": "DiagnosticsView",
+          "path": "Sources/Features/Diagnostics/DiagnosticsView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["TabView", "@State", "AsyncButton"],
+          "hasPreview": true
+        },
+        {
+          "name": "BackendTestView",
+          "path": "Sources/Features/Diagnostics/BackendTestView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["Form", "ProgressView", "@State"],
+          "hasPreview": true
+        },
+        {
+          "name": "TracingView",
+          "path": "Sources/Features/Tracing/TracingView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["List", "TimelineView", "@StateObject"],
+          "hasPreview": true
+        },
+        {
+          "name": "FileBrowserView",
+          "path": "Sources/Features/Files/FileBrowserView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["NavigationStack", "OutlineGroup", "@State"],
+          "hasPreview": true
+        },
+        {
+          "name": "FilePreviewView",
+          "path": "Sources/Features/Files/FilePreviewView.swift",
+          "type": "View",
+          "swiftUIFeatures": ["ScrollView", "AsyncImage", "@State"],
+          "hasPreview": true
+        },
+        {
+          "name": "ComponentLibrary",
+          "path": "Sources/App/Core/UI/ComponentLibrary.swift",
+          "type": "Library",
+          "swiftUIFeatures": ["ViewBuilder", "ButtonStyle", "LabelStyle"],
+          "hasPreview": true
+        }
+      ]
+    },
+    "reusableComponents": {
+      "count": 24,
+      "components": [
+        {
+          "name": "ReactiveSearchBar",
+          "path": "Sources/App/Components/ReactiveComponents.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["@StateObject", "@FocusState", "TextField"],
+          "accessibility": "Full",
+          "hasPreview": false
+        },
+        {
+          "name": "ReactiveFormField",
+          "path": "Sources/App/Components/ReactiveComponents.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["@Binding", "SecureField", "Validation"],
+          "accessibility": "Full",
+          "hasPreview": false
+        },
+        {
+          "name": "ReactiveToggle",
+          "path": "Sources/App/Components/ReactiveComponents.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["Toggle", "@Binding", "Animation"],
+          "accessibility": "Full",
+          "hasPreview": false
+        },
+        {
+          "name": "ReactiveLoadingButton",
+          "path": "Sources/App/Components/ReactiveComponents.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["Task", "async/await", "ProgressView"],
+          "accessibility": "Full",
+          "hasPreview": false
+        },
+        {
+          "name": "ReactiveProgressIndicator",
+          "path": "Sources/App/Components/ReactiveComponents.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["GeometryReader", "LinearGradient", "Animation"],
+          "accessibility": "Full",
+          "hasPreview": false
+        },
+        {
+          "name": "ChatMessageList",
+          "path": "Sources/Features/Sessions/Components/ChatMessageList.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["ScrollViewReader", "LazyVStack", "@Namespace"],
+          "accessibility": "Full",
+          "hasPreview": true
+        },
+        {
+          "name": "ChatMessageRow",
+          "path": "Sources/Features/Sessions/Components/ChatMessageList.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["HStack", "textSelection", "@Environment"],
+          "accessibility": "Full",
+          "hasPreview": false
+        },
+        {
+          "name": "EnhancedChatHeader",
+          "path": "Sources/Features/Sessions/Components/EnhancedChatHeader.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["@Binding", "Animation", "@Environment"],
+          "accessibility": "Full",
+          "hasPreview": true
+        },
+        {
+          "name": "MessageComposer",
+          "path": "Sources/Features/Sessions/Components/MessageComposer.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["TextEditor", "@FocusState", "@Binding"],
+          "accessibility": "Partial",
+          "hasPreview": false
+        },
+        {
+          "name": "MessageBubbleComponent",
+          "path": "Sources/Features/Sessions/Components/MessageBubbleComponent.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["VStack", "Alignment", "Theme"],
+          "accessibility": "Partial",
+          "hasPreview": true
+        },
+        {
+          "name": "MessageListView",
+          "path": "Sources/Features/Sessions/Components/MessageListView.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["ScrollView", "ForEach", "@Environment"],
+          "accessibility": "Partial",
+          "hasPreview": true
+        },
+        {
+          "name": "InputBarView",
+          "path": "Sources/Features/Sessions/Components/InputBarView.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["HStack", "TextField", "@Binding"],
+          "accessibility": "Partial",
+          "hasPreview": true
+        },
+        {
+          "name": "ToolTimelineView",
+          "path": "Sources/Features/Sessions/Components/ToolTimelineView.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["TimelineView", "ForEach", "@State"],
+          "accessibility": "Partial",
+          "hasPreview": true
+        },
+        {
+          "name": "QuickActionsView",
+          "path": "Sources/Features/Home/Components/QuickActionsView.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["LazyVGrid", "Button", "@State"],
+          "accessibility": "Full",
+          "hasPreview": true
+        },
+        {
+          "name": "RecentProjectsView",
+          "path": "Sources/Features/Home/Components/RecentProjectsView.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["List", "NavigationLink", "@ObservedObject"],
+          "accessibility": "Full",
+          "hasPreview": true
+        },
+        {
+          "name": "LoadingIndicator",
+          "path": "Sources/App/Components/LoadingIndicator.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["ProgressView", "Animation", "@State"],
+          "accessibility": "Full",
+          "hasPreview": true
+        },
+        {
+          "name": "LoadingStateView",
+          "path": "Sources/App/Components/LoadingStateView.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["VStack", "ProgressView", "ContentUnavailableView"],
+          "accessibility": "Full",
+          "hasPreview": true
+        },
+        {
+          "name": "AnimatedTextField",
+          "path": "Sources/App/Components/AnimatedTextField.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["TextField", "Animation", "@State"],
+          "accessibility": "Partial",
+          "hasPreview": true
+        },
+        {
+          "name": "AnimatedTextEditor",
+          "path": "Sources/App/Components/AnimatedTextEditor.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["TextEditor", "Animation", "@State"],
+          "accessibility": "Partial",
+          "hasPreview": true
+        },
+        {
+          "name": "AnimatedComponents",
+          "path": "Sources/App/Components/AnimatedComponents.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["Animation", "transition", "withAnimation"],
+          "accessibility": "Partial",
+          "hasPreview": true
+        },
+        {
+          "name": "CyberpunkComponents",
+          "path": "Sources/App/Components/CyberpunkComponents.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["Custom styling", "Gradients", "Effects"],
+          "accessibility": "Partial",
+          "hasPreview": true
+        },
+        {
+          "name": "AccessibleBarChart",
+          "path": "Sources/Features/Analytics/AccessibleChartComponents.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["Charts", "BarMark", "Accessibility"],
+          "accessibility": "Full",
+          "hasPreview": false
+        },
+        {
+          "name": "AccessibleLineChart",
+          "path": "Sources/Features/Analytics/AccessibleChartComponents.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["Charts", "LineMark", "AreaMark"],
+          "accessibility": "Full",
+          "hasPreview": false
+        },
+        {
+          "name": "AccessiblePieChart",
+          "path": "Sources/Features/Analytics/AccessibleChartComponents.swift",
+          "type": "Component",
+          "swiftUIFeatures": ["Charts", "SectorMark", "VoiceOver"],
+          "accessibility": "Full",
+          "hasPreview": false
+        }
+      ]
+    },
+    "utilityComponents": {
+      "count": 12,
+      "components": [
+        {
+          "name": "HapticFeedback",
+          "path": "Sources/App/Components/HapticFeedback.swift",
+          "type": "Utility",
+          "swiftUIFeatures": ["UIFeedbackGenerator", "ViewModifier"],
+          "accessibility": "N/A"
+        },
+        {
+          "name": "ErrorHandling",
+          "path": "Sources/App/Components/ErrorHandling.swift",
+          "type": "Utility",
+          "swiftUIFeatures": ["Alert", "ViewModifier", "@State"],
+          "accessibility": "Full"
+        },
+        {
+          "name": "AccessibilityHelpers",
+          "path": "Sources/App/Components/AccessibilityHelpers.swift",
+          "type": "Utility",
+          "swiftUIFeatures": ["ViewModifier", "accessibilityLabel", "accessibilityHint"],
+          "accessibility": "Full"
+        },
+        {
+          "name": "AccessibilityAudit",
+          "path": "Sources/App/Components/AccessibilityAudit.swift",
+          "type": "Utility",
+          "swiftUIFeatures": ["ViewModifier", "UIAccessibility", "VoiceOver"],
+          "accessibility": "Full"
+        },
+        {
+          "name": "ThemeValidation",
+          "path": "Sources/App/Components/ThemeValidation.swift",
+          "type": "Utility",
+          "swiftUIFeatures": ["Color", "ViewModifier", "Environment"],
+          "accessibility": "N/A"
+        },
+        {
+          "name": "ColorFixes",
+          "path": "Sources/App/Components/ColorFixes.swift",
+          "type": "Utility",
+          "swiftUIFeatures": ["Color", "Theme", "Migration helpers"],
+          "accessibility": "N/A"
+        },
+        {
+          "name": "SpacingFixes",
+          "path": "Sources/App/Components/SpacingFixes.swift",
+          "type": "Utility",
+          "swiftUIFeatures": ["Spacing", "Padding", "ViewModifier"],
+          "accessibility": "N/A"
+        },
+        {
+          "name": "DarkModeCompliance",
+          "path": "Sources/App/Components/DarkModeCompliance.swift",
+          "type": "Utility",
+          "swiftUIFeatures": ["ColorScheme", "@Environment", "ViewModifier"],
+          "accessibility": "Full"
+        },
+        {
+          "name": "OrientationHandler",
+          "path": "Sources/App/Components/OrientationHandler.swift",
+          "type": "Utility",
+          "swiftUIFeatures": ["Device orientation", "ViewModifier", "@Environment"],
+          "accessibility": "N/A"
+        },
+        {
+          "name": "iPadLayouts",
+          "path": "Sources/App/Components/iPadLayouts.swift",
+          "type": "Utility",
+          "swiftUIFeatures": ["NavigationSplitView", "iPad optimization", "Size classes"],
+          "accessibility": "Full"
+        },
+        {
+          "name": "UIEnhancements",
+          "path": "Sources/App/Components/UIEnhancements.swift",
+          "type": "Utility",
+          "swiftUIFeatures": ["ViewModifier", "Effects", "Animations"],
+          "accessibility": "Partial"
+        },
+        {
+          "name": "SceneStorageManager",
+          "path": "Sources/App/Core/SceneStorage/SceneStorageManager.swift",
+          "type": "Utility",
+          "swiftUIFeatures": ["@SceneStorage", "State restoration", "Property wrapper"],
+          "accessibility": "N/A"
+        }
+      ]
+    },
+    "viewModels": {
+      "count": 12,
+      "components": [
+        {
+          "name": "HomeViewModel",
+          "path": "Sources/Features/Home/HomeViewModel.swift",
+          "protocols": ["ObservableObject"],
+          "publishedProperties": ["sessions", "projects", "isLoading"],
+          "dependencies": ["APIClient", "AuthenticationManager"]
+        },
+        {
+          "name": "SessionsViewModel",
+          "path": "Sources/Features/Sessions/SessionsViewModel.swift",
+          "protocols": ["ObservableObject"],
+          "publishedProperties": ["sessions", "filteredSessions", "searchText"],
+          "dependencies": ["APIClient", "SSEClient"]
+        },
+        {
+          "name": "ChatViewModel",
+          "path": "Sources/Features/Sessions/ChatViewModel.swift",
+          "protocols": ["ObservableObject"],
+          "publishedProperties": ["messages", "connectionStatus", "isTyping"],
+          "dependencies": ["SSEClient", "APIClient", "AuthenticationManager"]
+        },
+        {
+          "name": "ProjectsViewModel",
+          "path": "Sources/Features/Projects/ProjectsViewModel.swift",
+          "protocols": ["ObservableObject"],
+          "publishedProperties": ["projects", "selectedProject", "isLoading"],
+          "dependencies": ["APIClient"]
+        },
+        {
+          "name": "SettingsViewModel",
+          "path": "Sources/Features/Settings/SettingsViewModel.swift",
+          "protocols": ["ObservableObject"],
+          "publishedProperties": ["settings", "isDirty", "isSaving"],
+          "dependencies": ["AppSettings", "KeychainService"]
+        },
+        {
+          "name": "MCPViewModel",
+          "path": "Sources/Features/MCP/MCPViewModel.swift",
+          "protocols": ["ObservableObject"],
+          "publishedProperties": ["tools", "selectedTools", "isConfigured"],
+          "dependencies": ["MCPService", "APIClient"]
+        },
+        {
+          "name": "MonitoringViewModel",
+          "path": "Sources/Features/Monitoring/MonitoringViewModel.swift",
+          "protocols": ["ObservableObject"],
+          "publishedProperties": ["metrics", "hostSnapshot", "isMonitoring"],
+          "dependencies": ["AnalyticsManager", "MonitoringService"]
+        },
+        {
+          "name": "ReactiveSearchViewModel",
+          "path": "Sources/App/Components/ReactiveComponents.swift",
+          "protocols": ["ObservableObject"],
+          "publishedProperties": ["searchText", "searchResults", "isSearching", "error"],
+          "dependencies": ["SearchServiceProtocol"]
+        },
+        {
+          "name": "ReactiveViewModel",
+          "path": "Sources/App/Core/Reactive/ReactiveViewModel.swift",
+          "protocols": ["ObservableObject"],
+          "publishedProperties": ["state", "isLoading", "error"],
+          "dependencies": []
+        }
+      ]
+    }
+  },
+  "swiftUIPatterns": {
+    "stateManagement": {
+      "@State": {
+        "count": 145,
+        "usage": "Local view state",
+        "examples": ["isShowingModal", "searchText", "selectedTab"]
+      },
+      "@StateObject": {
+        "count": 42,
+        "usage": "View-owned observable objects",
+        "examples": ["viewModel", "coordinator", "service"]
+      },
+      "@ObservedObject": {
+        "count": 28,
+        "usage": "External observable objects",
+        "examples": ["sharedViewModel", "parentViewModel"]
+      },
+      "@EnvironmentObject": {
+        "count": 15,
+        "usage": "Shared app-wide state",
+        "examples": ["authManager", "themeManager", "navigationCoordinator"]
+      },
+      "@Binding": {
+        "count": 67,
+        "usage": "Two-way bindings",
+        "examples": ["isPresented", "selectedItem", "text"]
+      },
+      "@FocusState": {
+        "count": 12,
+        "usage": "Focus management",
+        "examples": ["isFocused", "focusedField"]
+      },
+      "@SceneStorage": {
+        "count": 18,
+        "usage": "Scene state restoration",
+        "examples": ["selectedTab", "navigationPath", "inputDraft"]
+      },
+      "@AppStorage": {
+        "count": 8,
+        "usage": "UserDefaults persistence",
+        "examples": ["isDarkMode", "fontSize", "apiEndpoint"]
+      }
+    },
+    "viewComposition": {
+      "ViewBuilder": {
+        "count": 34,
+        "usage": "Conditional view composition"
+      },
+      "GeometryReader": {
+        "count": 12,
+        "usage": "Size-aware layouts"
+      },
+      "LazyVStack/LazyHStack": {
+        "count": 23,
+        "usage": "Performance optimization for lists"
+      },
+      "NavigationStack": {
+        "count": 8,
+        "usage": "iOS 16+ navigation"
+      },
+      "NavigationSplitView": {
+        "count": 4,
+        "usage": "iPad sidebar navigation"
+      }
+    },
+    "animations": {
+      "withAnimation": {
+        "count": 45,
+        "usage": "Explicit animations"
+      },
+      ".animation()": {
+        "count": 38,
+        "usage": "Implicit animations"
+      },
+      ".transition()": {
+        "count": 22,
+        "usage": "View transitions"
+      },
+      "AnimatableModifier": {
+        "count": 5,
+        "usage": "Custom animations"
+      }
+    },
+    "accessibility": {
+      "accessibilityLabel": {
+        "count": 89,
+        "usage": "Screen reader labels"
+      },
+      "accessibilityHint": {
+        "count": 56,
+        "usage": "Additional context"
+      },
+      "accessibilityValue": {
+        "count": 34,
+        "usage": "Current value description"
+      },
+      "accessibilityAddTraits": {
+        "count": 28,
+        "usage": "Semantic traits"
+      },
+      "accessibilityElement": {
+        "count": 42,
+        "usage": "Group/combine elements"
+      }
+    },
+    "performance": {
+      "LazyLoading": {
+        "count": 23,
+        "usage": "Lazy stacks and grids"
+      },
+      "TaskModifier": {
+        "count": 31,
+        "usage": "Async operations"
+      },
+      "Equatable": {
+        "count": 18,
+        "usage": "View update optimization"
+      },
+      "IdentifiableCollections": {
+        "count": 45,
+        "usage": "Efficient list updates"
+      }
+    }
+  },
+  "iOS17Features": {
+    "used": [
+      "Observable macro (prepared for migration)",
+      "ScrollView enhancements",
+      "Animation updates",
+      "SwiftData preparation",
+      "Inspector API ready",
+      "ContentUnavailableView"
+    ],
+    "notYetImplemented": [
+      "@Observable macro migration",
+      "SwiftData integration",
+      "Inspector API usage",
+      "MapKit improvements",
+      "Widget interactivity"
+    ]
+  },
+  "designSystemCompliance": {
+    "theme": {
+      "colorsCompliant": 92,
+      "colorsHardcoded": 8,
+      "spacingCompliant": 87,
+      "spacingHardcoded": 13,
+      "typographyCompliant": 94,
+      "typographyHardcoded": 6
+    },
+    "darkMode": {
+      "fullySupported": 78,
+      "partialSupport": 15,
+      "notSupported": 7
+    },
+    "dynamicType": {
+      "fullySupported": 82,
+      "partialSupport": 12,
+      "notSupported": 6
+    }
+  },
+  "testingCoverage": {
+    "snapshotTests": {
+      "infrastructure": "Complete",
+      "componentsWithTests": 3,
+      "componentsNeedingTests": 42,
+      "coveragePercentage": 6.7
+    },
+    "viewInspectorTests": {
+      "componentsWithTests": 5,
+      "componentsNeedingTests": 40,
+      "coveragePercentage": 11.1
+    },
+    "previewProviders": {
+      "viewsWithPreviews": 28,
+      "viewsNeedingPreviews": 17,
+      "coveragePercentage": 62.2
+    }
+  },
+  "recommendations": {
+    "critical": [
+      "Add snapshot tests for all reusable components",
+      "Complete accessibility labels for all interactive elements",
+      "Replace remaining hardcoded colors with Theme constants",
+      "Add SwiftUI previews for components missing them"
+    ],
+    "high": [
+      "Migrate to @Observable macro when ready",
+      "Implement proper focus management for all forms",
+      "Add landscape orientation support for iPad",
+      "Complete VoiceOver testing for all views"
+    ],
+    "medium": [
+      "Optimize lazy loading in long lists",
+      "Add more granular animation controls",
+      "Implement proper state restoration for all views",
+      "Add widget extensions"
+    ],
+    "low": [
+      "Consider SwiftData migration from Core Data",
+      "Add more custom view modifiers",
+      "Implement advanced gesture recognizers",
+      "Add custom transitions"
+    ]
+  }
+}

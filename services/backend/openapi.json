@@ -1,0 +1,6077 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Claude Code Backend API",
+    "description": "OpenAI-compatible API with Claude integration and MCP support",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/auth/register": {
+      "post": {
+        "tags": [
+          "authentication",
+          "Authentication"
+        ],
+        "summary": "Register",
+        "description": "Register a new user\n\n- Creates new user account with hashed password\n- Generates JWT access and refresh tokens\n- Creates API key for alternative authentication",
+        "operationId": "register_v1_auth_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "tags": [
+          "authentication",
+          "Authentication"
+        ],
+        "summary": "Login",
+        "description": "Login with email/username and password\n\nOAuth2 compatible login endpoint that accepts:\n- username: Email or username\n- password: User's password\n\nReturns JWT access and refresh tokens",
+        "operationId": "login_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_login_v1_auth_login_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "tags": [
+          "authentication",
+          "Authentication"
+        ],
+        "summary": "Refresh Token",
+        "description": "Refresh access token using refresh token\n\n- Validates refresh token\n- Generates new access and refresh tokens\n- Implements refresh token rotation for security",
+        "operationId": "refresh_token_v1_auth_refresh_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "authentication",
+          "Authentication"
+        ],
+        "summary": "Logout",
+        "description": "Logout user and revoke tokens\n\n- Revokes refresh token family if provided\n- Clears session data",
+        "operationId": "logout_v1_auth_logout_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Refresh Token"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/change-password": {
+      "post": {
+        "tags": [
+          "authentication",
+          "Authentication"
+        ],
+        "summary": "Change Password",
+        "description": "Change user password\n\n- Requires current password verification\n- Updates password hash\n- Revokes all existing refresh tokens",
+        "operationId": "change_password_v1_auth_change_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/me": {
+      "get": {
+        "tags": [
+          "authentication",
+          "Authentication"
+        ],
+        "summary": "Get Current User Info",
+        "description": "Get current user information",
+        "operationId": "get_current_user_info_v1_auth_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "authentication",
+          "Authentication"
+        ],
+        "summary": "Update Current User",
+        "description": "Update current user information",
+        "operationId": "update_current_user_v1_auth_me_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/verify-token": {
+      "post": {
+        "tags": [
+          "authentication",
+          "Authentication"
+        ],
+        "summary": "Verify Token",
+        "description": "Verify if the current token is valid",
+        "operationId": "verify_token_v1_auth_verify_token_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/v1/auth/users": {
+      "get": {
+        "tags": [
+          "authentication",
+          "Authentication"
+        ],
+        "summary": "List Users",
+        "description": "List all users (admin only)",
+        "operationId": "list_users_v1_auth_users_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserResponse"
+                  },
+                  "title": "Response List Users V1 Auth Users Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/users/{user_id}": {
+      "delete": {
+        "tags": [
+          "authentication",
+          "Authentication"
+        ],
+        "summary": "Delete User",
+        "description": "Delete a user (admin only)",
+        "operationId": "delete_user_v1_auth_users__user_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/chat/completions": {
+      "post": {
+        "tags": [
+          "chat"
+        ],
+        "summary": "Create Chat Completion",
+        "description": "Create a chat completion (OpenAI-compatible endpoint).\n\nThis endpoint is fully compatible with OpenAI's chat completion API,\nallowing drop-in replacement for existing OpenAI integrations.",
+        "operationId": "create_chat_completion_v1_chat_completions_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatCompletionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/models": {
+      "get": {
+        "tags": [
+          "models"
+        ],
+        "summary": "List Models",
+        "description": "List available models (OpenAI-compatible endpoint).\n\nReturns a list of available Claude models in OpenAI's format.",
+        "operationId": "list_models_v1_models_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/models/{model_id}": {
+      "get": {
+        "tags": [
+          "models"
+        ],
+        "summary": "Get Model",
+        "description": "Get information about a specific model.",
+        "operationId": "get_model_v1_models__model_id__get",
+        "parameters": [
+          {
+            "name": "model_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Model Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Model"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projects": {
+      "post": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Create Project",
+        "description": "Create a new project.",
+        "operationId": "create_project_v1_projects_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "List Projects",
+        "description": "List all projects for the current user.",
+        "operationId": "list_projects_v1_projects_get",
+        "parameters": [
+          {
+            "name": "is_active",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Is Active"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "default": 100,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectsList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/projects/{project_id}": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Get Project",
+        "description": "Get a specific project by ID.",
+        "operationId": "get_project_v1_projects__project_id__get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Update Project",
+        "description": "Update a project.",
+        "operationId": "update_project_v1_projects__project_id__patch",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Delete Project",
+        "description": "Delete a project.",
+        "operationId": "delete_project_v1_projects__project_id__delete",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Create Session",
+        "description": "Create a new chat session",
+        "operationId": "create_session_v1_sessions_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "List Sessions",
+        "description": "List all sessions with optional filtering",
+        "operationId": "list_sessions_v1_sessions_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/app__models__session__SessionStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "default": 100,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions/{session_id}": {
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Get Session",
+        "description": "Get a specific session by ID",
+        "operationId": "get_session_v1_sessions__session_id__get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Update Session",
+        "description": "Update session properties",
+        "operationId": "update_session_v1_sessions__session_id__patch",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Delete Session",
+        "description": "Delete a session",
+        "operationId": "delete_session_v1_sessions__session_id__delete",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions/{session_id}/stop": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Stop Session Streaming",
+        "description": "Stop active streaming for a session\nThis endpoint interrupts any ongoing SSE stream for the specified session",
+        "operationId": "stop_session_streaming_v1_sessions__session_id__stop_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions/{session_id}/stats": {
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Get Session Stats",
+        "description": "Get detailed statistics and metrics for a session",
+        "operationId": "get_session_stats_v1_sessions__session_id__stats_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionStats"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions/{session_id}/clear": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Clear Session History",
+        "description": "Clear message history for a session while keeping the session active",
+        "operationId": "clear_session_history_v1_sessions__session_id__clear_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions/{session_id}/archive": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Archive Session",
+        "description": "Archive a session (mark as archived, stop streaming)",
+        "operationId": "archive_session_v1_sessions__session_id__archive_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions/{session_id}/messages": {
+      "get": {
+        "tags": [
+          "sessions",
+          "messages"
+        ],
+        "summary": "Get Session Messages",
+        "description": "Get all messages for a specific session with pagination\n\n- Retrieves message history for the specified session\n- Supports pagination with limit/offset\n- Can filter by message role\n- Returns messages in chronological order",
+        "operationId": "get_session_messages_v1_sessions__session_id__messages_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Session ID",
+              "title": "Session Id"
+            },
+            "description": "Session ID"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "description": "Maximum number of messages to return",
+              "default": 100,
+              "title": "Limit"
+            },
+            "description": "Maximum number of messages to return"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of messages to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Number of messages to skip"
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by role (user/assistant/system)",
+              "title": "Role"
+            },
+            "description": "Filter by role (user/assistant/system)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions/{session_id}/tools": {
+      "get": {
+        "tags": [
+          "sessions",
+          "tools"
+        ],
+        "summary": "Get Session Tools",
+        "description": "Get tool executions for a specific session\n\n- Retrieves all tool invocations during the session\n- Includes MCP tools, native tools, and custom integrations\n- Shows execution status, timing, and results\n- Useful for debugging and analytics",
+        "operationId": "get_session_tools_v1_sessions__session_id__tools_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Session ID",
+              "title": "Session Id"
+            },
+            "description": "Session ID"
+          },
+          {
+            "name": "tool_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by tool type (mcp/native/custom)",
+              "title": "Tool Type"
+            },
+            "description": "Filter by tool type (mcp/native/custom)"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by status",
+              "title": "Status"
+            },
+            "description": "Filter by status"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "description": "Maximum number of executions to return",
+              "default": 100,
+              "title": "Limit"
+            },
+            "description": "Maximum number of executions to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToolExecutionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "sessions",
+          "tools"
+        ],
+        "summary": "Record Tool Execution",
+        "description": "Record a tool execution for a session (internal use)",
+        "operationId": "record_tool_execution_v1_sessions__session_id__tools_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ToolExecution"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToolExecution"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/user/profile": {
+      "get": {
+        "tags": [
+          "profile",
+          "user"
+        ],
+        "summary": "Get User Profile",
+        "description": "Get current user's profile with statistics\n\n- Returns user profile information\n- Includes usage statistics (sessions, messages, tokens)\n- Optionally includes API key for client storage\n- Shows preferences and settings",
+        "operationId": "get_user_profile_v1_user_profile_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "include_api_key",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Include API key in response",
+              "default": false,
+              "title": "Include Api Key"
+            },
+            "description": "Include API key in response"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "profile",
+          "user"
+        ],
+        "summary": "Update User Profile",
+        "description": "Update current user's profile\n\n- Updates username and preferences\n- Validates username uniqueness\n- Returns updated profile",
+        "operationId": "update_user_profile_v1_user_profile_put",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfileUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "profile",
+          "user"
+        ],
+        "summary": "Delete User Account",
+        "description": "Delete user account (soft delete)\n\n- Requires confirmation flag\n- Deactivates account rather than hard delete\n- Preserves data for audit purposes",
+        "operationId": "delete_user_account_v1_user_profile_delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "confirm",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Confirm account deletion",
+              "default": false,
+              "title": "Confirm"
+            },
+            "description": "Confirm account deletion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Delete User Account V1 User Profile Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/user/profile/reset-api-key": {
+      "post": {
+        "tags": [
+          "profile",
+          "user"
+        ],
+        "summary": "Reset Api Key",
+        "description": "Generate a new API key for the current user\n\n- Invalidates the old API key\n- Returns the new API key (only shown once)\n- Used for security rotation",
+        "operationId": "reset_api_key_v1_user_profile_reset_api_key_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Reset Api Key V1 User Profile Reset Api Key Post"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/v1/mcp/servers": {
+      "get": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "List Mcp Servers",
+        "description": "List all configured MCP servers and their status.",
+        "operationId": "list_mcp_servers_v1_mcp_servers_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MCPServerStatus"
+                  },
+                  "title": "Response List Mcp Servers V1 Mcp Servers Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/mcp/servers/{server_name}/start": {
+      "post": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Start Mcp Server",
+        "description": "Start a specific MCP server.",
+        "operationId": "start_mcp_server_v1_mcp_servers__server_name__start_post",
+        "parameters": [
+          {
+            "name": "server_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Server Name"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/mcp/servers/{server_name}/stop": {
+      "post": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Stop Mcp Server",
+        "description": "Stop a specific MCP server.",
+        "operationId": "stop_mcp_server_v1_mcp_servers__server_name__stop_post",
+        "parameters": [
+          {
+            "name": "server_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Server Name"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/mcp/servers/{server_name}/restart": {
+      "post": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Restart Mcp Server",
+        "description": "Restart a specific MCP server.",
+        "operationId": "restart_mcp_server_v1_mcp_servers__server_name__restart_post",
+        "parameters": [
+          {
+            "name": "server_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Server Name"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/mcp/tools": {
+      "get": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "List Mcp Tools",
+        "description": "List available MCP tools from all servers or a specific server.",
+        "operationId": "list_mcp_tools_v1_mcp_tools_get",
+        "parameters": [
+          {
+            "name": "server",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by server name",
+              "title": "Server"
+            },
+            "description": "Filter by server name"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/mcp/tools/call": {
+      "post": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Call Mcp Tool",
+        "description": "Call an MCP tool on a specific server.",
+        "operationId": "call_mcp_tool_v1_mcp_tools_call_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MCPToolCall"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MCPToolResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/mcp/config": {
+      "get": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Get Mcp Config",
+        "description": "Get the current MCP configuration.",
+        "operationId": "get_mcp_config_v1_mcp_config_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/mcp/config/servers": {
+      "post": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Add Mcp Server",
+        "description": "Add a new MCP server configuration.",
+        "operationId": "add_mcp_server_v1_mcp_config_servers_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MCPServerConfig"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/mcp/config/servers/{server_name}": {
+      "delete": {
+        "tags": [
+          "mcp"
+        ],
+        "summary": "Remove Mcp Server",
+        "description": "Remove an MCP server configuration.",
+        "operationId": "remove_mcp_server_v1_mcp_config_servers__server_name__delete",
+        "parameters": [
+          {
+            "name": "server_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Server Name"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/usage": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Usage Stats",
+        "description": "Get usage statistics for the current user",
+        "operationId": "get_usage_stats_v1_analytics_usage_get",
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start Date"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End Date"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageStats"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/tokens": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Token Usage",
+        "description": "Get detailed token usage breakdown",
+        "operationId": "get_token_usage_v1_analytics_tokens_get",
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(hour|day|week|month)$",
+              "default": "day",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenUsage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/tools": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Tool Usage",
+        "description": "Get MCP tool usage statistics",
+        "operationId": "get_tool_usage_v1_analytics_tools_get",
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start Date"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToolUsage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/sessions/{session_id}": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Session Analytics",
+        "description": "Get detailed analytics for a specific session",
+        "operationId": "get_session_analytics_v1_analytics_sessions__session_id__get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionAnalytics"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/timeseries": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Timeseries Data",
+        "description": "Get time series data for various metrics",
+        "operationId": "get_timeseries_data_v1_analytics_timeseries_get",
+        "parameters": [
+          {
+            "name": "metric",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^(sessions|messages|tokens|errors)$",
+              "title": "Metric"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(hour|day|week|month)$",
+              "default": "day",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeSeriesData"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/debug/info": {
+      "get": {
+        "tags": [
+          "debug"
+        ],
+        "summary": "Get Debug Info",
+        "description": "Get comprehensive debug information about the system\nAdmin access required",
+        "operationId": "get_debug_info_v1_debug_info_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/debug/health/detailed": {
+      "get": {
+        "tags": [
+          "debug"
+        ],
+        "summary": "Get Detailed Health",
+        "description": "Get detailed health status of all system components",
+        "operationId": "get_detailed_health_v1_debug_health_detailed_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/debug/metrics": {
+      "get": {
+        "tags": [
+          "debug"
+        ],
+        "summary": "Get Metrics",
+        "description": "Get application metrics and performance statistics",
+        "operationId": "get_metrics_v1_debug_metrics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/debug/logs": {
+      "get": {
+        "tags": [
+          "debug"
+        ],
+        "summary": "Get Recent Logs",
+        "description": "Get recent application logs\nAdmin access required",
+        "operationId": "get_recent_logs_v1_debug_logs_get",
+        "parameters": [
+          {
+            "name": "lines",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "default": 100,
+              "title": "Lines"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Level"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/debug/config": {
+      "get": {
+        "tags": [
+          "debug"
+        ],
+        "summary": "Get Configuration",
+        "description": "Get current application configuration (sanitized)\nAdmin access required",
+        "operationId": "get_configuration_v1_debug_config_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/debug/cache/clear": {
+      "post": {
+        "tags": [
+          "debug"
+        ],
+        "summary": "Clear Cache",
+        "description": "Clear application cache\nAdmin access required",
+        "operationId": "clear_cache_v1_debug_cache_clear_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/debug/environment": {
+      "get": {
+        "tags": [
+          "debug"
+        ],
+        "summary": "Get Environment Info",
+        "description": "Get environment variables and system information\nPublic endpoint for debugging client connectivity",
+        "operationId": "get_environment_info_v1_debug_environment_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/debug/test/error": {
+      "post": {
+        "tags": [
+          "debug"
+        ],
+        "summary": "Trigger Test Error",
+        "description": "Trigger a test error for debugging error handling\nAdmin access required",
+        "operationId": "trigger_test_error_v1_debug_test_error_post",
+        "parameters": [
+          {
+            "name": "error_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "generic",
+              "title": "Error Type"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/files/list": {
+      "get": {
+        "tags": [
+          "files"
+        ],
+        "summary": "List Files",
+        "description": "List files in a directory.",
+        "operationId": "list_files_v1_files_list_get",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Directory path to list",
+              "default": "/",
+              "title": "Path"
+            },
+            "description": "Directory path to list"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DirectoryListing"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/files/read": {
+      "get": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Read File",
+        "description": "Read the contents of a file.",
+        "operationId": "read_file_v1_files_read_get",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "File path to read",
+              "title": "Path"
+            },
+            "description": "File path to read"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileContent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/files/write": {
+      "post": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Write File",
+        "description": "Write content to a file.",
+        "operationId": "write_file_v1_files_write_post",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Path"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Content"
+            }
+          },
+          {
+            "name": "encoding",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "utf-8",
+              "title": "Encoding"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/files/upload": {
+      "post": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Upload File",
+        "description": "Upload a file.",
+        "operationId": "upload_file_v1_files_upload_post",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Directory to upload to",
+              "default": "/",
+              "title": "Path"
+            },
+            "description": "Directory to upload to"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_file_v1_files_upload_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/files/download": {
+      "get": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Download File",
+        "description": "Download a file.",
+        "operationId": "download_file_v1_files_download_get",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "File path to download",
+              "title": "Path"
+            },
+            "description": "File path to download"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/files/delete": {
+      "delete": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Delete File",
+        "description": "Delete a file or directory.",
+        "operationId": "delete_file_v1_files_delete_delete",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "File or directory path to delete",
+              "title": "Path"
+            },
+            "description": "File or directory path to delete"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/files/mkdir": {
+      "post": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Create Directory",
+        "description": "Create a new directory.",
+        "operationId": "create_directory_v1_files_mkdir_post",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Path"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/files/move": {
+      "post": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Move File",
+        "description": "Move or rename a file or directory.",
+        "operationId": "move_file_v1_files_move_post",
+        "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Source"
+            }
+          },
+          {
+            "name": "destination",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Destination"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/environment": {
+      "get": {
+        "tags": [
+          "environment"
+        ],
+        "summary": "Get Environment",
+        "description": "Get current host environment information.\n\nReturns comprehensive information about:\n- System (OS, platform, architecture)\n- Memory usage\n- Disk usage\n- Process information\n- Environment variables (filtered)\n- Python packages\n- Working directory",
+        "operationId": "get_environment_v1_environment_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvironmentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/environment/summary": {
+      "get": {
+        "tags": [
+          "environment"
+        ],
+        "summary": "Get Environment Summary",
+        "description": "Get a simplified environment summary.\n\nReturns basic environment information in a compact format.\nSimilar to Claude Code's environment context.",
+        "operationId": "get_environment_summary_v1_environment_summary_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/environment/claude-format": {
+      "get": {
+        "tags": [
+          "environment"
+        ],
+        "summary": "Get Claude Format Environment",
+        "description": "Get environment info in Claude Code's format.\n\nReturns environment information structured exactly like Claude Code's \nenvironment context for seamless integration.",
+        "operationId": "get_claude_format_environment_v1_environment_claude_format_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "description": "Health check endpoint",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Root",
+        "description": "Root endpoint with API information",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_login_v1_auth_login_post": {
+        "properties": {
+          "grant_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^password$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grant Type"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "title": "Password"
+          },
+          "scope": {
+            "type": "string",
+            "title": "Scope",
+            "default": ""
+          },
+          "client_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id"
+          },
+          "client_secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "format": "password",
+            "title": "Client Secret"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "Body_login_v1_auth_login_post"
+      },
+      "Body_upload_file_v1_files_upload_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_file_v1_files_upload_post"
+      },
+      "ChatCompletionChoice": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index"
+          },
+          "message": {
+            "$ref": "#/components/schemas/ChatMessage"
+          },
+          "finish_reason": {
+            "type": "string",
+            "title": "Finish Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "index",
+          "message",
+          "finish_reason"
+        ],
+        "title": "ChatCompletionChoice",
+        "description": "Chat completion choice"
+      },
+      "ChatCompletionRequest": {
+        "properties": {
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "default": "claude-3-opus-20240229"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "type": "array",
+            "title": "Messages"
+          },
+          "max_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens",
+            "default": 4096
+          },
+          "temperature": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 2.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature",
+            "default": 1.0
+          },
+          "top_p": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top P",
+            "default": 1.0
+          },
+          "n": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N",
+            "default": 1
+          },
+          "stream": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stream",
+            "default": false
+          },
+          "stop": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stop"
+          },
+          "presence_penalty": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Presence Penalty",
+            "default": 0.0
+          },
+          "frequency_penalty": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frequency Penalty",
+            "default": 0.0
+          },
+          "user": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User"
+          }
+        },
+        "type": "object",
+        "required": [
+          "messages"
+        ],
+        "title": "ChatCompletionRequest",
+        "description": "OpenAI-compatible chat completion request"
+      },
+      "ChatCompletionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "object": {
+            "type": "string",
+            "title": "Object",
+            "default": "chat.completion"
+          },
+          "created": {
+            "type": "integer",
+            "title": "Created"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "choices": {
+            "items": {
+              "$ref": "#/components/schemas/ChatCompletionChoice"
+            },
+            "type": "array",
+            "title": "Choices"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/ChatCompletionUsage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created",
+          "model",
+          "choices",
+          "usage"
+        ],
+        "title": "ChatCompletionResponse",
+        "description": "OpenAI-compatible chat completion response"
+      },
+      "ChatCompletionUsage": {
+        "properties": {
+          "prompt_tokens": {
+            "type": "integer",
+            "title": "Prompt Tokens"
+          },
+          "completion_tokens": {
+            "type": "integer",
+            "title": "Completion Tokens"
+          },
+          "total_tokens": {
+            "type": "integer",
+            "title": "Total Tokens"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prompt_tokens",
+          "completion_tokens",
+          "total_tokens"
+        ],
+        "title": "ChatCompletionUsage",
+        "description": "Token usage information"
+      },
+      "ChatMessage": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "title": "Role",
+            "description": "Role of the message sender"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content",
+            "description": "Content of the message"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "Optional name of the sender"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role",
+          "content"
+        ],
+        "title": "ChatMessage",
+        "description": "Chat message model"
+      },
+      "DirectoryListing": {
+        "properties": {
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/FileInfo"
+            },
+            "type": "array",
+            "title": "Files"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "path",
+          "files",
+          "total"
+        ],
+        "title": "DirectoryListing",
+        "description": "Directory listing response"
+      },
+      "DiskInfo": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "used": {
+            "type": "integer",
+            "title": "Used"
+          },
+          "free": {
+            "type": "integer",
+            "title": "Free"
+          },
+          "percent": {
+            "type": "number",
+            "title": "Percent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "used",
+          "free",
+          "percent"
+        ],
+        "title": "DiskInfo",
+        "description": "Disk information model"
+      },
+      "EnvironmentResponse": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "system": {
+            "$ref": "#/components/schemas/SystemInfo"
+          },
+          "memory": {
+            "$ref": "#/components/schemas/MemoryInfo"
+          },
+          "disk": {
+            "$ref": "#/components/schemas/DiskInfo"
+          },
+          "process": {
+            "$ref": "#/components/schemas/ProcessInfo"
+          },
+          "environment": {
+            "$ref": "#/components/schemas/EnvironmentVariables"
+          },
+          "python_packages": {
+            "items": {
+              "$ref": "#/components/schemas/PythonPackage"
+            },
+            "type": "array",
+            "title": "Python Packages"
+          },
+          "working_directory": {
+            "type": "string",
+            "title": "Working Directory"
+          },
+          "user": {
+            "type": "string",
+            "title": "User"
+          },
+          "cpu_count": {
+            "type": "integer",
+            "title": "Cpu Count"
+          },
+          "cpu_percent": {
+            "type": "number",
+            "title": "Cpu Percent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "system",
+          "memory",
+          "disk",
+          "process",
+          "environment",
+          "python_packages",
+          "working_directory",
+          "user",
+          "cpu_count",
+          "cpu_percent"
+        ],
+        "title": "EnvironmentResponse",
+        "description": "Complete environment response"
+      },
+      "EnvironmentVariables": {
+        "properties": {
+          "python_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Python Path"
+          },
+          "virtual_env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Virtual Env"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          },
+          "home": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Home"
+          },
+          "user": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User"
+          },
+          "shell": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shell"
+          },
+          "term": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term"
+          },
+          "lang": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lang"
+          },
+          "pwd": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pwd"
+          },
+          "hostname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hostname"
+          }
+        },
+        "type": "object",
+        "required": [
+          "python_path",
+          "virtual_env",
+          "path",
+          "home",
+          "user",
+          "shell",
+          "term",
+          "lang",
+          "pwd",
+          "hostname"
+        ],
+        "title": "EnvironmentVariables",
+        "description": "Filtered environment variables"
+      },
+      "FileContent": {
+        "properties": {
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "encoding": {
+            "type": "string",
+            "title": "Encoding",
+            "default": "utf-8"
+          }
+        },
+        "type": "object",
+        "required": [
+          "path",
+          "content"
+        ],
+        "title": "FileContent",
+        "description": "File content model"
+      },
+      "FileInfo": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "size": {
+            "type": "integer",
+            "title": "Size"
+          },
+          "is_directory": {
+            "type": "boolean",
+            "title": "Is Directory"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "modified_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Modified At"
+          },
+          "permissions": {
+            "type": "string",
+            "title": "Permissions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "path",
+          "size",
+          "is_directory",
+          "created_at",
+          "modified_at",
+          "permissions"
+        ],
+        "title": "FileInfo",
+        "description": "File information model"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MCPServerConfig": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "command": {
+            "type": "string",
+            "title": "Command"
+          },
+          "args": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Args"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Env"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "command"
+        ],
+        "title": "MCPServerConfig",
+        "description": "MCP server configuration"
+      },
+      "MCPServerStatus": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "pid": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pid"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "status"
+        ],
+        "title": "MCPServerStatus",
+        "description": "MCP server status"
+      },
+      "MCPToolCall": {
+        "properties": {
+          "server": {
+            "type": "string",
+            "title": "Server"
+          },
+          "tool": {
+            "type": "string",
+            "title": "Tool"
+          },
+          "arguments": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arguments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server",
+          "tool"
+        ],
+        "title": "MCPToolCall",
+        "description": "MCP tool call request"
+      },
+      "MCPToolResponse": {
+        "properties": {
+          "server": {
+            "type": "string",
+            "title": "Server"
+          },
+          "tool": {
+            "type": "string",
+            "title": "Tool"
+          },
+          "result": {
+            "title": "Result"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "duration_ms": {
+            "type": "number",
+            "title": "Duration Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server",
+          "tool",
+          "result",
+          "duration_ms"
+        ],
+        "title": "MCPToolResponse",
+        "description": "MCP tool call response"
+      },
+      "MemoryInfo": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "available": {
+            "type": "integer",
+            "title": "Available"
+          },
+          "percent": {
+            "type": "number",
+            "title": "Percent"
+          },
+          "used": {
+            "type": "integer",
+            "title": "Used"
+          },
+          "free": {
+            "type": "integer",
+            "title": "Free"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "available",
+          "percent",
+          "used",
+          "free"
+        ],
+        "title": "MemoryInfo",
+        "description": "Memory information model"
+      },
+      "MessageListResponse": {
+        "properties": {
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/MessageResponse"
+            },
+            "type": "array",
+            "title": "Messages"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "messages",
+          "total",
+          "limit",
+          "offset",
+          "session_id"
+        ],
+        "title": "MessageListResponse",
+        "description": "Message list response with pagination"
+      },
+      "MessageResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "token_count": {
+            "type": "integer",
+            "title": "Token Count",
+            "default": 0
+          },
+          "message_metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Message Metadata"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "session_id",
+          "role",
+          "content",
+          "created_at"
+        ],
+        "title": "MessageResponse",
+        "description": "Message response schema"
+      },
+      "Model": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "object": {
+            "type": "string",
+            "title": "Object",
+            "default": "model"
+          },
+          "created": {
+            "type": "integer",
+            "title": "Created"
+          },
+          "owned_by": {
+            "type": "string",
+            "title": "Owned By",
+            "default": "anthropic"
+          },
+          "permission": {
+            "items": {
+              "$ref": "#/components/schemas/ModelPermission"
+            },
+            "type": "array",
+            "title": "Permission"
+          },
+          "root": {
+            "type": "string",
+            "title": "Root"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "root"
+        ],
+        "title": "Model",
+        "description": "Model information"
+      },
+      "ModelPermission": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "default": "modelperm-default"
+          },
+          "object": {
+            "type": "string",
+            "title": "Object",
+            "default": "model_permission"
+          },
+          "created": {
+            "type": "integer",
+            "title": "Created"
+          },
+          "allow_create_engine": {
+            "type": "boolean",
+            "title": "Allow Create Engine",
+            "default": false
+          },
+          "allow_sampling": {
+            "type": "boolean",
+            "title": "Allow Sampling",
+            "default": true
+          },
+          "allow_logprobs": {
+            "type": "boolean",
+            "title": "Allow Logprobs",
+            "default": true
+          },
+          "allow_search_indices": {
+            "type": "boolean",
+            "title": "Allow Search Indices",
+            "default": false
+          },
+          "allow_view": {
+            "type": "boolean",
+            "title": "Allow View",
+            "default": true
+          },
+          "allow_fine_tuning": {
+            "type": "boolean",
+            "title": "Allow Fine Tuning",
+            "default": false
+          },
+          "organization": {
+            "type": "string",
+            "title": "Organization",
+            "default": "*"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Group"
+          },
+          "is_blocking": {
+            "type": "boolean",
+            "title": "Is Blocking",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "ModelPermission",
+        "description": "Model permission information"
+      },
+      "ModelsResponse": {
+        "properties": {
+          "object": {
+            "type": "string",
+            "title": "Object",
+            "default": "list"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/Model"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "ModelsResponse",
+        "description": "Models list response"
+      },
+      "PasswordChangeRequest": {
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "title": "Current Password"
+          },
+          "new_password": {
+            "type": "string",
+            "maxLength": 72,
+            "minLength": 8,
+            "title": "New Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "title": "PasswordChangeRequest",
+        "description": "Password change request schema"
+      },
+      "ProcessInfo": {
+        "properties": {
+          "pid": {
+            "type": "integer",
+            "title": "Pid"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "cpu_percent": {
+            "type": "number",
+            "title": "Cpu Percent"
+          },
+          "memory_percent": {
+            "type": "number",
+            "title": "Memory Percent"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "create_time": {
+            "type": "number",
+            "title": "Create Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pid",
+          "name",
+          "username",
+          "cpu_percent",
+          "memory_percent",
+          "status",
+          "create_time"
+        ],
+        "title": "ProcessInfo",
+        "description": "Process information model"
+      },
+      "ProjectCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Project name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description",
+            "description": "Project description"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path",
+            "description": "Project file path"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "ProjectCreate",
+        "description": "Project creation model"
+      },
+      "ProjectResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "path",
+          "is_active",
+          "metadata",
+          "created_at",
+          "updated_at",
+          "user_id"
+        ],
+        "title": "ProjectResponse",
+        "description": "Project response model"
+      },
+      "ProjectUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          }
+        },
+        "type": "object",
+        "title": "ProjectUpdate",
+        "description": "Project update model"
+      },
+      "ProjectsList": {
+        "properties": {
+          "projects": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectResponse"
+            },
+            "type": "array",
+            "title": "Projects"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "projects",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "ProjectsList",
+        "description": "Projects list response"
+      },
+      "PythonPackage": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "version"
+        ],
+        "title": "PythonPackage",
+        "description": "Python package information"
+      },
+      "RefreshTokenRequest": {
+        "properties": {
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "refresh_token"
+        ],
+        "title": "RefreshTokenRequest",
+        "description": "Refresh token request schema"
+      },
+      "SessionAnalytics": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "total_messages": {
+            "type": "integer",
+            "title": "Total Messages"
+          },
+          "total_tokens": {
+            "type": "integer",
+            "title": "Total Tokens"
+          },
+          "average_response_time": {
+            "type": "number",
+            "title": "Average Response Time"
+          },
+          "error_rate": {
+            "type": "number",
+            "title": "Error Rate"
+          },
+          "tool_usage_count": {
+            "type": "integer",
+            "title": "Tool Usage Count"
+          },
+          "duration_seconds": {
+            "type": "number",
+            "title": "Duration Seconds"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "last_activity": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Activity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "total_messages",
+          "total_tokens",
+          "average_response_time",
+          "error_rate",
+          "tool_usage_count",
+          "duration_seconds",
+          "created_at",
+          "last_activity"
+        ],
+        "title": "SessionAnalytics",
+        "description": "Session analytics summary"
+      },
+      "SessionCreate": {
+        "properties": {
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "title": "SessionCreate",
+        "description": "Session creation request"
+      },
+      "SessionList": {
+        "properties": {
+          "sessions": {
+            "items": {
+              "$ref": "#/components/schemas/SessionResponse"
+            },
+            "type": "array",
+            "title": "Sessions"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sessions",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "SessionList",
+        "description": "List of sessions response"
+      },
+      "SessionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SessionStatus-Output"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "project_id",
+          "name",
+          "model",
+          "status",
+          "metadata",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "SessionResponse",
+        "description": "Session response model"
+      },
+      "SessionStats": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SessionStatus-Output"
+          },
+          "duration_seconds": {
+            "type": "number",
+            "title": "Duration Seconds"
+          },
+          "message_count": {
+            "type": "integer",
+            "title": "Message Count"
+          },
+          "token_usage": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Token Usage"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "active_tools": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Active Tools"
+          },
+          "tool_invocations": {
+            "type": "integer",
+            "title": "Tool Invocations"
+          },
+          "error_count": {
+            "type": "integer",
+            "title": "Error Count"
+          },
+          "average_response_time": {
+            "type": "number",
+            "title": "Average Response Time"
+          },
+          "memory_usage": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Memory Usage"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "created_at",
+          "updated_at",
+          "status",
+          "duration_seconds",
+          "message_count",
+          "token_usage",
+          "model",
+          "active_tools",
+          "tool_invocations",
+          "error_count",
+          "average_response_time",
+          "memory_usage",
+          "metadata"
+        ],
+        "title": "SessionStats",
+        "description": "Session statistics"
+      },
+      "SessionStatus-Output": {
+        "type": "string",
+        "enum": [
+          "active",
+          "idle",
+          "streaming",
+          "archived",
+          "error"
+        ],
+        "title": "SessionStatus",
+        "description": "Session status enum"
+      },
+      "SessionUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/app__schemas__session__SessionStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "title": "SessionUpdate",
+        "description": "Session update request"
+      },
+      "SystemInfo": {
+        "properties": {
+          "platform": {
+            "type": "string",
+            "title": "Platform"
+          },
+          "platform_release": {
+            "type": "string",
+            "title": "Platform Release"
+          },
+          "platform_version": {
+            "type": "string",
+            "title": "Platform Version"
+          },
+          "architecture": {
+            "type": "string",
+            "title": "Architecture"
+          },
+          "hostname": {
+            "type": "string",
+            "title": "Hostname"
+          },
+          "ip_address": {
+            "type": "string",
+            "title": "Ip Address"
+          },
+          "processor": {
+            "type": "string",
+            "title": "Processor"
+          },
+          "python_version": {
+            "type": "string",
+            "title": "Python Version"
+          },
+          "python_implementation": {
+            "type": "string",
+            "title": "Python Implementation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "platform",
+          "platform_release",
+          "platform_version",
+          "architecture",
+          "hostname",
+          "ip_address",
+          "processor",
+          "python_version",
+          "python_implementation"
+        ],
+        "title": "SystemInfo",
+        "description": "System information model"
+      },
+      "TimeSeriesData": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "value"
+        ],
+        "title": "TimeSeriesData",
+        "description": "Time series data point"
+      },
+      "Token": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type",
+            "default": "bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "title": "Expires In"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "refresh_token",
+          "expires_in"
+        ],
+        "title": "Token",
+        "description": "Token response schema"
+      },
+      "TokenResponse": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type",
+            "default": "bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "title": "Expires In"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserResponse"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "refresh_token",
+          "expires_in",
+          "user"
+        ],
+        "title": "TokenResponse",
+        "description": "Extended token response with user info"
+      },
+      "TokenUsage": {
+        "properties": {
+          "prompt_tokens": {
+            "type": "integer",
+            "title": "Prompt Tokens"
+          },
+          "completion_tokens": {
+            "type": "integer",
+            "title": "Completion Tokens"
+          },
+          "total_tokens": {
+            "type": "integer",
+            "title": "Total Tokens"
+          },
+          "cost_estimate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Estimate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prompt_tokens",
+          "completion_tokens",
+          "total_tokens"
+        ],
+        "title": "TokenUsage",
+        "description": "Token usage statistics"
+      },
+      "ToolExecution": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "tool_name": {
+            "type": "string",
+            "title": "Tool Name"
+          },
+          "tool_type": {
+            "type": "string",
+            "title": "Tool Type"
+          },
+          "input_params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Input Params"
+          },
+          "output": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "pending"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "execution_time_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution Time Ms"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tool_name",
+          "tool_type",
+          "input_params"
+        ],
+        "title": "ToolExecution",
+        "description": "Tool execution record"
+      },
+      "ToolExecutionResponse": {
+        "properties": {
+          "executions": {
+            "items": {
+              "$ref": "#/components/schemas/ToolExecution"
+            },
+            "type": "array",
+            "title": "Executions"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "executions",
+          "total",
+          "session_id"
+        ],
+        "title": "ToolExecutionResponse",
+        "description": "Tool execution response"
+      },
+      "ToolUsage": {
+        "properties": {
+          "tool_name": {
+            "type": "string",
+            "title": "Tool Name"
+          },
+          "tool_type": {
+            "type": "string",
+            "title": "Tool Type"
+          },
+          "usage_count": {
+            "type": "integer",
+            "title": "Usage Count"
+          },
+          "success_rate": {
+            "type": "number",
+            "title": "Success Rate"
+          },
+          "average_execution_time": {
+            "type": "number",
+            "title": "Average Execution Time"
+          },
+          "last_used": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Used"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tool_name",
+          "tool_type",
+          "usage_count",
+          "success_rate",
+          "average_execution_time",
+          "last_used"
+        ],
+        "title": "ToolUsage",
+        "description": "Tool usage statistics"
+      },
+      "UsageStats": {
+        "properties": {
+          "total_sessions": {
+            "type": "integer",
+            "title": "Total Sessions"
+          },
+          "total_messages": {
+            "type": "integer",
+            "title": "Total Messages"
+          },
+          "total_tokens": {
+            "type": "integer",
+            "title": "Total Tokens"
+          },
+          "active_users": {
+            "type": "integer",
+            "title": "Active Users"
+          },
+          "average_session_duration": {
+            "type": "number",
+            "title": "Average Session Duration"
+          },
+          "period": {
+            "type": "string",
+            "title": "Period"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_sessions",
+          "total_messages",
+          "total_tokens",
+          "active_users",
+          "average_session_duration",
+          "period"
+        ],
+        "title": "UsageStats",
+        "description": "Usage statistics summary"
+      },
+      "UserCreate": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 72,
+            "minLength": 8,
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "UserCreate",
+        "description": "Schema for user registration"
+      },
+      "UserProfileResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Roles"
+          },
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Permissions"
+          },
+          "preferences": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Preferences"
+          },
+          "api_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Api Key"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "last_login": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Login"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          },
+          "session_count": {
+            "type": "integer",
+            "title": "Session Count",
+            "default": 0
+          },
+          "message_count": {
+            "type": "integer",
+            "title": "Message Count",
+            "default": 0
+          },
+          "token_usage": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Token Usage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "UserProfileResponse",
+        "description": "User profile response schema"
+      },
+      "UserProfileUpdate": {
+        "properties": {
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          },
+          "preferences": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferences"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "UserProfileUpdate",
+        "description": "User profile update schema"
+      },
+      "UserResponse": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "roles": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roles"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "api_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Api Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "id",
+          "created_at"
+        ],
+        "title": "UserResponse",
+        "description": "Schema for user response"
+      },
+      "UserUpdate": {
+        "properties": {
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          },
+          "preferences": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferences"
+          }
+        },
+        "type": "object",
+        "title": "UserUpdate",
+        "description": "Schema for user profile update"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "app__models__session__SessionStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "idle",
+          "streaming",
+          "archived",
+          "error"
+        ],
+        "title": "SessionStatus",
+        "description": "Session status enumeration"
+      },
+      "app__schemas__session__SessionStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "idle",
+          "streaming",
+          "archived",
+          "error"
+        ],
+        "title": "SessionStatus",
+        "description": "Session status enum"
+      }
+    },
+    "securitySchemes": {
+      "OAuth2PasswordBearer": {
+        "type": "oauth2",
+        "flows": {
+          "password": {
+            "scopes": {},
+            "tokenUrl": "/v1/auth/login"
+          }
+        }
+      },
+      "APIKeyHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    }
+  }
+}

@@ -67,7 +67,7 @@ final class HomeViewModel: ObservableObject {
     }
     
     var activeSessions: [APIClient.Session] {
-        sessions.filter { $0.isActive }.prefix(5).map { $0 }
+        Array(sessions.filter { $0.isActive }.prefix(5))
     }
     
     var hasData: Bool {

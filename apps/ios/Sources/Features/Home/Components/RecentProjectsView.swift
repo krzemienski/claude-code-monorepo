@@ -1,5 +1,8 @@
 import SwiftUI
 
+// Type alias for convenience
+typealias Project = APIClient.Project
+
 /// Recent projects component for home view
 /// Displays a list of recent projects with navigation
 struct RecentProjectsView: View {
@@ -206,38 +209,34 @@ struct RecentProjectsView_Previews: PreviewProvider {
         Project(
             id: "1",
             name: "iOS App",
+            description: "Native iOS application built with SwiftUI",
             path: "/Users/dev/projects/ios-app",
-            type: .swiftui,
-            status: .active,
-            createdAt: Date(),
-            updatedAt: Date()
+            createdAt: "2024-01-01T00:00:00Z",
+            updatedAt: "2024-01-15T00:00:00Z"
         ),
         Project(
             id: "2",
             name: "Web Dashboard",
+            description: "React-based admin dashboard",
             path: "/Users/dev/projects/web-dashboard",
-            type: .react,
-            status: .active,
-            createdAt: Date(),
-            updatedAt: Date()
+            createdAt: "2024-01-05T00:00:00Z",
+            updatedAt: "2024-01-16T00:00:00Z"
         ),
         Project(
             id: "3",
             name: "Backend API",
+            description: "Node.js REST API service",
             path: "/Users/dev/projects/backend-api",
-            type: .nodejs,
-            status: .paused,
-            createdAt: Date(),
-            updatedAt: Date()
+            createdAt: "2024-01-10T00:00:00Z",
+            updatedAt: "2024-01-17T00:00:00Z"
         ),
         Project(
             id: "4",
             name: "ML Model",
+            description: "Machine learning model for predictions",
             path: "/Users/dev/projects/ml-model",
-            type: .python,
-            status: .active,
-            createdAt: Date(),
-            updatedAt: Date()
+            createdAt: "2024-01-12T00:00:00Z",
+            updatedAt: "2024-01-18T00:00:00Z"
         )
     ]
     

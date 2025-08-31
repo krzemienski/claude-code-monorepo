@@ -144,7 +144,7 @@ struct InputBarView: View {
         .animation(buttonAnimation, value: sendButtonScale)
         .accessibilityLabel("Send message")
         .accessibilityHint(canSend ? "Double tap to send" : "Type a message first")
-        .accessibilityAddTraits(canSend ? [] : .isNotEnabled)
+        .accessibilityAddTraits(canSend ? [] : .isDisabled)
     }
     
     @ViewBuilder

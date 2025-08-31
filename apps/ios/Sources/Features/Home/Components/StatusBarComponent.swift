@@ -52,7 +52,7 @@ public struct StatusBarComponent: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Theme.secondaryBackground)
+                .fill(Theme.backgroundSecondary)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)

@@ -73,7 +73,7 @@ public enum ComponentLibrary {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .background(Theme.secondaryBackground)
+                .background(Theme.backgroundSecondary)
                 .foregroundStyle(Theme.primary)
                 .cornerRadius(12)
                 .overlay(
@@ -101,7 +101,7 @@ public enum ComponentLibrary {
         public var body: some View {
             content
                 .padding(padding)
-                .background(Theme.cardBackground)
+                .background(Theme.card)
                 .cornerRadius(16)
                 .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
         }
@@ -172,7 +172,7 @@ public enum ComponentLibrary {
                 }
             }
             .padding()
-            .background(Theme.inputBackground)
+            .background(Theme.input)
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
@@ -440,14 +440,14 @@ public struct StyleGuide: View {
                 .fontWeight(.bold)
             
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 16) {
-                ColorSwatch("Primary", Theme.primary)
-                ColorSwatch("Accent", Theme.accent)
-                ColorSwatch("Background", Theme.background)
-                ColorSwatch("Secondary", Theme.secondaryBackground)
-                ColorSwatch("Success", .green)
-                ColorSwatch("Warning", .orange)
-                ColorSwatch("Error", .red)
-                ColorSwatch("Info", .blue)
+                ComponentLibraryColorSwatch("Primary", Theme.primary)
+                ComponentLibraryColorSwatch("Accent", Theme.accent)
+                ComponentLibraryColorSwatch("Background", Theme.background)
+                ComponentLibraryColorSwatch("Secondary", Theme.backgroundSecondary)
+                ComponentLibraryColorSwatch("Success", .green)
+                ComponentLibraryColorSwatch("Warning", .orange)
+                ComponentLibraryColorSwatch("Error", .red)
+                ComponentLibraryColorSwatch("Info", .blue)
             }
         }
     }
@@ -543,7 +543,7 @@ public struct StyleGuide: View {
     }
 }
 
-private struct ColorSwatch: View {
+private struct ComponentLibraryColorSwatch: View {
     let name: String
     let color: Color
     

@@ -256,10 +256,7 @@ final class ChatViewModel: ObservableObject {
                 throw URLError(.badURL)
             }
             
-            var headers: [String: String] = ["Content-Type": "application/json"]
-            if !settings.apiKeyPlaintext.isEmpty {
-                headers["Authorization"] = "Bearer \(settings.apiKeyPlaintext)"
-            }
+            let headers: [String: String] = ["Content-Type": "application/json"]
             
             // Create SSE client
             sseClient = SSEClient(url: url.absoluteString, headers: headers, body: data)
@@ -296,9 +293,6 @@ final class ChatViewModel: ObservableObject {
             request.httpBody = data
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             
-            if !settings.apiKeyPlaintext.isEmpty {
-                request.setValue("Bearer \(settings.apiKeyPlaintext)", forHTTPHeaderField: "Authorization")
-            }
             
             let (responseData, response) = try await URLSession.shared.data(for: request)
             

@@ -238,6 +238,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "227D417C9336CB38D87E5EE8"
+               BuildableName = "ViewInspector.framework"
+               BlueprintName = "ViewInspector"
+               ReferencedContainer = "container:Tuist/.build/tuist-derived/ViewInspector/ViewInspector.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "C0D6D83586899AD15DD9C41C"
                BuildableName = "_RopeModule.framework"
                BlueprintName = "_RopeModule"

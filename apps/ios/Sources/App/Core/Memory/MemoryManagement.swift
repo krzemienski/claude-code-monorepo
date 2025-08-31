@@ -357,7 +357,7 @@ final class ResourcePool<T> {
 final class MemoryMonitor: ObservableObject {
     static let shared = MemoryMonitor()
     
-    @Published private(set) var currentUsage: MemoryUsage = .init()
+    @Published private(set) var currentUsage: MemoryUsageInfo = .init(used: 0, peak: 0, available: 0)
     private var timer: Timer?
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "MemoryMonitor")
     
@@ -394,7 +394,7 @@ final class MemoryMonitor: ObservableObject {
         }
         
         if result == KERN_SUCCESS {
-            currentUsage = MemoryUsage(
+            currentUsage = MemoryUsageInfo(
                 used: Int(info.resident_size),
                 peak: max(currentUsage.peak, Int(info.resident_size)),
                 available: ProcessInfo.processInfo.physicalMemory
@@ -409,7 +409,7 @@ final class MemoryMonitor: ObservableObject {
 
 // MARK: - Supporting Types
 
-struct MemoryUsage {
+struct MemoryUsageInfo {
     let used: Int
     let peak: Int
     let available: UInt64

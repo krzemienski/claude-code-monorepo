@@ -4,7 +4,7 @@ import PackageDescription
 Package(
     name: "ClaudeCode",
     platforms: [
-        .iOS(.v16)
+        .iOS(.v17)
     ],
     products: [
         .library(

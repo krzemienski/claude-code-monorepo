@@ -11,7 +11,8 @@ let packageSettings = PackageSettings(
         "Collections": .framework,
         "LDSwiftEventSource": .framework,
         "KeychainAccess": .framework,
-        "DGCharts": .framework
+        "DGCharts": .framework,
+        "ViewInspector": .framework
         // "Shout": .framework - Removed, not compatible with iOS
     ]
 )
@@ -32,7 +33,10 @@ let package = Package(
         .package(url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: "4.2.0"),
         
         // UI Components
-        .package(url: "https://github.com/danielgindi/Charts.git", from: "5.0.0")
+        .package(url: "https://github.com/danielgindi/Charts.git", from: "5.0.0"),
+        
+        // Testing
+        .package(url: "https://github.com/nalexn/ViewInspector.git", from: "0.9.0")
         
         // SSH - Removed as it's not compatible with iOS (requires libssh2)
         // .package(url: "https://github.com/jakeheis/Shout.git", from: "0.5.7")

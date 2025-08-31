@@ -30,9 +30,6 @@ final class Container: ObservableObject {
     }
     
     // MARK: - Service Protocols (Delegate to EnhancedContainer)
-    var authenticationService: AuthenticationServiceProtocol {
-        enhancedContainer.authenticationService
-    }
     
     var cacheService: CacheServiceProtocol {
         enhancedContainer.cacheService
@@ -127,7 +124,6 @@ extension View {
 @MainActor
 final class MockAPIClient: APIClientProtocol {
     let baseURL = URL(string: "https://mock.api.com") ?? URL(fileURLWithPath: "/")
-    let apiKey: String? = nil
     
     func health() async throws -> APIClient.HealthResponse {
         // Return a mock healthy response matching the actual backend format
@@ -135,13 +131,13 @@ final class MockAPIClient: APIClientProtocol {
             let status: String = "healthy"
             let timestamp: String? = ISO8601DateFormatter().string(from: Date())
         }
-        do {
-            let mockData = try JSONEncoder().encode(["status": "healthy", "timestamp": ISO8601DateFormatter().string(from: Date())])
-            return try JSONDecoder().decode(APIClient.HealthResponse.self, from: mockData)
-        } catch {
-            // Return a default health response if encoding/decoding fails
-            return APIClient.HealthResponse(status: "healthy", timestamp: ISO8601DateFormatter().string(from: Date()))
-        }
+        let mockResponse: [String: Any] = [
+            "ok": true,
+            "version": "1.0.0",
+            "active_sessions": 3
+        ]
+        let mockData = try JSONSerialization.data(withJSONObject: mockResponse)
+        return try JSONDecoder().decode(APIClient.HealthResponse.self, from: mockData)
     }
     
     func listProjects() async throws -> [APIClient.Project] {

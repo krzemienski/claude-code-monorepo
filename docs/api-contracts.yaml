@@ -1,0 +1,122 @@
+openapi: 3.0.0
+info:
+  title: Claude Code Backend API
+  description: OpenAI-compatible API with Claude integration and MCP support
+  version: 1.0.0
+servers:
+- url: http://localhost:8000
+endpoints:
+  POST /v1/auth/register:
+    summary: Register
+    tags:
+    - authentication
+    - Authentication
+    authenticated: false
+  POST /v1/auth/login:
+    summary: Login
+    tags:
+    - authentication
+    - Authentication
+    authenticated: true
+  POST /v1/auth/refresh:
+    summary: Refresh Token
+    tags:
+    - authentication
+    - Authentication
+    authenticated: false
+  POST /v1/chat/completions:
+    summary: Create Chat Completion
+    tags:
+    - chat
+    authenticated: false
+  POST /v1/sessions:
+    summary: Create Session
+    tags:
+    - sessions
+    authenticated: false
+  GET /v1/sessions:
+    summary: List Sessions
+    tags:
+    - sessions
+    authenticated: false
+  GET /v1/sessions/{session_id}:
+    summary: Get Session
+    tags:
+    - sessions
+    authenticated: false
+  PATCH /v1/sessions/{session_id}:
+    summary: Update Session
+    tags:
+    - sessions
+    authenticated: false
+  DELETE /v1/sessions/{session_id}:
+    summary: Delete Session
+    tags:
+    - sessions
+    authenticated: false
+  POST /v1/sessions/{session_id}/stop:
+    summary: Stop Session Streaming
+    tags:
+    - sessions
+    authenticated: false
+  GET /v1/sessions/{session_id}/stats:
+    summary: Get Session Stats
+    tags:
+    - sessions
+    authenticated: false
+  POST /v1/sessions/{session_id}/clear:
+    summary: Clear Session History
+    tags:
+    - sessions
+    authenticated: false
+  POST /v1/sessions/{session_id}/archive:
+    summary: Archive Session
+    tags:
+    - sessions
+    authenticated: false
+  GET /v1/sessions/{session_id}/messages:
+    summary: Get Session Messages
+    tags:
+    - sessions
+    - messages
+    authenticated: true
+  GET /v1/sessions/{session_id}/tools:
+    summary: Get Session Tools
+    tags:
+    - sessions
+    - tools
+    authenticated: true
+  POST /v1/sessions/{session_id}/tools:
+    summary: Record Tool Execution
+    tags:
+    - sessions
+    - tools
+    authenticated: true
+  GET /v1/user/profile:
+    summary: Get User Profile
+    tags:
+    - profile
+    - user
+    authenticated: true
+  PUT /v1/user/profile:
+    summary: Update User Profile
+    tags:
+    - profile
+    - user
+    authenticated: true
+  DELETE /v1/user/profile:
+    summary: Delete User Account
+    tags:
+    - profile
+    - user
+    authenticated: true
+  POST /v1/user/profile/reset-api-key:
+    summary: Reset Api Key
+    tags:
+    - profile
+    - user
+    authenticated: true
+  GET /health:
+    summary: Health Check
+    tags: []
+    authenticated: false

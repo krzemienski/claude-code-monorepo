@@ -16,7 +16,6 @@ final class APIIntegrationTests: XCTestCase {
         cancellables = []
         
         let settings = AppSettings()
-        settings.apiKeyPlaintext = "test-api-key"
         settings.backendURL = "http://localhost:8000"
         
         apiClient = EnhancedAPIClient(
@@ -193,9 +192,9 @@ final class APIIntegrationTests: XCTestCase {
         XCTAssertEqual(sessions[0].totalTokens, 1500)
     }
     
-    // MARK: - Authentication Tests
+    // MARK: - No Authentication Tests
     
-    func testAuthenticationHeaders() async throws {
+    func testNoAuthenticationHeaders() async throws {
         // Given
         let expectedResponse = """
         {"ok": true, "version": "1.0.0", "active_sessions": 0}
@@ -214,9 +213,9 @@ final class APIIntegrationTests: XCTestCase {
         
         // Then
         XCTAssertNotNil(mockURLSession.lastRequest)
-        XCTAssertEqual(
+        XCTAssertNil(
             mockURLSession.lastRequest?.value(forHTTPHeaderField: "Authorization"),
-            "Bearer test-api-key"
+            "Should not have Authorization header"
         )
     }
     

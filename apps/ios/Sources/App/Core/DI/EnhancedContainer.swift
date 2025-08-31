@@ -174,9 +174,6 @@ final class EnhancedContainer: ObservableObject {
         createNetworkingService()
     }()
     
-    private(set) lazy var authenticationService: AuthenticationServiceProtocol = {
-        createAuthenticationService()
-    }()
     
     private(set) lazy var cacheService: CacheServiceProtocol = {
         createCacheService()
@@ -213,9 +210,6 @@ final class EnhancedContainer: ObservableObject {
             self?.createNetworkingService() ?? MockNetworkingService()
         }
         
-        serviceLocator.register(AuthenticationServiceProtocol.self) { [weak self] in
-            self?.createAuthenticationService() ?? MockAuthenticationService()
-        }
         
         serviceLocator.register(CacheServiceProtocol.self) { [weak self] in
             self?.createCacheService() ?? InMemoryCacheService()
@@ -239,12 +233,6 @@ final class EnhancedContainer: ObservableObject {
         return NetworkingService(apiClient: apiClient)
     }
     
-    private func createAuthenticationService() -> AuthenticationServiceProtocol {
-        guard let settings = serviceLocator.resolve(AppSettings.self) else {
-            return MockAuthenticationService()
-        }
-        return AuthenticationService(settings: settings)
-    }
     
     private func createCacheService() -> CacheServiceProtocol {
         #if DEBUG
@@ -332,11 +320,6 @@ protocol NetworkingServiceProtocol {
     func cancelAllRequests()
 }
 
-protocol AuthenticationServiceProtocol: AnyObject {
-    var isAuthenticated: Bool { get }
-    func authenticate(apiKey: String) async throws
-    func logout()
-}
 
 protocol CacheServiceProtocol {
     func cache<T: Codable>(_ object: T, forKey key: String) async
@@ -362,26 +345,6 @@ struct NetworkingService: NetworkingServiceProtocol {
     }
 }
 
-@MainActor
-final class AuthenticationService: AuthenticationServiceProtocol {
-    private let settings: AppSettings
-    
-    init(settings: AppSettings) {
-        self.settings = settings
-    }
-    
-    var isAuthenticated: Bool {
-        !settings.apiKeyPlaintext.isEmpty
-    }
-    
-    func authenticate(apiKey: String) async throws {
-        settings.apiKeyPlaintext = apiKey
-    }
-    
-    func logout() {
-        settings.apiKeyPlaintext = ""
-    }
-}
 
 // MARK: - Mock Implementations
 
@@ -394,11 +357,6 @@ struct MockNetworkingService: NetworkingServiceProtocol {
     func cancelAllRequests() {}
 }
 
-final class MockAuthenticationService: AuthenticationServiceProtocol {
-    var isAuthenticated: Bool { false }
-    func authenticate(apiKey: String) async throws {}
-    func logout() {}
-}
 
 struct MockAnalyticsService: AnalyticsServiceProtocol {
     func track(event: String, properties: [String: Any]?) {}

@@ -20,11 +20,25 @@ struct ClaudeCodeApp: App {
         WindowGroup {
             RootTabView()
                 .preferredColorScheme(.dark)
+                .performanceOverlay() // ⚡ Performance monitoring
                 .onAppear {
                     Logger.app.logLifecycle("Main window appeared")
+                    setupCyberpunkTheme()
                 }
         }
     }
+}
+
+// 🎨 Cyberpunk Theme Setup
+func setupCyberpunkTheme() {
+    // Configure global appearance
+    UINavigationBar.appearance().barTintColor = UIColor(CyberpunkTheme.Colors.darkBg)
+    UINavigationBar.appearance().titleTextAttributes = [
+        .foregroundColor: UIColor(CyberpunkTheme.Colors.neonCyan)
+    ]
+    UITabBar.appearance().barTintColor = UIColor(CyberpunkTheme.Colors.darkBgSecondary)
+    UITabBar.appearance().tintColor = UIColor(CyberpunkTheme.Colors.neonCyan)
+    UITabBar.appearance().unselectedItemTintColor = UIColor(CyberpunkTheme.Colors.neonCyan.opacity(0.5))
 }
 
 struct RootTabView: View {
@@ -41,6 +55,9 @@ struct RootTabView: View {
             SessionsView()
                 .tabItem { Label("Sessions", systemImage: "bubble.left.and.bubble.right") }
 
+            EnhancedAnalyticsView()
+                .tabItem { Label("Analytics", systemImage: "chart.line.uptrend.xyaxis") }
+                
             MonitoringView()
                 .tabItem { Label("Monitor", systemImage: "gauge") }
             

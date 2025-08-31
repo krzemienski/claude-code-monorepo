@@ -1,0 +1,384 @@
+name: iOS CI/CD (Tuist)
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'apps/ios/**'
+      - '.github/workflows/ios-tuist-ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'apps/ios/**'
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+  IOS_DESTINATION: 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.5'
+  TUIST_CONFIG_CLOUD_TOKEN: ${{ secrets.TUIST_CLOUD_TOKEN }}
+  TUIST_USE_CACHE: 'true'
+
+jobs:
+  build-and-test:
+    name: Build and Test with Tuist
+    runs-on: macos-14
+    timeout-minutes: 30
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+      
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_15.4.app
+      
+    - name: Install Tuist
+      run: |
+        # Install Tuist using the official installation script
+        curl -Ls https://install.tuist.io | bash
+        
+        # Add Tuist to PATH for this job
+        echo "/usr/local/bin" >> $GITHUB_PATH
+        
+        # Verify installation
+        tuist version
+        
+    - name: Cache Tuist Dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/Library/Caches/tuist
+          apps/ios/.tuist/Cache
+          apps/ios/Tuist/Dependencies
+        key: ${{ runner.os }}-tuist-${{ hashFiles('**/Tuist/**/*.swift', '**/Project.swift', '**/Package.resolved') }}
+        restore-keys: |
+          ${{ runner.os }}-tuist-
+          
+    - name: Cache Swift Package Manager
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/Library/Developer/Xcode/DerivedData
+          apps/ios/.build
+        key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+        restore-keys: |
+          ${{ runner.os }}-spm-
+          
+    - name: Install SwiftLint
+      run: |
+        if ! command -v swiftlint &> /dev/null; then
+          brew install swiftlint
+        fi
+        swiftlint --version
+        
+    - name: Fetch Tuist Dependencies
+      working-directory: apps/ios
+      run: |
+        # Fetch and cache dependencies
+        tuist fetch
+        
+    - name: Generate Xcode Project with Tuist
+      working-directory: apps/ios
+      run: |
+        echo "🔨 Generating Xcode project with Tuist..."
+        tuist generate --no-open
+        
+        # Verify project was generated
+        ls -la *.xcworkspace || ls -la *.xcodeproj
+        
+    - name: Warm Build Cache
+      working-directory: apps/ios
+      run: |
+        # Warm up Tuist cache for faster builds
+        tuist cache warm --dependencies-only
+        
+    - name: Run SwiftLint
+      working-directory: apps/ios
+      run: |
+        if [ -f .swiftlint.yml ]; then
+          swiftlint --config .swiftlint.yml --reporter github-actions-logging
+        else
+          swiftlint lint Sources --reporter github-actions-logging
+        fi
+      continue-on-error: true
+        
+    - name: Build for Testing
+      working-directory: apps/ios
+      run: |
+        set -o pipefail
+        
+        # Use Tuist build command with caching
+        tuist build \
+          --configuration Debug \
+          --build-output-path build/ \
+          --device "${{ env.IOS_DESTINATION }}" \
+          --clean false | xcpretty --color
+          
+    - name: Run Unit Tests
+      working-directory: apps/ios
+      run: |
+        set -o pipefail
+        
+        # Use Tuist test command
+        tuist test \
+          --configuration Debug \
+          --result-bundle-path build/TestResults \
+          --device "${{ env.IOS_DESTINATION }}" \
+          --clean false \
+          --retry-count 2 | xcpretty --color --test
+          
+    - name: Generate Code Coverage Report
+      working-directory: apps/ios
+      run: |
+        # Generate coverage report using Tuist
+        tuist test \
+          --configuration Debug \
+          --result-bundle-path build/TestResults \
+          --test-plan UnitTests \
+          --code-coverage \
+          --coverage-output-path coverage.lcov \
+          --clean false
+          
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: apps/ios/coverage.lcov
+        flags: ios
+        name: ios-coverage
+        
+    - name: Run UI Tests
+      if: github.event_name == 'push'
+      working-directory: apps/ios
+      run: |
+        set -o pipefail
+        
+        # Run UI tests with Tuist
+        tuist test \
+          --configuration Debug \
+          --test-plan UITests \
+          --device "${{ env.IOS_DESTINATION }}" \
+          --clean false | xcpretty --color --test
+      continue-on-error: true
+          
+    - name: Archive Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ github.sha }}
+        path: |
+          apps/ios/build/TestResults/**/*.xcresult
+          apps/ios/build/Logs/Test/*.xcresult
+          
+    - name: Upload Build Artifacts
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-build-${{ github.sha }}
+        path: |
+          apps/ios/build/Build/Products/**/*.app
+          apps/ios/build/Build/Products/**/*.dSYM
+        retention-days: 7
+          
+  deploy-testflight:
+    name: Deploy to TestFlight
+    runs-on: macos-14
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install Tuist
+      run: |
+        curl -Ls https://install.tuist.io | bash
+        echo "/usr/local/bin" >> $GITHUB_PATH
+        tuist version
+        
+    - name: Setup Certificates
+      env:
+        CERTIFICATES_P12: ${{ secrets.CERTIFICATES_P12 }}
+        CERTIFICATES_PASSWORD: ${{ secrets.CERTIFICATES_PASSWORD }}
+        PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      run: |
+        # Create temporary keychain
+        security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+        
+        # Import certificates
+        echo "$CERTIFICATES_P12" | base64 --decode > certificate.p12
+        security import certificate.p12 -k build.keychain -P "$CERTIFICATES_PASSWORD" -T /usr/bin/codesign
+        
+        # Import provisioning profile
+        echo "$PROVISIONING_PROFILE" | base64 --decode > profile.mobileprovision
+        mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+        cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+        
+        security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+        
+    - name: Generate Release Project
+      working-directory: apps/ios
+      run: |
+        # Generate project for release configuration
+        tuist generate --no-open
+        
+    - name: Increment Build Number
+      working-directory: apps/ios
+      run: |
+        BUILD_NUMBER=$(date +%Y%m%d%H%M)
+        /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" Sources/Resources/Info.plist
+        
+    - name: Build and Archive
+      working-directory: apps/ios
+      run: |
+        set -o pipefail
+        
+        # Build release archive with Tuist
+        tuist build \
+          --configuration Release \
+          --generate-only \
+          --clean false
+          
+        # Archive using xcodebuild for App Store submission
+        xcodebuild archive \
+          -workspace ClaudeCode.xcworkspace \
+          -scheme ClaudeCode \
+          -archivePath build/ClaudeCode.xcarchive \
+          -destination "generic/platform=iOS" \
+          -allowProvisioningUpdates \
+          CODE_SIGN_STYLE="Manual" \
+          DEVELOPMENT_TEAM="${{ secrets.DEVELOPMENT_TEAM }}" | xcpretty
+          
+    - name: Export IPA
+      working-directory: apps/ios
+      run: |
+        # Create export options plist
+        cat > ExportOptions.plist <<EOF
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+          <key>method</key>
+          <string>app-store</string>
+          <key>teamID</key>
+          <string>${{ secrets.DEVELOPMENT_TEAM }}</string>
+          <key>uploadBitcode</key>
+          <false/>
+          <key>compileBitcode</key>
+          <false/>
+          <key>uploadSymbols</key>
+          <true/>
+          <key>signingStyle</key>
+          <string>manual</string>
+          <key>provisioningProfiles</key>
+          <dict>
+            <key>com.claudecode.ios</key>
+            <string>${{ secrets.PROVISIONING_PROFILE_NAME }}</string>
+          </dict>
+        </dict>
+        </plist>
+        EOF
+        
+        xcodebuild -exportArchive \
+          -archivePath build/ClaudeCode.xcarchive \
+          -exportPath build/ \
+          -exportOptionsPlist ExportOptions.plist \
+          -allowProvisioningUpdates | xcpretty
+          
+    - name: Upload to TestFlight
+      env:
+        APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+        APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+      run: |
+        # Create API key file
+        mkdir -p ~/.appstoreconnect/private_keys
+        echo "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
+        
+        # Upload using xcrun altool
+        xcrun altool --upload-app \
+          --type ios \
+          --file build/ClaudeCode.ipa \
+          --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
+          --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
+          --verbose
+          
+    - name: Clean up Keychain
+      if: always()
+      run: |
+        security delete-keychain build.keychain || true
+        rm -f ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision
+        rm -rf ~/.appstoreconnect/private_keys
+        
+  performance-analysis:
+    name: Build Performance Analysis
+    runs-on: macos-14
+    needs: build-and-test
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install Tuist
+      run: |
+        curl -Ls https://install.tuist.io | bash
+        echo "/usr/local/bin" >> $GITHUB_PATH
+        
+    - name: Analyze Build Performance
+      working-directory: apps/ios
+      run: |
+        # Generate build time report
+        tuist build \
+          --configuration Debug \
+          --build-time-report \
+          --verbose | tee build-performance.log
+          
+        # Extract and format metrics
+        echo "## 📊 Build Performance Metrics" > performance-report.md
+        echo "" >> performance-report.md
+        
+        # Parse build times from log
+        grep -E "Build time:|Cache hit rate:|Dependencies resolved:" build-performance.log >> performance-report.md || true
+        
+    - name: Upload Performance Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-report-${{ github.sha }}
+        path: apps/ios/performance-report.md
+        retention-days: 7
+        
+  notify-slack:
+    name: Notify Slack
+    runs-on: ubuntu-latest
+    needs: [build-and-test, deploy-testflight]
+    if: always()
+    
+    steps:
+    - name: Send Slack Notification
+      uses: slack/slack-github-action@v1
+      with:
+        payload: |
+          {
+            "text": "iOS CI/CD Pipeline (Tuist)",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*🔨 Build System:* Tuist\n*📱 iOS Build:* ${{ needs.build-and-test.result }}\n*🚀 TestFlight:* ${{ needs.deploy-testflight.result }}\n*🌳 Branch:* ${{ github.ref_name }}\n*💾 Commit:* `${{ github.sha }}`"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "⚡ *Performance Benefits:*\n• Incremental builds with Tuist cache\n• Parallel dependency resolution\n• Optimized test execution"
+                }
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

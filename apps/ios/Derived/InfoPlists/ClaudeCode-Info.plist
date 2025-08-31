@@ -17,9 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -32,22 +34,33 @@
 			<dict>
 				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
+				<key>NSTemporaryExceptionMinimumTLSVersion</key>
+				<string>1.0</string>
+				<key>NSTemporaryExceptionRequiresForwardSecrecy</key>
+				<false/>
 			</dict>
 		</dict>
 	</dict>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
-		<false/>
+		<true/>
 		<key>UISceneConfigurations</key>
 		<dict/>
 	</dict>
 	<key>UILaunchScreen</key>
-	<dict/>
+	<dict>
+		<key>UIColorName</key>
+		<string>AccentColor</string>
+		<key>UIImageName</key>
+		<string>LaunchIcon</string>
+	</dict>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
 	</array>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleDefault</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -59,5 +72,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
 </dict>
 </plist>

@@ -1,15 +1,6 @@
 {
-  "originHash" : "572e37d72dcd8d313759b33db17b4afdca0918df1b4edcaf3125309c88f875fa",
+  "originHash" : "3ff5c3fd8c0d57a80b2a34c07f35d4030e0cd14c7f1e2ac262d86d3b591f9b1d",
   "pins" : [
-    {
-      "identity" : "bluesocket",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/IBM-Swift/BlueSocket",
-      "state" : {
-        "revision" : "c9894fd117457f1d006575fbfb2fdfd6f79eac03",
-        "version" : "1.0.200"
-      }
-    },
     {
       "identity" : "charts",
       "kind" : "remoteSourceControl",
@@ -26,15 +17,6 @@
       "state" : {
         "revision" : "84e546727d66f1adc5439debad16270d0fdd04e7",
         "version" : "4.2.2"
-      }
-    },
-    {
-      "identity" : "shout",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/jakeheis/Shout.git",
-      "state" : {
-        "revision" : "fbcae228bc68d5e2352f0790079995d27b610dbc",
-        "version" : "0.5.7"
       }
     },
     {
@@ -71,6 +53,15 @@
       "state" : {
         "revision" : "4c83e1cdf4ba538ef6e43a9bbd0bcc33a0ca46e3",
         "version" : "2.7.0"
+      }
+    },
+    {
+      "identity" : "viewinspector",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nalexn/ViewInspector.git",
+      "state" : {
+        "revision" : "a6fcac8485bc8f57b2d2b55bb6d97138e8659e4b",
+        "version" : "0.10.2"
       }
     }
   ],

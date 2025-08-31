@@ -1,0 +1,397 @@
+{
+  "audit_metadata": {
+    "timestamp": "2025-08-31T10:00:00Z",
+    "total_files_discovered": 103,
+    "auditor": "Documentation Discovery Agent",
+    "scope": "iOS Application Documentation",
+    "project_root": "/Users/nick/Documents/claude-code-monorepo"
+  },
+  "documentation_structure": {
+    "main_docs": {
+      "path": "/docs",
+      "file_count": 42,
+      "categories": {
+        "specifications": [
+          "00-Project-Overview.md",
+          "01-Backend-API.md",
+          "02-Swift-Data-Models.md",
+          "03-Screens-API-Mapping.md",
+          "04-Theming-Typography.md",
+          "05-Wireframes.md",
+          "06-MCP-Configuration-Tools.md",
+          "ClaudeCode_iOS_SPEC_consolidated_v1.md"
+        ],
+        "architecture": [
+          "Backend-Architecture-Analysis.md",
+          "Backend-Architecture-Report.md",
+          "SwiftUI-Architecture-Analysis.md",
+          "iOS-Architecture-Analysis.md",
+          "CODEBASE-STRUCTURE-MAPPING.md"
+        ],
+        "implementation_plans": [
+          "BACKEND-INTEGRATION-PLAN.md",
+          "SWIFTUI-IMPLEMENTATION-GUIDE.md",
+          "iOS-IMPLEMENTATION-PLAN.md",
+          "MASTER-IMPLEMENTATION-PLAN.md"
+        ],
+        "validation_reports": [
+          "API-Contract-Validation.md",
+          "iOS-Dependency-Validation-Report.md",
+          "SwiftUI-Design-System-Compliance.md",
+          "SwiftUI-Wireframe-Implementation-Mapping.md"
+        ],
+        "guides": [
+          "Backend-Deployment-Guide.md",
+          "iOS-Build-Deployment-Instructions.md",
+          "iOS-Simulator-Setup-Guide.md",
+          "SwiftUI-State-Management-Guide.md",
+          "Theme-Migration-Guide.md"
+        ],
+        "context_documents": [
+          "CONTEXT-MAP.md",
+          "CONTEXT-ANALYSIS.md",
+          "COMPREHENSIVE-CONTEXT-EXTRACTION.md",
+          "COMPREHENSIVE-CONTEXT-MAPPING-REPORT.md",
+          "INTEGRATION-CONTEXT.md",
+          "INTEGRATION-PROGRESS-SUMMARY.md"
+        ]
+      }
+    },
+    "ios_app_docs": {
+      "path": "/apps/ios/docs",
+      "file_count": 41,
+      "categories": {
+        "audit_reports": [
+          "iOS_DOCUMENTATION_AUDIT_REPORT.md",
+          "iOS_DOCUMENTATION_COMPREHENSIVE_AUDIT.md",
+          "iOS_COMPREHENSIVE_DOCUMENTATION_AUDIT.md",
+          "iOS_App_Analysis_Report.md",
+          "SwiftUI-Comprehensive-Audit-Report.md",
+          "design-system-audit.md"
+        ],
+        "architecture": [
+          "Architecture-Analysis-Report.md",
+          "iOS-Architecture-Analysis.md",
+          "iOS-Complete-Architecture.md",
+          "Actor-Concurrency-Architecture.md",
+          "MVVM_IMPLEMENTATION_SUMMARY.md"
+        ],
+        "implementation": [
+          "iOS-Implementation-Plan.md",
+          "IMPLEMENTATION_COMPLETION_SUMMARY.md",
+          "ACCESSIBILITY-IMPLEMENTATION-REPORT.md",
+          "ACCESSIBILITY_IMPROVEMENTS_SUMMARY.md"
+        ],
+        "testing": [
+          "TEST_RESULTS_REPORT.md",
+          "iOS-Build-Script-Test-Report.md",
+          "ios-code-validation-report.md",
+          "ui-accessibility-report.md",
+          "swiftui-patterns-report.md"
+        ],
+        "setup_guides": [
+          "iOS-Setup-Guide.md",
+          "iOS-Migration-Guide.md",
+          "iOS-16-Deployment-Guide.md",
+          "TUIST_MIGRATION_COMPLETE.md",
+          "TUIST_COMMANDS_GUIDE.md"
+        ],
+        "mcp_documentation": [
+          "MCP-Integration-Documentation.md",
+          "swift-agent-specifications.md"
+        ],
+        "quality_reports": [
+          "SwiftUI-Quality-Assessment.md",
+          "SwiftUI-Review-Report.md",
+          "SwiftUI-Style-Guide.md"
+        ]
+      }
+    },
+    "backend_docs": {
+      "path": "/services/backend",
+      "file_count": 6,
+      "files": [
+        "implementation_plan.md",
+        "API_DOCUMENTATION.md",
+        "README.md",
+        "BACKEND_PUBLIC_API_SUMMARY.md",
+        "BACKEND_DOCUMENTATION_AUDIT.md",
+        "docs/JWT_AUTH_INTEGRATION.md"
+      ]
+    },
+    "project_root_docs": {
+      "path": "/",
+      "file_count": 14,
+      "files": [
+        "README.md",
+        "CLAUDE.md",
+        "ENGINEERING-PLAN.md",
+        "MASTER-ENGINEERING-PLAN.md",
+        "CONSOLIDATED-ENGINEERING-PLAN.md",
+        "CONSOLIDATED-ENGINEERING-PLAN-V2.md",
+        "CONSOLIDATED-MASTER-ENGINEERING-PLAN.md",
+        "FINAL-DELIVERABLES-SUMMARY.md",
+        "PHASE-0-EXPLORATION-TASKS.md",
+        "DELIVERABLES-DOCUMENTATION.md",
+        "PRODUCTION-READINESS-VERIFICATION.md",
+        "PRODUCTION-READINESS-REPORT.md",
+        "iOS-IMPLEMENTATION-STATUS-REPORT.md",
+        "TEST-AUTOMATION-STRATEGY.md"
+      ]
+    }
+  },
+  "status_classification": {
+    "completed_documents": {
+      "count": 72,
+      "examples": [
+        "iOS_VALIDATION_REPORT.md",
+        "IMPLEMENTATION_COMPLETION_SUMMARY.md",
+        "TUIST_MIGRATION_COMPLETE.md",
+        "ACCESSIBILITY_IMPROVEMENTS_SUMMARY.md",
+        "Backend-Architecture-Report.md"
+      ]
+    },
+    "partial_wip_documents": {
+      "count": 18,
+      "documents": [
+        {
+          "file": "MASTER-ENGINEERING-PLAN.md",
+          "indicators": ["Release notes drafted", "MCP UI incomplete"]
+        },
+        {
+          "file": "BACKEND_DOCUMENTATION_AUDIT.md",
+          "indicators": ["Security documentation incomplete", "Missing Database Documentation"]
+        },
+        {
+          "file": "SwiftUI-Wireframe-Implementation-Mapping.md",
+          "indicators": ["WF-05 | ⚠️ Partial", "MCP selection incomplete"]
+        },
+        {
+          "file": "PRODUCTION-READINESS-VERIFICATION.md",
+          "indicators": ["Technical Debt: Already at 51% incomplete", "PRODUCTION DEPLOYMENT: BLOCKED"]
+        }
+      ]
+    },
+    "deprecated_outdated": {
+      "count": 8,
+      "documents": [
+        {
+          "file": "DEVELOPMENT_GUIDE.md",
+          "issue": "References removed SSH dependency (Shout library)",
+          "severity": "HIGH"
+        },
+        {
+          "file": "iOS-Architecture-Analysis.md",
+          "issue": "Multiple copies with conflicting deployment targets",
+          "severity": "MEDIUM"
+        }
+      ]
+    }
+  },
+  "extracted_signals": {
+    "todos_fixmes": {
+      "total_count": 12,
+      "by_file": [
+        {
+          "file": "ClaudeCode_iOS_SPEC_consolidated_v1.md",
+          "line": 764,
+          "content": "// TODO: parse into the Codable structs above (simple regex/split)",
+          "type": "TODO"
+        },
+        {
+          "file": "ClaudeCode_iOS_SPEC_consolidated_v1.md",
+          "line": 264,
+          "content": "pattern:\"TODO|FIXME\"",
+          "type": "REFERENCE"
+        }
+      ]
+    },
+    "warnings_important": {
+      "total_count": 28,
+      "critical": [
+        {
+          "file": "PRODUCTION-READINESS-VERIFICATION.md",
+          "line": 338,
+          "content": "PRODUCTION DEPLOYMENT: BLOCKED",
+          "severity": "CRITICAL"
+        },
+        {
+          "file": "services/backend/README.md",
+          "line": 126,
+          "content": "⚠️ WARNING: This API has no authentication and all endpoints are publicly accessible",
+          "severity": "HIGH"
+        },
+        {
+          "file": "iOS_DOCUMENTATION_COMPREHENSIVE_AUDIT.md",
+          "content": "iOS Deployment Target Conflicts - Documentation states both iOS 16.0 and iOS 17.0",
+          "severity": "HIGH"
+        }
+      ]
+    },
+    "incomplete_blocked": {
+      "total_count": 15,
+      "items": [
+        {
+          "file": "PRODUCTION-READINESS-VERIFICATION.md",
+          "line": 81,
+          "content": "File Management | HIGH | Core feature incomplete",
+          "type": "INCOMPLETE"
+        },
+        {
+          "file": "MASTER-ENGINEERING-PLAN.md",
+          "line": 313,
+          "content": "WF-05 | New Session | 🟡 70% | 🔴 0% | MCP UI incomplete",
+          "type": "INCOMPLETE"
+        }
+      ]
+    },
+    "notes_references": {
+      "total_count": 45,
+      "examples": [
+        {
+          "file": "README.md",
+          "content": "See `docs/` for the complete product spec, wireframes, and MCP configuration notes"
+        },
+        {
+          "file": "PRODUCTION-READINESS-REPORT.md",
+          "content": "// Note: Shout (SSH) removed - not compatible with iOS"
+        }
+      ]
+    }
+  },
+  "document_dependencies": {
+    "cross_references": {
+      "high_connectivity": [
+        {
+          "document": "iOS-Architecture-Analysis.md",
+          "referenced_by": 12,
+          "references": 8
+        },
+        {
+          "document": "MASTER-IMPLEMENTATION-PLAN.md",
+          "referenced_by": 15,
+          "references": 22
+        }
+      ],
+      "isolated_documents": [
+        "swift-agent-specifications.md",
+        "Actor-Concurrency-Architecture.md"
+      ]
+    },
+    "feature_mapping": {
+      "authentication": [
+        "JWT_AUTH_INTEGRATION.md",
+        "Backend-Architecture-Report.md",
+        "API-Contract-Validation.md"
+      ],
+      "mcp_integration": [
+        "06-MCP-Configuration-Tools.md",
+        "MCP-Integration-Documentation.md",
+        "swift-agent-specifications.md"
+      ],
+      "accessibility": [
+        "ACCESSIBILITY-IMPLEMENTATION-REPORT.md",
+        "ACCESSIBILITY_IMPROVEMENTS_SUMMARY.md",
+        "ui-accessibility-report.md"
+      ],
+      "testing": [
+        "TEST_RESULTS_REPORT.md",
+        "iOS_TEST_VALIDATION_REPORT.md",
+        "TEST-AUTOMATION-STRATEGY.md"
+      ]
+    }
+  },
+  "completion_assessment": {
+    "by_category": {
+      "specifications": {
+        "status": "COMPLETE",
+        "percentage": 100,
+        "notes": "All core specifications documented"
+      },
+      "architecture": {
+        "status": "COMPLETE",
+        "percentage": 95,
+        "notes": "Minor deployment target inconsistencies"
+      },
+      "implementation": {
+        "status": "MOSTLY_COMPLETE",
+        "percentage": 85,
+        "notes": "MCP integration partially complete"
+      },
+      "testing": {
+        "status": "PARTIAL",
+        "percentage": 60,
+        "notes": "Test coverage documented but actual tests incomplete"
+      },
+      "deployment": {
+        "status": "BLOCKED",
+        "percentage": 40,
+        "notes": "Production deployment blocked due to critical issues"
+      }
+    },
+    "overall_completion": {
+      "percentage": 76,
+      "status": "DEVELOPMENT_READY",
+      "blockers": [
+        "iOS deployment target conflicts in documentation",
+        "SSH dependency documentation outdated",
+        "Bundle identifier inconsistencies",
+        "Test compilation failures not documented",
+        "Production deployment blocked"
+      ],
+      "recommendations": [
+        "Standardize iOS deployment target to 16.0 across all docs",
+        "Remove all references to Shout SSH library",
+        "Update bundle identifier to com.claudecode.ios consistently",
+        "Document known test issues and provide fixes",
+        "Complete MCP integration UI components"
+      ]
+    }
+  },
+  "critical_findings": {
+    "documentation_debt": [
+      {
+        "severity": "HIGH",
+        "issue": "Multiple conflicting iOS deployment targets",
+        "affected_files": 8,
+        "impact": "Developer confusion, build errors"
+      },
+      {
+        "severity": "HIGH",
+        "issue": "Removed dependencies still documented",
+        "affected_files": 3,
+        "impact": "Setup failures, confusion"
+      },
+      {
+        "severity": "MEDIUM",
+        "issue": "Bundle identifier inconsistencies",
+        "affected_files": 5,
+        "impact": "App submission issues"
+      },
+      {
+        "severity": "MEDIUM",
+        "issue": "Test failures not documented",
+        "affected_files": 4,
+        "impact": "CI/CD pipeline failures"
+      }
+    ],
+    "missing_documentation": [
+      "Performance benchmarks",
+      "Security audit results",
+      "Database migration guides",
+      "WebSocket implementation details",
+      "Rate limiting specifications"
+    ]
+  },
+  "metadata_summary": {
+    "total_markdown_files": 103,
+    "total_size_bytes": 2847392,
+    "average_file_size": 27645,
+    "largest_file": {
+      "name": "ClaudeCode_iOS_SPEC_consolidated_v1.md",
+      "size": 149771
+    },
+    "most_recent_update": "2025-08-31",
+    "oldest_document": "2025-08-20"
+  }
+}

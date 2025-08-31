@@ -16,26 +16,45 @@ public struct HomeViewRefactored: View {
     // Animation states
     @State private var showWelcome = false
     @State private var selectedSection: HomeSection? = nil
+    @State private var glowAnimation = false
+    @State private var backgroundParticles = true
     
     public var body: some View {
         AppNavigationStack {
-            contentView
-                .navigationTitle("")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        HeaderComponent(
-                            isLoading: $viewModel.isLoading,
-                            settingsAction: navigateToSettings
-                        )
+            ZStack {
+                // Cyberpunk background with particle effects
+                if !reduceMotion && backgroundParticles {
+                    ParticleEffectsView(particleCount: 30)
+                        .opacity(0.3)
+                        .allowsHitTesting(false)
+                }
+                
+                contentView
+                    .navigationTitle("")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .principal) {
+                            HeaderComponent(
+                                isLoading: $viewModel.isLoading,
+                                settingsAction: navigateToSettings
+                            )
+                            .holographicEffect()
+                        }
+                    }
+            }
+            .background(CyberpunkTheme.darkBackground)
+            .task {
+                await loadInitialData()
+                if !reduceMotion {
+                    withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                        glowAnimation = true
                     }
                 }
-                .task {
-                    await loadInitialData()
-                }
-                .refreshable {
-                    await viewModel.refresh()
-                }
+            }
+            .refreshable {
+                CyberpunkTheme.mediumImpact()
+                await viewModel.refresh()
+            }
         }
     }
     
@@ -111,49 +130,53 @@ public struct HomeViewRefactored: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(greetingText)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [Theme.primary, Theme.accent],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
+                            .font(.system(size: 36, weight: .bold, design: .rounded))
+                            .foregroundStyle(CyberpunkTheme.neonGradient)
+                            .glitchEffect()
+                            .neonGlow(color: CyberpunkTheme.neonCyan, intensity: 3)
                         
                         Text("What would you like to work on today?")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 14, weight: .light, design: .monospaced))
+                            .foregroundStyle(CyberpunkTheme.neonMagenta.opacity(0.8))
                     }
                     
                     Spacer()
                 }
                 
-                // Quick Stats
+                // Quick Stats with cyberpunk styling
                 HStack(spacing: 16) {
-                    StatCard(
-                        value: "\(viewModel.sessionCount)",
-                        label: "Sessions",
+                    EnhancedStatCard(
+                        value: "\(viewModel.sessions.count)",
+                        label: "SESSIONS",
                         icon: "bubble.left.and.bubble.right",
-                        color: .blue
+                        color: CyberpunkTheme.neonCyan,
+                        glowAnimation: glowAnimation
                     )
                     
-                    StatCard(
-                        value: "\(viewModel.projectCount)",
-                        label: "Projects",
+                    EnhancedStatCard(
+                        value: "\(viewModel.projects.count)",
+                        label: "PROJECTS",
                         icon: "folder",
-                        color: .orange
+                        color: CyberpunkTheme.neonMagenta,
+                        glowAnimation: glowAnimation
                     )
                     
-                    StatCard(
-                        value: formatTokenCount(viewModel.totalTokens),
-                        label: "Tokens",
+                    EnhancedStatCard(
+                        value: formatTokenCount(viewModel.stats?.totalTokens ?? 0),
+                        label: "TOKENS",
                         icon: "bolt",
-                        color: .green
+                        color: CyberpunkTheme.neonGreen,
+                        glowAnimation: glowAnimation
                     )
                 }
             }
-            .transition(.opacity.combined(with: .move(edge: .top)))
+            .transition(.asymmetric(
+                insertion: .scale.combined(with: .opacity),
+                removal: .scale.combined(with: .opacity)
+            ))
+            .onTapGesture {
+                CyberpunkTheme.lightImpact()
+            }
         }
     }
     
@@ -169,8 +192,8 @@ public struct HomeViewRefactored: View {
     // MARK: - Recent Sessions Section
     @ViewBuilder
     private var recentSessionsSection: some View {
-        SessionListComponent(
-            sessions: viewModel.recentSessions,
+        APISessionListComponent(
+            sessions: viewModel.activeSessions,
             onSessionTap: { session in
                 navigationCoordinator.navigate(to: .session(session.id))
             },
@@ -188,12 +211,14 @@ public struct HomeViewRefactored: View {
                 .font(.headline)
                 .foregroundStyle(Theme.primary)
             
-            MetricsChart(metrics: viewModel.performanceMetrics)
+            // MetricsChart placeholder
+            Text("Performance metrics")
+                .foregroundStyle(Theme.mutedFg)
                 .frame(height: 200)
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Theme.secondaryBackground)
+                        .fill(Theme.backgroundSecondary)
                 )
         }
     }
@@ -201,21 +226,8 @@ public struct HomeViewRefactored: View {
     // MARK: - Status Section
     @ViewBuilder
     private var statusSection: some View {
-        StatusBarComponent(
-            metrics: SystemMetrics(
-                tokenUsage: TokenUsage(
-                    used: viewModel.tokensUsed,
-                    limit: viewModel.tokenLimit
-                ),
-                memoryUsage: MemoryUsage(
-                    used: viewModel.memoryUsed,
-                    total: viewModel.memoryTotal
-                ),
-                performanceScore: viewModel.performanceScore
-            ),
-            isConnected: viewModel.isConnected,
-            syncStatus: viewModel.syncStatus
-        )
+        AnimatedStatusBar()
+            .scanlineEffect()
     }
     
     // MARK: - Helper Methods
@@ -233,7 +245,7 @@ public struct HomeViewRefactored: View {
                 title: "Browse Files",
                 icon: "folder",
                 color: .orange,
-                badge: viewModel.unreadFileCount > 0 ? "\(viewModel.unreadFileCount)" : nil
+                badge: nil
             ) {
                 navigationCoordinator.navigate(to: .file(""))
             },
@@ -309,6 +321,78 @@ private enum HomeSection {
     case settings
 }
 
+// Enhanced stat card with cyberpunk styling
+private struct EnhancedStatCard: View {
+    let value: String
+    let label: String
+    let icon: String
+    let color: Color
+    let glowAnimation: Bool
+    
+    @State private var isHovered = false
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.1))
+                    .frame(width: 40, height: 40)
+                
+                Circle()
+                    .stroke(color, lineWidth: 2)
+                    .frame(width: 40, height: 40)
+                    .scaleEffect(glowAnimation && isHovered ? 1.2 : 1.0)
+                    .opacity(glowAnimation && isHovered ? 0.5 : 1.0)
+                
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(color)
+                    .neonGlow(color: color, intensity: 2)
+            }
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(value)
+                    .font(.system(size: 20, weight: .bold, design: .monospaced))
+                    .foregroundStyle(color)
+                
+                Text(label)
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .foregroundStyle(color.opacity(0.7))
+            }
+            
+            Spacer()
+        }
+        .padding(12)
+        .background(
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(CyberpunkTheme.darkCard)
+                
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(
+                        LinearGradient(
+                            colors: [color.opacity(0.6), color.opacity(0.2)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
+                    .blur(radius: isHovered ? 2 : 0)
+            }
+        )
+        .scaleEffect(isHovered ? 1.02 : 1.0)
+        .onHover { hovering in
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                isHovered = hovering
+            }
+            if hovering {
+                CyberpunkTheme.lightImpact()
+            }
+        }
+    }
+}
+
+// Keep the original StatCard for backward compatibility
 private struct StatCard: View {
     let value: String
     let label: String
@@ -341,13 +425,20 @@ private struct StatCard: View {
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Theme.secondaryBackground)
+                .fill(Theme.backgroundSecondary)
         )
     }
 }
 
+// ChartMetric for chart visualization
+private struct ChartMetric: Identifiable {
+    let id = UUID()
+    let timestamp: Date
+    let value: Double
+}
+
 private struct MetricsChart: View {
-    let metrics: [PerformanceMetric]
+    let metrics: [ChartMetric]
     
     var body: some View {
         Chart(metrics) { metric in

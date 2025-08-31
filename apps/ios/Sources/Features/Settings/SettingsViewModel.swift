@@ -8,10 +8,8 @@ import os.log
 final class SettingsViewModel: ObservableObject {
     // MARK: - Published Properties
     @Published var baseURL: String = ""
-    @Published var apiKeyPlaintext: String = ""
     @Published var streamingDefault: Bool = true
     @Published var sseBufferKiB: Int = 64
-    @Published var showApiKey: Bool = false
     @Published var isValidating: Bool = false
     @Published var healthStatus: HealthStatus = .notValidated
     @Published var errorMessage: String?
@@ -75,7 +73,6 @@ final class SettingsViewModel: ObservableObject {
     // MARK: - Setup Methods
     private func loadSettings() {
         baseURL = settings.baseURL
-        apiKeyPlaintext = settings.apiKeyPlaintext
         streamingDefault = settings.streamingDefault
         sseBufferKiB = settings.sseBufferKiB
     }
@@ -89,12 +86,6 @@ final class SettingsViewModel: ObservableObject {
             }
             .store(in: &cancellables)
         
-        $apiKeyPlaintext
-            .removeDuplicates()
-            .sink { [weak self] newValue in
-                self?.settings.apiKeyPlaintext = newValue
-            }
-            .store(in: &cancellables)
         
         $streamingDefault
             .removeDuplicates()
@@ -112,9 +103,6 @@ final class SettingsViewModel: ObservableObject {
     }
     
     // MARK: - Public Methods
-    func toggleApiKeyVisibility() {
-        showApiKey.toggle()
-    }
     
     func validateAndSave() async {
         guard canValidate else {
@@ -127,7 +115,6 @@ final class SettingsViewModel: ObservableObject {
         
         // Save current values to settings
         settings.baseURL = baseURL
-        settings.apiKeyPlaintext = apiKeyPlaintext
         settings.streamingDefault = streamingDefault
         settings.sseBufferKiB = sseBufferKiB
         
@@ -143,8 +130,6 @@ final class SettingsViewModel: ObservableObject {
             let health = try await client.health()
             
             if health.ok {
-                // Save API key securely
-                try settings.saveAPIKey()
                 
                 healthStatus = .healthy(
                     version: health.version ?? "unknown",
@@ -169,7 +154,6 @@ final class SettingsViewModel: ObservableObject {
     
     func resetToDefaults() {
         baseURL = "http://localhost:8000"
-        apiKeyPlaintext = ""
         streamingDefault = true
         sseBufferKiB = 64
         healthStatus = .notValidated
@@ -177,7 +161,6 @@ final class SettingsViewModel: ObservableObject {
         
         // Apply to settings
         settings.baseURL = baseURL
-        settings.apiKeyPlaintext = apiKeyPlaintext
         settings.streamingDefault = streamingDefault
         settings.sseBufferKiB = sseBufferKiB
         

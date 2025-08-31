@@ -35,6 +35,9 @@ def setup_logging(log_level: Optional[str] = None) -> logging.Logger:
         level=getattr(logging, level.upper(), logging.INFO)
     )
     
+    # Determine environment (default to development if not set)
+    environment = getattr(settings, 'ENVIRONMENT', 'development')
+    
     # Configure structlog
     structlog.configure(
         processors=[
@@ -43,7 +46,7 @@ def setup_logging(log_level: Optional[str] = None) -> logging.Logger:
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
             structlog.processors.UnicodeDecoder(),
-            JSONRenderer() if settings.ENVIRONMENT == "production" else structlog.dev.ConsoleRenderer()
+            JSONRenderer() if environment == "production" else structlog.dev.ConsoleRenderer()
         ],
         context_class=dict,
         logger_factory=LoggerFactory(),
@@ -57,7 +60,7 @@ def setup_logging(log_level: Optional[str] = None) -> logging.Logger:
     logger.info(
         "Logging configured",
         level=level,
-        environment=settings.ENVIRONMENT,
+        environment=environment,
         debug=settings.DEBUG
     )
     

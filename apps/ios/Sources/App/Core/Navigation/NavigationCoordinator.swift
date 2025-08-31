@@ -210,7 +210,7 @@ public struct NavigationDestinationModifier: ViewModifier {
                     HomeView()
                     
                 case .session(let id):
-                    ChatView(sessionId: id)
+                    AdaptiveChatView()
                     
                 case .settings:
                     SettingsView()
@@ -270,7 +270,7 @@ public struct AppNavigationStack<Content: View>: View {
     private func sheetContent(for sheet: NavigationCoordinator.SheetDestination) -> some View {
         switch sheet {
         case .newSession:
-            NewSessionView()
+            NewSessionView(projectId: "default")
             
         case .quickSettings:
             QuickSettingsView()
@@ -290,7 +290,7 @@ public struct AppNavigationStack<Content: View>: View {
             OnboardingView()
             
         case .sessionDetail(let id):
-            ChatView(sessionId: id)
+            AdaptiveChatView()
                 .navigationBarHidden(false)
             
         case .mediaViewer(let url):

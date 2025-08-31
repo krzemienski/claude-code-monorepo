@@ -4,6 +4,236 @@
    <FileRef
       location = "group:ClaudeCode.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:.gitignore">
+   </FileRef>
+   <FileRef
+      location = "group:.tuist-version">
+   </FileRef>
+   <FileRef
+      location = "group:DEVELOPMENT_GUIDE.md">
+   </FileRef>
+   <FileRef
+      location = "group:IMPLEMENTATION_SUMMARY.md">
+   </FileRef>
+   <FileRef
+      location = "group:README.md">
+   </FileRef>
+   <FileRef
+      location = "group:SWIFT_PATTERN_INTEGRATION_REPORT.md">
+   </FileRef>
+   <Group
+      location = "group:docs"
+      name = "docs">
+      <FileRef
+         location = "group:ACCESSIBILITY-IMPLEMENTATION-REPORT.md">
+      </FileRef>
+      <FileRef
+         location = "group:ACCESSIBILITY_IMPROVEMENTS_SUMMARY.md">
+      </FileRef>
+      <FileRef
+         location = "group:Actor-Concurrency-Architecture.md">
+      </FileRef>
+      <FileRef
+         location = "group:Architecture-Analysis-Report.md">
+      </FileRef>
+      <FileRef
+         location = "group:CI-CD-TUIST-MIGRATION.md">
+      </FileRef>
+      <FileRef
+         location = "group:COMPREHENSIVE_DOCUMENTATION_AUDIT_FINAL.md">
+      </FileRef>
+      <FileRef
+         location = "group:IMPLEMENTATION_COMPLETION_SUMMARY.md">
+      </FileRef>
+      <FileRef
+         location = "group:INTEGRATION_TEST_REPORT.md">
+      </FileRef>
+      <FileRef
+         location = "group:MCP-Integration-Documentation.md">
+      </FileRef>
+      <FileRef
+         location = "group:MVVM_IMPLEMENTATION_SUMMARY.md">
+      </FileRef>
+      <FileRef
+         location = "group:Missing-API-Endpoints-Implementation.swift">
+      </FileRef>
+      <FileRef
+         location = "group:SwiftUI-Agent-Specifications.md">
+      </FileRef>
+      <FileRef
+         location = "group:SwiftUI-Architecture-Report.md">
+      </FileRef>
+      <FileRef
+         location = "group:SwiftUI-Comprehensive-Audit-Report.md">
+      </FileRef>
+      <FileRef
+         location = "group:SwiftUI-Performance-UX-Report.md">
+      </FileRef>
+      <FileRef
+         location = "group:SwiftUI-Quality-Assessment.md">
+      </FileRef>
+      <FileRef
+         location = "group:SwiftUI-Review-Report.md">
+      </FileRef>
+      <FileRef
+         location = "group:SwiftUI-Style-Guide.md">
+      </FileRef>
+      <FileRef
+         location = "group:SwiftUI-Validation-Executive-Summary.md">
+      </FileRef>
+      <FileRef
+         location = "group:SwiftUI-Validation-Report-Complete.md">
+      </FileRef>
+      <FileRef
+         location = "group:SwiftUI_Audit_Report.json">
+      </FileRef>
+      <FileRef
+         location = "group:TEST_ENVIRONMENT_SPECIFICATIONS.md">
+      </FileRef>
+      <FileRef
+         location = "group:TEST_RESULTS_REPORT.md">
+      </FileRef>
+      <FileRef
+         location = "group:TUIST_ARCHITECTURE_REPORT.md">
+      </FileRef>
+      <FileRef
+         location = "group:TUIST_COMMANDS_GUIDE.md">
+      </FileRef>
+      <FileRef
+         location = "group:TUIST_MIGRATION_CHECKLIST.md">
+      </FileRef>
+      <FileRef
+         location = "group:TUIST_MIGRATION_COMPLETE.md">
+      </FileRef>
+      <FileRef
+         location = "group:TUIST_MIGRATION_GUIDE.md">
+      </FileRef>
+      <FileRef
+         location = "group:TUIST_SETUP.md">
+      </FileRef>
+      <FileRef
+         location = "group:design-system-audit.md">
+      </FileRef>
+      <FileRef
+         location = "group:documentation-action-items.json">
+      </FileRef>
+      <FileRef
+         location = "group:iOS-16-Deployment-Guide.md">
+      </FileRef>
+      <FileRef
+         location = "group:iOS-Architecture-Analysis.md">
+      </FileRef>
+      <FileRef
+         location = "group:iOS-Build-Script-Test-Report.md">
+      </FileRef>
+      <FileRef
+         location = "group:iOS-COMPREHENSIVE-AUDIT-REPORT-2025.md">
+      </FileRef>
+      <FileRef
+         location = "group:iOS-Complete-Architecture.md">
+      </FileRef>
+      <FileRef
+         location = "group:iOS-Documentation-Audit-Sequential-Agent1.md">
+      </FileRef>
+      <FileRef
+         location = "group:iOS-Environment-Setup-Validation-Report.md">
+      </FileRef>
+      <FileRef
+         location = "group:iOS-Implementation-Plan.md">
+      </FileRef>
+      <FileRef
+         location = "group:iOS-Migration-Guide.md">
+      </FileRef>
+      <FileRef
+         location = "group:iOS-Setup-Guide.md">
+      </FileRef>
+      <FileRef
+         location = "group:iOS_App_Analysis_Report.md">
+      </FileRef>
+      <FileRef
+         location = "group:iOS_COMPREHENSIVE_DOCUMENTATION_AUDIT.md">
+      </FileRef>
+      <FileRef
+         location = "group:iOS_DOCUMENTATION_AUDIT_REPORT.md">
+      </FileRef>
+      <FileRef
+         location = "group:iOS_DOCUMENTATION_COMPREHENSIVE_AUDIT.md">
+      </FileRef>
+      <FileRef
+         location = "group:ios-architecture.md">
+      </FileRef>
+      <FileRef
+         location = "group:ios-code-validation-report.md">
+      </FileRef>
+      <FileRef
+         location = "group:ios-documentation-audit.json">
+      </FileRef>
+      <FileRef
+         location = "group:ios-todo-list.json">
+      </FileRef>
+      <FileRef
+         location = "group:swift-agent-specifications.md">
+      </FileRef>
+      <FileRef
+         location = "group:swiftui-component-audit.json">
+      </FileRef>
+      <FileRef
+         location = "group:swiftui-patterns-report.md">
+      </FileRef>
+      <FileRef
+         location = "group:swiftui-validation-report.md">
+      </FileRef>
+      <FileRef
+         location = "group:ui-accessibility-report.md">
+      </FileRef>
+   </Group>
+   <FileRef
+      location = "group:iOS_SIMULATOR_TEST_REPORT.md">
+   </FileRef>
+   <FileRef
+      location = "group:iOS_TEST_VALIDATION_REPORT.md">
+   </FileRef>
+   <FileRef
+      location = "group:iOS_VALIDATION_REPORT.md">
+   </FileRef>
+   <FileRef
+      location = "group:iOS_VALIDATION_SUMMARY.md">
+   </FileRef>
+   <Group
+      location = "group:scripts"
+      name = "scripts">
+      <FileRef
+         location = "group:bootstrap.sh">
+      </FileRef>
+      <FileRef
+         location = "group:build.sh">
+      </FileRef>
+      <FileRef
+         location = "group:ci-tuist-setup.sh">
+      </FileRef>
+      <FileRef
+         location = "group:migrate-ci-to-tuist.sh">
+      </FileRef>
+      <FileRef
+         location = "group:monitor-performance.sh">
+      </FileRef>
+      <FileRef
+         location = "group:remove-file-reference.sh">
+      </FileRef>
+      <FileRef
+         location = "group:run-accessibility-tests.sh">
+      </FileRef>
+      <FileRef
+         location = "group:swiftui-validator">
+      </FileRef>
+      <FileRef
+         location = "group:validate-all-devices.sh">
+      </FileRef>
+   </Group>
+   <FileRef
+      location = "group:swift-analysis-report.md">
+   </FileRef>
    <Group
       location = "container:"
       name = "Dependencies">
@@ -15,6 +245,9 @@
       </FileRef>
       <FileRef
          location = "group:Tuist/.build/tuist-derived/LDSwiftEventSource/LDSwiftEventSource.xcodeproj">
+      </FileRef>
+      <FileRef
+         location = "group:Tuist/.build/tuist-derived/ViewInspector/ViewInspector.xcodeproj">
       </FileRef>
       <FileRef
          location = "group:Tuist/.build/tuist-derived/swift-collections/swift-collections.xcodeproj">

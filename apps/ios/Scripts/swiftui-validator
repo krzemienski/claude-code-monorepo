@@ -1,0 +1,399 @@
+#!/usr/bin/env swift
+
+import Foundation
+import SwiftUI
+
+// MARK: - SwiftUI Component Validator CLI Tool
+// Command-line tool for automated SwiftUI component validation
+
+// ANSI Color codes for terminal output
+struct ANSIColors {
+    static let reset = "\u{001B}[0m"
+    static let red = "\u{001B}[31m"
+    static let green = "\u{001B}[32m"
+    static let yellow = "\u{001B}[33m"
+    static let blue = "\u{001B}[34m"
+    static let magenta = "\u{001B}[35m"
+    static let cyan = "\u{001B}[36m"
+    static let white = "\u{001B}[37m"
+    static let bold = "\u{001B}[1m"
+}
+
+// MARK: - Validation Categories
+enum ValidationCategory: String, CaseIterable {
+    case stateManagement = "State Management"
+    case navigation = "Navigation"
+    case accessibility = "Accessibility"
+    case animation = "Animation"
+    case performance = "Performance"
+    case preview = "Preview"
+    case layout = "Layout"
+    case dataFlow = "Data Flow"
+    case modifiers = "View Modifiers"
+    case lifecycle = "Lifecycle"
+}
+
+// MARK: - Validation Rules
+struct ValidationRule {
+    let id: String
+    let category: ValidationCategory
+    let severity: Severity
+    let description: String
+    let regex: NSRegularExpression?
+    
+    enum Severity: String {
+        case error = "ERROR"
+        case warning = "WARNING"
+        case info = "INFO"
+        case suggestion = "SUGGESTION"
+        
+        var color: String {
+            switch self {
+            case .error: return ANSIColors.red
+            case .warning: return ANSIColors.yellow
+            case .info: return ANSIColors.cyan
+            case .suggestion: return ANSIColors.blue
+            }
+        }
+    }
+}
+
+// MARK: - Validator
+class SwiftUIValidator {
+    
+    private var validationRules: [ValidationRule] = []
+    private var violations: [Violation] = []
+    private var fileCount = 0
+    private var componentCount = 0
+    
+    struct Violation {
+        let file: String
+        let line: Int
+        let rule: ValidationRule
+        let message: String
+    }
+    
+    init() {
+        setupValidationRules()
+    }
+    
+    private func setupValidationRules() {
+        // State Management Rules
+        validationRules.append(ValidationRule(
+            id: "SM001",
+            category: .stateManagement,
+            severity: .error,
+            description: "@State properties should be private",
+            regex: try? NSRegularExpression(pattern: #"^\s*@State\s+(?!private)"#, options: [])
+        ))
+        
+        validationRules.append(ValidationRule(
+            id: "SM002",
+            category: .stateManagement,
+            severity: .warning,
+            description: "@ObservedObject should not be used for local state",
+            regex: try? NSRegularExpression(pattern: #"@ObservedObject.*=.*\(\)"#, options: [])
+        ))
+        
+        validationRules.append(ValidationRule(
+            id: "SM003",
+            category: .stateManagement,
+            severity: .error,
+            description: "@StateObject should be used instead of @ObservedObject for owned objects",
+            regex: try? NSRegularExpression(pattern: #"@ObservedObject.*=.*init"#, options: [])
+        ))
+        
+        // Accessibility Rules
+        validationRules.append(ValidationRule(
+            id: "A001",
+            category: .accessibility,
+            severity: .error,
+            description: "Interactive elements must have accessibility labels",
+            regex: try? NSRegularExpression(pattern: #"Button\([^)]*\)\s*\{[^}]*\}(?!.*\.accessibilityLabel)"#, options: [.dotMatchesLineSeparators])
+        ))
+        
+        validationRules.append(ValidationRule(
+            id: "A002",
+            category: .accessibility,
+            severity: .warning,
+            description: "Images should have accessibility labels",
+            regex: try? NSRegularExpression(pattern: #"Image\([^)]*\)(?!.*\.accessibilityLabel)"#, options: [])
+        ))
+        
+        validationRules.append(ValidationRule(
+            id: "A003",
+            category: .accessibility,
+            severity: .warning,
+            description: "Check for accessibilityReduceMotion environment value",
+            regex: try? NSRegularExpression(pattern: #"\.animation\([^)]*\)(?!.*reduceMotion)"#, options: [])
+        ))
+        
+        // Performance Rules
+        validationRules.append(ValidationRule(
+            id: "P001",
+            category: .performance,
+            severity: .warning,
+            description: "Use LazyVStack/LazyHStack for large lists",
+            regex: try? NSRegularExpression(pattern: #"ForEach.*\{[\s\S]*?VStack(?!.*Lazy)"#, options: [.dotMatchesLineSeparators])
+        ))
+        
+        validationRules.append(ValidationRule(
+            id: "P002",
+            category: .performance,
+            severity: .info,
+            description: "Consider using @ViewBuilder for complex view composition",
+            regex: try? NSRegularExpression(pattern: #"func.*-> some View \{[\s\S]{500,}"#, options: [.dotMatchesLineSeparators])
+        ))
+        
+        // Navigation Rules
+        validationRules.append(ValidationRule(
+            id: "N001",
+            category: .navigation,
+            severity: .info,
+            description: "Use NavigationStack instead of NavigationView (iOS 16+)",
+            regex: try? NSRegularExpression(pattern: #"NavigationView"#, options: [])
+        ))
+        
+        // Animation Rules
+        validationRules.append(ValidationRule(
+            id: "AN001",
+            category: .animation,
+            severity: .warning,
+            description: "Explicit animation values recommended",
+            regex: try? NSRegularExpression(pattern: #"\.animation\(\.default\)"#, options: [])
+        ))
+        
+        // Preview Rules
+        validationRules.append(ValidationRule(
+            id: "PR001",
+            category: .preview,
+            severity: .suggestion,
+            description: "Add preview providers for SwiftUI views",
+            regex: try? NSRegularExpression(pattern: #"struct\s+\w+\s*:\s*View\s*\{[\s\S]*?\}(?![\s\S]*struct\s+\w+_Previews)"#, options: [.dotMatchesLineSeparators])
+        ))
+    }
+    
+    func validateFile(at path: String) {
+        guard let content = try? String(contentsOfFile: path, encoding: .utf8) else {
+            print("\(ANSIColors.red)Error reading file: \(path)\(ANSIColors.reset)")
+            return
+        }
+        
+        fileCount += 1
+        let lines = content.components(separatedBy: .newlines)
+        
+        // Count SwiftUI components
+        let componentRegex = try? NSRegularExpression(pattern: #"struct\s+\w+\s*:\s*View"#, options: [])
+        let componentMatches = componentRegex?.matches(in: content, options: [], range: NSRange(content.startIndex..., in: content))
+        componentCount += componentMatches?.count ?? 0
+        
+        // Apply validation rules
+        for rule in validationRules {
+            guard let regex = rule.regex else { continue }
+            
+            let matches = regex.matches(in: content, options: [], range: NSRange(content.startIndex..., in: content))
+            
+            for match in matches {
+                let lineNumber = getLineNumber(for: match.range.location, in: content)
+                let violation = Violation(
+                    file: path,
+                    line: lineNumber,
+                    rule: rule,
+                    message: rule.description
+                )
+                violations.append(violation)
+            }
+        }
+    }
+    
+    func validateDirectory(at path: String) {
+        let fileManager = FileManager.default
+        
+        guard let enumerator = fileManager.enumerator(atPath: path) else {
+            print("\(ANSIColors.red)Error: Cannot access directory at \(path)\(ANSIColors.reset)")
+            return
+        }
+        
+        while let element = enumerator.nextObject() as? String {
+            if element.hasSuffix(".swift") && !element.contains(".build") && !element.contains("Tests") {
+                let fullPath = "\(path)/\(element)"
+                validateFile(at: fullPath)
+            }
+        }
+    }
+    
+    private func getLineNumber(for location: Int, in content: String) -> Int {
+        let substring = String(content.prefix(location))
+        return substring.components(separatedBy: .newlines).count
+    }
+    
+    func generateReport() {
+        print("\n\(ANSIColors.bold)SwiftUI Component Validation Report\(ANSIColors.reset)")
+        print("=" * 80)
+        
+        // Summary
+        print("\n\(ANSIColors.cyan)Summary:\(ANSIColors.reset)")
+        print("  Files analyzed: \(fileCount)")
+        print("  SwiftUI components found: \(componentCount)")
+        print("  Total violations: \(violations.count)")
+        
+        // Violations by severity
+        let errorCount = violations.filter { $0.rule.severity == .error }.count
+        let warningCount = violations.filter { $0.rule.severity == .warning }.count
+        let infoCount = violations.filter { $0.rule.severity == .info }.count
+        let suggestionCount = violations.filter { $0.rule.severity == .suggestion }.count
+        
+        print("\n\(ANSIColors.cyan)Violations by Severity:\(ANSIColors.reset)")
+        print("  \(ANSIColors.red)Errors: \(errorCount)\(ANSIColors.reset)")
+        print("  \(ANSIColors.yellow)Warnings: \(warningCount)\(ANSIColors.reset)")
+        print("  \(ANSIColors.cyan)Info: \(infoCount)\(ANSIColors.reset)")
+        print("  \(ANSIColors.blue)Suggestions: \(suggestionCount)\(ANSIColors.reset)")
+        
+        // Violations by category
+        print("\n\(ANSIColors.cyan)Violations by Category:\(ANSIColors.reset)")
+        for category in ValidationCategory.allCases {
+            let count = violations.filter { $0.rule.category == category }.count
+            if count > 0 {
+                print("  \(category.rawValue): \(count)")
+            }
+        }
+        
+        // Detailed violations
+        if !violations.isEmpty {
+            print("\n\(ANSIColors.cyan)Detailed Violations:\(ANSIColors.reset)")
+            print("-" * 80)
+            
+            let groupedViolations = Dictionary(grouping: violations) { $0.file }
+            
+            for (file, fileViolations) in groupedViolations.sorted(by: { $0.key < $1.key }) {
+                let fileName = URL(fileURLWithPath: file).lastPathComponent
+                print("\n\(ANSIColors.bold)\(fileName)\(ANSIColors.reset)")
+                
+                for violation in fileViolations.sorted(by: { $0.line < $1.line }) {
+                    let severityColor = violation.rule.severity.color
+                    print("  \(severityColor)[\(violation.rule.severity.rawValue)]\(ANSIColors.reset) Line \(violation.line): \(violation.rule.id) - \(violation.message)")
+                }
+            }
+        }
+        
+        // Score calculation
+        let baseScore = 100.0
+        let errorPenalty = 10.0
+        let warningPenalty = 5.0
+        let infoPenalty = 2.0
+        
+        let score = max(0, baseScore - 
+            (Double(errorCount) * errorPenalty) -
+            (Double(warningCount) * warningPenalty) -
+            (Double(infoCount) * infoPenalty))
+        
+        print("\n" + "=" * 80)
+        
+        let scoreColor = score >= 80 ? ANSIColors.green : 
+                        score >= 60 ? ANSIColors.yellow : ANSIColors.red
+        
+        print("\(ANSIColors.bold)Overall Score: \(scoreColor)\(String(format: "%.1f", score))/100\(ANSIColors.reset)")
+        
+        // Recommendations
+        generateRecommendations()
+        
+        // Exit code based on errors
+        if errorCount > 0 {
+            exit(1)
+        }
+    }
+    
+    private func generateRecommendations() {
+        print("\n\(ANSIColors.cyan)Recommendations:\(ANSIColors.reset)")
+        
+        let accessibilityViolations = violations.filter { $0.rule.category == .accessibility }.count
+        if accessibilityViolations > 5 {
+            print("  • Consider creating reusable accessible components")
+            print("  • Implement a centralized accessibility configuration")
+        }
+        
+        let stateViolations = violations.filter { $0.rule.category == .stateManagement }.count
+        if stateViolations > 3 {
+            print("  • Review state management patterns")
+            print("  • Consider using @StateObject for view models")
+        }
+        
+        let performanceViolations = violations.filter { $0.rule.category == .performance }.count
+        if performanceViolations > 0 {
+            print("  • Optimize list rendering with Lazy containers")
+            print("  • Profile view body computation times")
+        }
+        
+        if violations.isEmpty {
+            print("  ✅ Great job! No violations found.")
+        }
+    }
+}
+
+// MARK: - String Extension
+extension String {
+    static func * (left: String, right: Int) -> String {
+        return String(repeating: left, count: right)
+    }
+}
+
+// MARK: - Main Execution
+let arguments = CommandLine.arguments
+
+if arguments.count < 2 {
+    print("Usage: swiftui-validator <path-to-directory-or-file>")
+    print("Options:")
+    print("  --help    Show this help message")
+    print("  --version Show version information")
+    exit(1)
+}
+
+if arguments[1] == "--help" {
+    print("""
+    SwiftUI Component Validator v1.0.0
+    
+    A comprehensive validation tool for SwiftUI components that checks for:
+    - State management best practices
+    - Accessibility compliance
+    - Performance optimizations
+    - Navigation patterns
+    - Animation guidelines
+    - Preview coverage
+    
+    Usage:
+      swiftui-validator <path>    Validate a Swift file or directory
+      swiftui-validator --help     Show this help message
+      swiftui-validator --version  Show version information
+    
+    Examples:
+      swiftui-validator Sources/
+      swiftui-validator MyView.swift
+    """)
+    exit(0)
+}
+
+if arguments[1] == "--version" {
+    print("SwiftUI Component Validator v1.0.0")
+    exit(0)
+}
+
+let path = arguments[1]
+let validator = SwiftUIValidator()
+
+let fileManager = FileManager.default
+var isDirectory: ObjCBool = false
+
+if fileManager.fileExists(atPath: path, isDirectory: &isDirectory) {
+    if isDirectory.boolValue {
+        print("\(ANSIColors.cyan)Validating directory: \(path)\(ANSIColors.reset)")
+        validator.validateDirectory(at: path)
+    } else {
+        print("\(ANSIColors.cyan)Validating file: \(path)\(ANSIColors.reset)")
+        validator.validateFile(at: path)
+    }
+    
+    validator.generateReport()
+} else {
+    print("\(ANSIColors.red)Error: Path does not exist: \(path)\(ANSIColors.reset)")
+    exit(1)
+}

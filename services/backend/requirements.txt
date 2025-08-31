@@ -20,11 +20,8 @@ redis==5.0.1
 aioredis==2.0.1
 hiredis==2.3.2
 
-# Authentication and security
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-bcrypt==4.1.2
-cryptography==41.0.7
+# Authentication removed - all endpoints are public
+# Previously had python-jose, passlib, bcrypt, cryptography
 
 # HTTP and networking
 httpx==0.26.0

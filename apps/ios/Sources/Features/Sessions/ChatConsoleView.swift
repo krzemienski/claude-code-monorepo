@@ -91,13 +91,24 @@ struct ChatConsoleView: View {
     
     @ViewBuilder
     private var chatAreaView: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: Theme.Spacing.md) {
-                    ForEach(viewModel.messages) { message in
-                        enhancedBubbleView(message)
-                            .frame(maxWidth: .infinity, alignment: message.role == .user ? .trailing : .leading)
-                            .padding(.horizontal)
+        // ⚡ Using VirtualizedChatMessageList for 60 FPS performance
+        VirtualizedChatMessageList(
+            messages: viewModel.messages,
+            scrollToBottom: $scrollToBottom,
+            onToolTapped: { tool in
+                selectedTool = tool
+                showToolDetails = true
+            }
+        )
+        .background(CyberpunkTheme.Colors.darkBg)
+        .overlay(
+            // 🎨 Cyberpunk glow overlay
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(CyberpunkTheme.Colors.neonCyan.opacity(0.3), lineWidth: 1)
+                .shadow(color: CyberpunkTheme.Colors.neonCyan.opacity(0.5), radius: 10)
+                .allowsHitTesting(false)
+        )
+        .scanlineEffect()
                             .transition(reduceMotion ? .opacity : .asymmetric(
                                 insertion: .scale.combined(with: .opacity),
                                 removal: .opacity
@@ -248,7 +259,13 @@ struct ChatConsoleView: View {
     
     private var backgroundView: some View {
         ZStack {
-            Theme.background
+            // 🎨 Cyberpunk gradient background
+            CyberpunkTheme.Colors.darkGradient
+                .ignoresSafeArea()
+            
+            // ⚡ Animated scanline effect
+            Color.clear
+                .scanlineEffect()
                 .ignoresSafeArea()
             
             // Animated grid pattern

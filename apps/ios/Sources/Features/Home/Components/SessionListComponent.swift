@@ -2,16 +2,16 @@ import SwiftUI
 
 /// SessionListComponent - Displays list of chat sessions
 public struct SessionListComponent: View {
-    let sessions: [ChatSession]
-    let onSessionTap: (ChatSession) -> Void
+    let sessions: [APIClient.Session]
+    let onSessionTap: (APIClient.Session) -> Void
     let onNewSession: () -> Void
     
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     public init(
-        sessions: [ChatSession],
-        onSessionTap: @escaping (ChatSession) -> Void,
+        sessions: [APIClient.Session],
+        onSessionTap: @escaping (APIClient.Session) -> Void,
         onNewSession: @escaping () -> Void
     ) {
         self.sessions = sessions
@@ -39,7 +39,7 @@ public struct SessionListComponent: View {
             }
             
             if sessions.isEmpty {
-                EmptyStateView(
+                SessionEmptyStateView(
                     icon: "bubble.left.and.bubble.right",
                     title: "No Sessions",
                     message: "Start a new session to begin",
@@ -55,8 +55,8 @@ public struct SessionListComponent: View {
 
 // MARK: - Session List
 private struct SessionList: View {
-    let sessions: [ChatSession]
-    let onTap: (ChatSession) -> Void
+    let sessions: [APIClient.Session]
+    let onTap: (APIClient.Session) -> Void
     
     var body: some View {
         LazyVStack(spacing: 12) {
@@ -69,8 +69,8 @@ private struct SessionList: View {
 
 // MARK: - Session Row
 private struct SessionRow: View {
-    let session: ChatSession
-    let onTap: (ChatSession) -> Void
+    let session: APIClient.Session
+    let onTap: (APIClient.Session) -> Void
     
     @State private var isHovered = false
     
@@ -78,7 +78,7 @@ private struct SessionRow: View {
         Button(action: { onTap(session) }) {
             HStack(spacing: 12) {
                 // Session Icon
-                Image(systemName: session.icon ?? "bubble.left")
+                Image(systemName: session.icon)
                     .font(.title3)
                     .foregroundStyle(Theme.accent)
                     .frame(width: 32, height: 32)
@@ -95,7 +95,7 @@ private struct SessionRow: View {
                         .foregroundStyle(.primary)
                         .lineLimit(1)
                     
-                    Text(session.formattedDate)
+                    Text(session.updatedAt)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -103,8 +103,8 @@ private struct SessionRow: View {
                 Spacer()
                 
                 // Message Count
-                if session.messageCount > 0 {
-                    Text("\(session.messageCount)")
+                if let count = session.messageCount, count > 0 {
+                    Text("\(count)")
                         .font(.caption)
                         .fontWeight(.medium)
                         .foregroundStyle(.white)
@@ -126,7 +126,7 @@ private struct SessionRow: View {
             .padding(.vertical, 12)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isHovered ? Theme.secondaryBackground : Theme.background)
+                    .fill(isHovered ? Theme.backgroundSecondary : Theme.background)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
@@ -146,7 +146,7 @@ private struct SessionRow: View {
 }
 
 // MARK: - Empty State View
-private struct EmptyStateView: View {
+private struct SessionEmptyStateView: View {
     let icon: String
     let title: String
     let message: String
@@ -183,51 +183,37 @@ private struct EmptyStateView: View {
     }
 }
 
-// MARK: - Chat Session Extension
-extension ChatSession {
-    var formattedDate: String {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .abbreviated
-        return formatter.localizedString(for: updatedAt, relativeTo: Date())
-    }
-    
-    var icon: String? {
-        // Return icon based on session type or content
-        switch type {
-        case .coding:
-            return "chevron.left.forwardslash.chevron.right"
-        case .documentation:
-            return "doc.text"
-        case .general:
-            return "bubble.left"
-        default:
-            return "bubble.left"
-        }
-    }
-    
-    var messageCount: Int {
-        messages?.count ?? 0
-    }
-}
+// MARK: - API Session Extension
+// Extension moved to APISessionListComponent.swift to avoid duplication
 
 // MARK: - Preview Provider
 struct SessionListComponent_Previews: PreviewProvider {
     static let mockSessions = [
-        ChatSession(
+        APIClient.Session(
             id: "1",
+            projectId: "proj-1",
             title: "SwiftUI Navigation Help",
-            type: .coding,
-            messages: Array(repeating: Message(role: .user, content: "test"), count: 5),
-            createdAt: Date().addingTimeInterval(-3600),
-            updatedAt: Date().addingTimeInterval(-1800)
+            model: "claude-3-opus",
+            systemPrompt: nil,
+            createdAt: "2024-01-20T10:00:00Z",
+            updatedAt: "2024-01-20T10:30:00Z",
+            isActive: true,
+            totalTokens: 1250,
+            totalCost: 0.05,
+            messageCount: 10
         ),
-        ChatSession(
+        APIClient.Session(
             id: "2",
+            projectId: "proj-1",
             title: "API Documentation",
-            type: .documentation,
-            messages: Array(repeating: Message(role: .assistant, content: "test"), count: 12),
-            createdAt: Date().addingTimeInterval(-86400),
-            updatedAt: Date().addingTimeInterval(-7200)
+            model: "gpt-4",
+            systemPrompt: nil,
+            createdAt: "2024-01-19T10:00:00Z",
+            updatedAt: "2024-01-19T12:00:00Z",
+            isActive: false,
+            totalTokens: 850,
+            totalCost: 0.03,
+            messageCount: 5
         )
     ]
     
